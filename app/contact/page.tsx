@@ -30,6 +30,13 @@ export default function Contact() {
         title: "Success!",
         description: "Your message has been sent successfully.",
       })
+      // Reset form data
+      setFormData({
+        name: "",
+        email: "",
+        subject: "",
+        message: "",
+      })
     }
   }, [state.succeeded, toast])
 
@@ -204,6 +211,15 @@ export default function Contact() {
                       )}
                     </Button>
                   </motion.div>
+                  {state.succeeded && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mt-4 text-center text-sm text-green-600 dark:text-green-400"
+                    >
+                      Thank you for your message! I&apos;ll get back to you soon.
+                    </motion.div>
+                  )}
                   <ValidationError errors={state.errors} />
                 </form>
               </CardContent>
