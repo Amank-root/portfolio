@@ -16,6 +16,7 @@ import { Mail, MapPin, Github, Linkedin, Twitter, Send, MessageSquare, User } fr
 export default function Contact() {
   const [state, handleSubmit] = useForm(process.env.NEXT_PUBLIC_FORM!);
   const { toast } = useToast()
+  const [showSuccess, setShowSuccess] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -23,13 +24,14 @@ export default function Contact() {
     message: "",
   })
 
-  // Show toast when form is submitted successfully
+  // Show toast and success message when form is submitted successfully
   useEffect(() => {
     if (state.succeeded) {
       toast({
         title: "Success!",
         description: "Your message has been sent successfully.",
       })
+      setShowSuccess(true)
       // Reset form data
       setFormData({
         name: "",
@@ -37,6 +39,12 @@ export default function Contact() {
         subject: "",
         message: "",
       })
+      // Hide success message after 3 seconds
+      const timer = setTimeout(() => {
+        setShowSuccess(false)
+      }, 3000)
+
+      return () => clearTimeout(timer)
     }
   }, [state.succeeded, toast])
 
@@ -211,10 +219,11 @@ export default function Contact() {
                       )}
                     </Button>
                   </motion.div>
-                  {state.succeeded && (
+                  {showSuccess && (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
                       className="mt-4 text-center text-sm text-green-600 dark:text-green-400"
                     >
                       Thank you for your message! I&apos;ll get back to you soon.

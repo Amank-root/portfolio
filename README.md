@@ -1,36 +1,112 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Portfolio [Live Link](https://amankushwaha.netlify.app/)
 
-## Getting Started
+A unique portfolio website designed to mimic the Visual Studio Code interface, built with Next.js, TypeScript, and Tailwind CSS.
 
-First, run the development server:
+## 🚀 Features
 
+- **VS Code-Inspired Design**: Familiar interface with a file explorer, tabs, and terminal
+- **Dark/Light Theme**: Automatic theme switching based on system preferences
+- **Responsive Layout**: Mobile-friendly design with collapsible sidebar
+- **Interactive Elements**: Smooth animations and transitions using Framer Motion
+- **Contact Form**: Integrated with Formspree for easy communication
+- **Project Showcase**: Dynamic project cards with links to live demos and source code
+- **Skills Section**: Visual representation of technical skills and expertise
+- **Terminal Interface**: Interactive terminal-like component for a unique user experience
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 14 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **UI Components**: shadcn/ui
+- **Animations**: Framer Motion
+- **Form Handling**: Formspree
+- **Icons**: Lucide Icons
+- **Deployment**: Netlify
+
+## 🚦 Getting Started
+
+1. **Clone the repository**
+```bash
+git clone https://github.com/Amank-root/portfolio.git
+cd portfolio
+```
+
+2. **Install dependencies**
+```bash
+npm install
+# or
+pnpm install
+```
+
+3. **Set up environment variables**
+```bash
+# Create a .env.local file and add:
+NEXT_PUBLIC_FORM=your_formspree_form_id
+```
+
+4. **Run the development server**
 ```bash
 npm run dev
 # or
-yarn dev
-# or
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. **Open [http://localhost:3000](http://localhost:3000) in your browser**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📁 Project Structure
+```markdown
+portfolio/
+├── app/                    # Next.js app directory
+│   ├── about/              # About page
+│   ├── contact/            # Contact page
+│   ├── projects/           # Projects page
+│   ├── skills/             # Skills page
+│   └── layout.tsx          # Root layout
+├── components/             # Reusable components
+├── hooks/                  # Custom hooks
+├── styles/                 # Global styles
+└── public/                 # Static assets
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+## 🎨 Customization
 
-To learn more about Next.js, take a look at the following resources:
+1. **Personal Information**: Update your details in the respective page components
+2. **Projects**: Modify the projects data in `app/projects/page.tsx`
+3. **Skills**: Update your skills in `app/skills/page.tsx`
+4. **Theme**: Customize colors in `tailwind.config.js`
+5. **Content**: Modify text content in each page component
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📱 Responsive Design
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Desktop**: Full VS Code-like interface
+- **Tablet**: Collapsible sidebar with main content
+- **Mobile**: Optimized mobile view with bottom navigation
 
-## Deploy on Vercel
+## 🔧 Development
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Run tests: `npm run test`
+- Build: `npm run build`
+- Lint: `npm run lint`
+- Format: `npm run format`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📞 Contact
+
+Your Name - [@AmanKushwaha_28](https://twitter.com/AmanKushwaha_28)
+Project Link: [https://github.com/Amank-root/portfolio](https://github.com/Amank-root/portfolio)
+
+## 🙏 Acknowledgments
+
+- [shadcn/ui](https://ui.shadcn.com/) for the beautiful UI components
+- [Lucide Icons](https://lucide.dev/) for the icon set
+- [Formspree](https://formspree.io/) for form handling
+- [Framer Motion](https://www.framer.com/motion/) for animations
