@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { FileText, User, Code, Briefcase, Mail, Menu, X } from "lucide-react"
-import { cn } from "@/lib/utils"
+// import { cn } from "@/lib/utils"
 
 export function MobileNav() {
   const [isOpen, setIsOpen] = React.useState(false)
