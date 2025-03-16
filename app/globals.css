@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 225 6% 13%;
+  --foreground: 210 20% 98%;
+
+  --primary: 217 91% 60%;
+  --primary-foreground: 210 20% 98%;
+
+  --secondary: 215 14% 34%;
+  --secondary-foreground: 210 20% 98%;
+
+  --accent: 160 84% 39%;
+  --accent-foreground: 210 20% 98%;
+
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 210 20% 98%;
+
+  --muted: 215 14% 34%;
+  --muted-foreground: 217 19% 75%;
+
+  --card: 222 13% 19%;
+  --card-foreground: 210 20% 98%;
+
+  --popover: 222 13% 19%;
+  --popover-foreground: 210 20% 98%;
+
+  --border: 215 14% 34%;
+  --input: 215 14% 34%;
+  --ring: 224 76% 48%;
+
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: 225 6% 13%;
+  --foreground: 210 20% 98%;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.terminal {
+  font-family: var(--font-fira-code);
+}
+
+.terminal-prompt::before {
+  content: "$ ";
+  color: hsl(var(--accent));
+}
+
+.terminal-output {
+  color: hsl(var(--foreground));
+  white-space: pre-wrap;
+}
+
+.syntax-string {
+  color: #ce9178;
+}
+
+.syntax-keyword {
+  color: #569cd6;
+}
+
+.syntax-function {
+  color: #dcdcaa;
+}
+
+.syntax-comment {
+  color: #6a9955;
+}
+
+.syntax-variable {
+  color: #9cdcfe;
+}
+
+.syntax-type {
+  color: #4ec9b0;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.animate-blink {
+  animation: blink 1s infinite;
+}
+
