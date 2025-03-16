@@ -11,8 +11,9 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 const firaCode = Fira_Code({ subsets: ["latin"], variable: "--font-fira-code" })
 
 export const metadata: Metadata = {
-  title: "Developer Portfolio",
-  description: "Full-stack developer portfolio with VSCode theme",
+  title: "Aman Kushwaha ~ Portfolio",
+  description: "Aman Kushwaha a passionate Full Stack Developer specializing in MERN stack development, Machine Learning, etc.",
+  icons: "/ak-logo.svg"
 }
 
 export default function RootLayout({
