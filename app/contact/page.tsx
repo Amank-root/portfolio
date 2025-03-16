@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,9 +10,11 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Terminal } from "@/components/terminal"
 import { useToast } from "@/hooks/use-toast"
+import { useForm, ValidationError } from "@formspree/react";
 import { Mail, MapPin, Github, Linkedin, Twitter, Send, MessageSquare, User } from "lucide-react"
 
 export default function Contact() {
+  const [state, handleSubmit] = useForm(process.env.NEXT_PUBLIC_FORM!);
   const { toast } = useToast()
   const [formData, setFormData] = useState({
     name: "",
@@ -20,8 +22,16 @@ export default function Contact() {
     subject: "",
     message: "",
   })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [showSuccess, setShowSuccess] = useState(false)
+
+  // Show toast when form is submitted successfully
+  useEffect(() => {
+    if (state.succeeded) {
+      toast({
+        title: "Success!",
+        description: "Your message has been sent successfully.",
+      })
+    }
+  }, [state.succeeded, toast])
 
   // Animation variants
   const container = {
@@ -45,47 +55,7 @@ export default function Contact() {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    
-    const formData = new FormData(e.currentTarget)
-    const data = {
-      name: formData.get('name') as string,
-      email: formData.get('email') as string,
-      subject: formData.get('subject') as string,
-      message: formData.get('message') as string
-    }
 
-    try {
-      await fetch("/", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams(data).toString()
-      })
-
-      setShowSuccess(true)
-      toast({
-        title: "Success!",
-        description: "Your message has been sent successfully.",
-      })
-      e.currentTarget.reset()
-      setFormData({ name: "", email: "", subject: "", message: "" })
-      
-      setTimeout(() => {
-        setShowSuccess(false)
-      }, 3000)
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to send message. Please try again.",
-        variant: "destructive",
-      })
-      console.error('Error submitting form:', error)
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
 
   return (
     <div className="flex h-full flex-col overflow-y-auto">
@@ -130,8 +100,7 @@ export default function Contact() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form name="contact" data-netlify-recaptcha="true" onSubmit={handleSubmit} className="space-y-4 sm:space-y-6" method="POST" data-netlify="true">
-                <input type="hidden" name="form-name" value="contact" />
+                <form name="contact" onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                   <div className="space-y-3 sm:space-y-4">
                     <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
                       <div className="space-y-1 sm:space-y-2">
@@ -204,10 +173,10 @@ export default function Contact() {
                       </div>
                     </div>
                   </div>
-                  <div data-netlify-recaptcha="true"></div>
+
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Button type="submit" className="w-full gap-2 text-xs sm:text-sm" disabled={isSubmitting}>
-                      {isSubmitting ? (
+                    <Button type="submit" className="w-full gap-2 text-xs sm:text-sm" disabled={state.submitting}>
+                      {state.submitting ? (
                         <>
                           <svg className="h-3 w-3 animate-spin sm:h-4 sm:w-4" viewBox="0 0 24 24">
                             <circle
@@ -235,17 +204,7 @@ export default function Contact() {
                       )}
                     </Button>
                   </motion.div>
-
-                  {showSuccess && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="mt-4 rounded-md bg-green-100 p-3 text-center text-sm text-green-800"
-                    >
-                      Message sent successfully!
-                    </motion.div>
-                  )}
+                  <ValidationError errors={state.errors} />
                 </form>
               </CardContent>
             </Card>
