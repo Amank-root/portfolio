@@ -1,5 +1,6 @@
 # Portfolio [Live Link](https://amankushwaha.netlify.app/)
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/0e820de8-b2f9-4a71-8a6d-63cd83ef4cfe/deploy-status)](https://app.netlify.com/sites/amankushwaha/deploys)
 A unique portfolio website designed to mimic the Visual Studio Code interface, built with Next.js, TypeScript, and Tailwind CSS.
 
 ## 🚀 Features
@@ -43,6 +44,8 @@ pnpm install
 ```bash
 # Create a .env.local file and add:
 NEXT_PUBLIC_FORM=your_formspree_form_id
+NEXT_PUBLIC_RECAPTCHA_SITE_KEY=your_recaptcha_site_key
+NETLIFY_NEXT_PLUGIN_SKIP=true
 ```
 
 4. **Run the development server**

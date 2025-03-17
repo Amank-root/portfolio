@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { Sidebar } from "@/components/sidebar"
 import { Header } from "@/components/header"
 import { MobileNav } from "@/components/mobile-nav"
+import { Toaster } from "@/components/toaster"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 const firaCode = Fira_Code({ subsets: ["latin"], variable: "--font-fira-code" })
@@ -44,6 +45,7 @@ export default function RootLayout({
               </div>
             </footer>
           </div>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

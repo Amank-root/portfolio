@@ -2,20 +2,20 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Terminal } from "@/components/terminal"
-import { useToast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 import { useForm, ValidationError } from "@formspree/react";
+import ReCAPTCHA from "react-google-recaptcha";
 import { Mail, MapPin, Github, Linkedin, Twitter, Send, MessageSquare, User } from "lucide-react"
 
 export default function Contact() {
   const [state, handleSubmit] = useForm(process.env.NEXT_PUBLIC_FORM!);
-  const { toast } = useToast()
   const [showSuccess, setShowSuccess] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
@@ -23,13 +23,13 @@ export default function Contact() {
     subject: "",
     message: "",
   })
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   // Show toast and success message when form is submitted successfully
   useEffect(() => {
     if (state.succeeded) {
-      toast({
-        title: "Success!",
-        description: "Your message has been sent successfully.",
+      toast.success("Message sent successfully!", {
+        description: "Thank you for your message. I'll get back to you soon.",
       })
       setShowSuccess(true)
       // Reset form data
@@ -46,7 +46,7 @@ export default function Contact() {
 
       return () => clearTimeout(timer)
     }
-  }, [state.succeeded, toast])
+  }, [state.succeeded])
 
   // Animation variants
   const container = {
@@ -70,7 +70,19 @@ export default function Contact() {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const recaptchaValue = recaptchaRef.current?.getValue();
+    
+    if (!recaptchaValue) {
+      toast.error("reCAPTCHA Required", {
+        description: "Please complete the reCAPTCHA verification.",
+      });
+      return;
+    }
+    
+    handleSubmit(e);
+  };
 
   return (
     <div className="flex h-full flex-col overflow-y-auto">
@@ -115,7 +127,8 @@ export default function Contact() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form name="contact" onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                <form name="contact" onSubmit={handleFormSubmit} className="space-y-4 sm:space-y-6">
+                <input type="hidden" name="form-name" value="contact" />
                   <div className="space-y-3 sm:space-y-4">
                     <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
                       <div className="space-y-1 sm:space-y-2">
@@ -152,6 +165,7 @@ export default function Contact() {
                             className="text-xs sm:text-sm pl-10"
                           />
                         </div>
+                        <ValidationError field="email" prefix="Email" errors={state.errors} />
                       </div>
                     </div>
 
@@ -187,6 +201,14 @@ export default function Contact() {
                         />
                       </div>
                     </div>
+                  </div>
+
+                  <div className="mb-4 flex justify-center">
+                    <ReCAPTCHA
+                      ref={recaptchaRef}
+                      sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+                      size="normal"
+                    />
                   </div>
 
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
