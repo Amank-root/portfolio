@@ -13,10 +13,14 @@ import { toast } from "sonner"
 import { useForm, ValidationError } from "@formspree/react";
 import ReCAPTCHA from "react-google-recaptcha";
 import { Mail, MapPin, Github, Linkedin, Twitter, Send, MessageSquare, User } from "lucide-react"
+import { getContact } from "@/sanity/lib/queries"
+import { Contact } from "@/sanity/lib/types"
 
 export default function Contact() {
   const [state, handleSubmit] = useForm(process.env.NEXT_PUBLIC_FORM!);
   const [showSuccess, setShowSuccess] = useState(false)
+  const [contactData, setContactData] = useState<Contact | null>(null)
+  const [loading, setLoading] = useState(true)
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -24,6 +28,42 @@ export default function Contact() {
     message: "",
   })
   const recaptchaRef = useRef<ReCAPTCHA>(null);
+
+  // Fetch contact data from Sanity
+  useEffect(() => {
+    async function fetchContact() {
+      try {
+        setLoading(true)
+        const data = await getContact()
+        setContactData(data || fallbackContactData)
+      } catch (error) {
+        console.error('Error fetching contact data:', error)
+        setContactData(fallbackContactData)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchContact()
+  }, [])
+
+  // Fallback contact data
+  const fallbackContactData: Contact = {
+    _id: "contact",
+    _type: "contact",
+    title: "Get In Touch",
+    description: "Have a project in mind or want to discuss potential opportunities? Feel free to reach out through the form below or via my contact information.",
+    email: "amank.root@gmail.com",
+    phone: "+91 9876543210",
+    location: "New Delhi, India",
+    socialLinks: [
+      { platform: "GitHub", url: "https://github.com/Amank-root", icon: "Github" },
+      { platform: "LinkedIn", url: "https://linkedin.com/in/amank-root", icon: "Linkedin" },
+      { platform: "Twitter", url: "https://twitter.com/amank_root", icon: "Twitter" }
+    ],
+    formspreeEndpoint: process.env.NEXT_PUBLIC_FORM,
+    recaptchaSiteKey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
+  }
 
   // Show toast and success message when form is submitted successfully
   useEffect(() => {

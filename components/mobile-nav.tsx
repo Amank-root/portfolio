@@ -1,12 +1,14 @@
 "use client"
 
 import * as React from "react"
+import { useState } from "react"
 import Link from "next/link"
 import { FileText, User, Code, Briefcase, Mail, Menu, X } from "lucide-react"
-// import { cn } from "@/lib/utils"
+import { useHasMounted } from "./client-only"
 
 export function MobileNav() {
-  const [isOpen, setIsOpen] = React.useState(false)
+  const [isOpen, setIsOpen] = useState(false)
+  const mounted = useHasMounted()
 
   const navItems = [
     { name: "Home", path: "/", icon: FileText },
@@ -15,6 +17,10 @@ export function MobileNav() {
     { name: "Skills", path: "/skills", icon: Code },
     { name: "Contact", path: "/contact", icon: Mail },
   ]
+
+  if (!mounted) {
+    return null
+  }
 
   return (
     <div className="md:hidden">

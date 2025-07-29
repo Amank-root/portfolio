@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import { useState, useEffect } from "react"
 
 import { motion } from "framer-motion"
 import Image from "next/image"
@@ -12,9 +13,91 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Briefcase, GraduationCap, Heart, Coffee, Gamepad2, BookOpen, Music, Code, Download } from "lucide-react"
 import { useMediaQuery } from "@/hooks/use-media-query"
+import { useHasMounted } from "@/components/client-only"
+import { getAbout } from "@/sanity/lib/queries"
+import { About } from "@/sanity/lib/types"
+import { urlFor } from "@/sanity/lib/image"
+import { PortableText } from "@portabletext/react"
 
 export default function About() {
+  const mounted = useHasMounted()
   const isMobile = useMediaQuery("(max-width: 768px)")
+  const [aboutData, setAboutData] = useState<About | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  // Fetch about data from Sanity
+  useEffect(() => {
+    async function fetchAbout() {
+      try {
+        setLoading(true)
+        const data = await getAbout()
+        setAboutData(data)
+      } catch (error) {
+        console.error('Error fetching about data:', error)
+        // Use fallback data if Sanity fails
+        setAboutData(fallbackAboutData)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (mounted) {
+      fetchAbout()
+    }
+  }, [mounted])
+
+  // Fallback data
+  const fallbackAboutData: About = {
+    _id: "about",
+    _type: "about",
+    title: "About Me",
+    bio: [
+      {
+        _type: "block",
+        style: "normal",
+        children: [
+          {
+            _type: "span",
+            marks: [],
+            text: "I'm a passionate Full Stack Developer currently pursuing B.Tech in Computer Science and Engineering. I love creating efficient, scalable, and user-friendly solutions using modern web technologies."
+          }
+        ]
+      }
+    ],
+    profileImage: {
+      asset: {
+        _id: "image-asset",
+        url: "/aman-pic.jpg"
+      },
+      alt: "Aman Kushwaha"
+    },
+    experiences: [
+      {
+        title: "Full Stack Developer",
+        company: "Freelance",
+        startDate: "2023-01-01",
+        endDate: "",
+        current: true,
+        description: "Developing web applications using React, Node.js, and MongoDB",
+        skills: ["React", "Node.js", "MongoDB", "Express"]
+      }
+    ],
+    education: [
+      {
+        degree: "Bachelor of Technology in Data Science",
+        institution: "MDU, Rohtak",
+        startDate: "2023-01-01",
+        endDate: "2027-01-01",
+        current: true,
+        description: "Currently pursuing B.Tech with focus on data science and web development"
+      }
+    ],
+    interests: [
+      { name: "Coding", icon: "Code" },
+      { name: "Gaming", icon: "Gamepad2" },
+      { name: "Music", icon: "Music" }
+    ]
+  }
 
   // Education Data
   const educationData = [{

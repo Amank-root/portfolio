@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import { useState, useEffect } from "react"
 
 import { motion } from "framer-motion"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -16,6 +17,9 @@ import {
   Cloud,
   Palette,
 } from "lucide-react"
+import { useHasMounted } from "@/components/client-only"
+import { getSkills } from "@/sanity/lib/queries"
+import { Skill } from "@/sanity/lib/types"
 
 interface SkillCardProps {
   icon: React.ElementType
@@ -57,6 +61,92 @@ function SkillCard({ icon: Icon, title, description, skills }: SkillCardProps) {
 }
 
 export default function Skills() {
+  const mounted = useHasMounted()
+  const [skills, setSkills] = useState<Skill[]>([])
+  const [loading, setLoading] = useState(true)
+
+  // Fetch skills from Sanity
+  useEffect(() => {
+    async function fetchSkills() {
+      try {
+        setLoading(true)
+        const skillsData = await getSkills()
+        setSkills(skillsData || fallbackSkills)
+      } catch (error) {
+        console.error('Error fetching skills:', error)
+        setSkills(fallbackSkills)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (mounted) {
+      fetchSkills()
+    }
+  }, [mounted])
+
+  // Fallback skills data
+  const fallbackSkills: Skill[] = [
+    {
+      _id: "frontend",
+      _type: "skill",
+      title: "Frontend Development",
+      description: "Creating responsive and interactive user interfaces",
+      category: "frontend",
+      skills: ["React", "Next.js", "TypeScript", "Tailwind CSS", "HTML5", "CSS3"],
+      icon: "Code",
+      order: 1
+    },
+    {
+      _id: "backend",
+      _type: "skill", 
+      title: "Backend Development",
+      description: "Building robust server-side applications and APIs",
+      category: "backend",
+      skills: ["Node.js", "Express.js", "Python", "MongoDB", "PostgreSQL", "REST APIs"],
+      icon: "Server",
+      order: 2
+    },
+    {
+      _id: "tools",
+      _type: "skill",
+      title: "Development Tools",
+      description: "Tools and technologies for efficient development",
+      category: "tools", 
+      skills: ["Git", "VS Code", "Docker", "AWS", "Vercel", "Figma"],
+      icon: "Wrench",
+      order: 3
+    }
+  ]
+
+  // Group skills by category
+  const skillsByCategory = skills.reduce((acc, skill) => {
+    if (!acc[skill.category]) {
+      acc[skill.category] = []
+    }
+    acc[skill.category].push(skill)
+    return acc
+  }, {} as Record<string, Skill[]>)
+
+  // Icon mapping
+  const iconMap: Record<string, React.ElementType> = {
+    Code,
+    Server, 
+    Wrench,
+    Braces,
+    Database,
+    Globe,
+    GitBranch,
+    Cloud,
+    Palette,
+  }
+
+  // Get icon component
+  const getIcon = (iconName?: string) => {
+    if (!iconName) return Code
+    return iconMap[iconName] || Code
+  }
+
   // Animation variants
   const container = {
     hidden: { opacity: 0 },
