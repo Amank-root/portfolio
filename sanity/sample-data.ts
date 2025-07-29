@@ -15,10 +15,10 @@ const sampleData = {
           {
             _type: 'span',
             marks: [],
-            text: "I'm a passionate Full Stack Developer currently pursuing B.Tech in Computer Science and Engineering. I love creating efficient, scalable, and user-friendly solutions using modern web technologies."
-          }
-        ]
-      }
+            text: "I'm a passionate Full Stack Developer currently pursuing B.Tech in Computer Science and Engineering. I love creating efficient, scalable, and user-friendly solutions using modern web technologies.",
+          },
+        ],
+      },
     ],
     experiences: [
       {
@@ -27,8 +27,8 @@ const sampleData = {
         startDate: '2023-01-01',
         current: true,
         description: 'Developing web applications using React, Node.js, and MongoDB',
-        skills: ['React', 'Node.js', 'MongoDB', 'Express']
-      }
+        skills: ['React', 'Node.js', 'MongoDB', 'Express'],
+      },
     ],
     education: [
       {
@@ -37,14 +37,14 @@ const sampleData = {
         startDate: '2023-01-01',
         endDate: '2027-01-01',
         current: true,
-        description: 'Currently pursuing B.Tech with focus on data science and web development'
-      }
+        description: 'Currently pursuing B.Tech with focus on data science and web development',
+      },
     ],
     interests: [
       { name: 'Coding', icon: 'Code' },
       { name: 'Gaming', icon: 'Gamepad2' },
-      { name: 'Music', icon: 'Music' }
-    ]
+      { name: 'Music', icon: 'Music' },
+    ],
   },
 
   // Contact data
@@ -52,15 +52,16 @@ const sampleData = {
     _id: 'contact',
     _type: 'contact',
     title: 'Get In Touch',
-    description: 'Have a project in mind or want to discuss potential opportunities? Feel free to reach out through the form below or via my contact information.',
+    description:
+      'Have a project in mind or want to discuss potential opportunities? Feel free to reach out through the form below or via my contact information.',
     email: 'amank.root@gmail.com',
     phone: '+91 9876543210',
     location: 'New Delhi, India',
     socialLinks: [
       { platform: 'GitHub', url: 'https://github.com/Amank-root', icon: 'Github' },
       { platform: 'LinkedIn', url: 'https://linkedin.com/in/amank-root', icon: 'Linkedin' },
-      { platform: 'Twitter', url: 'https://twitter.com/amank_root', icon: 'Twitter' }
-    ]
+      { platform: 'Twitter', url: 'https://twitter.com/amank_root', icon: 'Twitter' },
+    ],
   },
 
   // Sample tags
@@ -72,7 +73,7 @@ const sampleData = {
     { _type: 'tag', name: 'MongoDB', category: 'database', color: 'green' },
     { _type: 'tag', name: 'Tailwind CSS', category: 'framework', color: 'blue' },
     { _type: 'tag', name: 'Python', category: 'language', color: 'yellow' },
-    { _type: 'tag', name: 'Express.js', category: 'framework', color: 'gray' }
+    { _type: 'tag', name: 'Express.js', category: 'framework', color: 'gray' },
   ],
 
   // Sample skills
@@ -84,7 +85,7 @@ const sampleData = {
       category: 'frontend',
       skills: ['React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'HTML5', 'CSS3'],
       icon: 'Code',
-      order: 1
+      order: 1,
     },
     {
       _type: 'skill',
@@ -93,7 +94,7 @@ const sampleData = {
       category: 'backend',
       skills: ['Node.js', 'Express.js', 'Python', 'MongoDB', 'PostgreSQL', 'REST APIs'],
       icon: 'Server',
-      order: 2
+      order: 2,
     },
     {
       _type: 'skill',
@@ -102,22 +103,22 @@ const sampleData = {
       category: 'tools',
       skills: ['Git', 'VS Code', 'Docker', 'AWS', 'Vercel', 'Figma'],
       icon: 'Wrench',
-      order: 3
-    }
-  ]
+      order: 3,
+    },
+  ],
 }
 
 // Function to create sample data
 export async function createSampleData() {
   try {
     console.log('Creating sample data...')
-    
+
     // Create tags first (as they are referenced by projects)
     for (const tag of sampleData.tags) {
       await client.createIfNotExists({
         ...tag,
         _id: `tag-${tag.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
-        slug: { current: tag.name.toLowerCase().replace(/[^a-z0-9]/g, '-') }
+        slug: { current: tag.name.toLowerCase().replace(/[^a-z0-9]/g, '-') },
       })
     }
 
@@ -125,7 +126,7 @@ export async function createSampleData() {
     for (const skill of sampleData.skills) {
       await client.createIfNotExists({
         ...skill,
-        _id: `skill-${skill.title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`
+        _id: `skill-${skill.title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
       })
     }
 

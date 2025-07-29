@@ -1,21 +1,21 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { useState } from "react"
-import Link from "next/link"
-import { FileText, User, Code, Briefcase, Mail, Menu, X } from "lucide-react"
-import { useHasMounted } from "./client-only"
+import * as React from 'react'
+import { useState } from 'react'
+import Link from 'next/link'
+import { FileText, User, Code, Briefcase, Mail, Menu, X } from 'lucide-react'
+import { useHasMounted } from './client-only'
 
 export function MobileNav() {
   const [isOpen, setIsOpen] = useState(false)
   const mounted = useHasMounted()
 
   const navItems = [
-    { name: "Home", path: "/", icon: FileText },
-    { name: "About", path: "/about", icon: User },
-    { name: "Projects", path: "/projects", icon: Briefcase },
-    { name: "Skills", path: "/skills", icon: Code },
-    { name: "Contact", path: "/contact", icon: Mail },
+    { name: 'Home', path: '/', icon: FileText },
+    { name: 'About', path: '/about', icon: User },
+    { name: 'Projects', path: '/projects', icon: Briefcase },
+    { name: 'Skills', path: '/skills', icon: Code },
+    { name: 'Contact', path: '/contact', icon: Mail },
   ]
 
   if (!mounted) {
@@ -34,7 +34,7 @@ export function MobileNav() {
       {isOpen && (
         <div className="fixed inset-0 z-40 bg-[#1e1e1e] px-4 pt-16">
           <nav className="space-y-4">
-            {navItems.map((item) => (
+            {navItems.map(item => (
               <Link
                 key={item.path}
                 href={item.path}
@@ -50,4 +50,4 @@ export function MobileNav() {
       )}
     </div>
   )
-} 
+}

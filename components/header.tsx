@@ -1,13 +1,13 @@
-import Link from "next/link"
-import { FileCode, X } from "lucide-react"
+import Link from 'next/link'
+import { FileCode, X } from 'lucide-react'
 
 export function Header() {
   const tabs = [
-    { name: "index.tsx", path: "/" },
-    { name: "about.tsx", path: "/about" },
-    { name: "projects.tsx", path: "/projects" },
-    { name: "skills.tsx", path: "/skills" },
-    { name: "contact.tsx", path: "/contact" },
+    { name: 'index.tsx', path: '/' },
+    { name: 'about.tsx', path: '/about' },
+    { name: 'projects.tsx', path: '/projects' },
+    { name: 'skills.tsx', path: '/skills' },
+    { name: 'contact.tsx', path: '/contact' },
   ]
 
   return (
@@ -18,7 +18,7 @@ export function Header() {
       </div>
 
       <div className="flex flex-1 overflow-x-auto">
-        {tabs.map((tab) => (
+        {tabs.map(tab => (
           <Link
             key={tab.path}
             href={tab.path}
@@ -32,4 +32,3 @@ export function Header() {
     </header>
   )
 }
-

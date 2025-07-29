@@ -1,10 +1,10 @@
-import type React from "react"
+import type React from 'react'
 interface TerminalProps {
   children: React.ReactNode
   className?: string
 }
 
-export function Terminal({ children, className = "" }: TerminalProps) {
+export function Terminal({ children, className = '' }: TerminalProps) {
   return (
     <div
       className={`terminal rounded-md border border-border bg-[#1e1e1e] p-3 font-mono text-xs leading-relaxed sm:p-4 sm:text-sm ${className}`}
@@ -18,4 +18,3 @@ export function Terminal({ children, className = "" }: TerminalProps) {
     </div>
   )
 }
-

@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from "react"
-import { ProjectCard } from "@/components/project-card"
-import { getProjects } from "@/sanity/lib/queries"
-import { Project } from "@/sanity/lib/types"
-import { useHasMounted } from "@/components/client-only"
+import { useState, useEffect } from 'react'
+import { ProjectCard } from '@/components/project-card'
+import { getProjects } from '@/sanity/lib/queries'
+import { Project } from '@/sanity/lib/types'
+import { useHasMounted } from '@/components/client-only'
 
 export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([])
@@ -22,7 +22,7 @@ export default function Projects() {
         setLoading(false)
       }
     }
-    
+
     if (mounted) {
       loadProjects()
     }
@@ -46,11 +46,10 @@ export default function Projects() {
       <h1 className="mb-6 text-2xl font-bold text-primary">Projects</h1>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {projects.map((project) => (
+        {projects.map(project => (
           <ProjectCard key={project._id} project={project} />
         ))}
       </div>
     </div>
   )
 }
-

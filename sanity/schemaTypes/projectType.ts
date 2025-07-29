@@ -1,4 +1,4 @@
-import {defineField, defineType} from 'sanity'
+import { defineField, defineType } from 'sanity'
 
 export const projectType = defineType({
   name: 'project',
@@ -9,7 +9,7 @@ export const projectType = defineType({
       name: 'title',
       title: 'Title',
       type: 'string',
-      validation: (Rule) => Rule.required(),
+      validation: Rule => Rule.required(),
     }),
     defineField({
       name: 'slug',
@@ -19,13 +19,13 @@ export const projectType = defineType({
         source: 'title',
         maxLength: 96,
       },
-      validation: (Rule) => Rule.required(),
+      validation: Rule => Rule.required(),
     }),
     defineField({
       name: 'description',
       title: 'Description',
       type: 'text',
-      validation: (Rule) => Rule.required(),
+      validation: Rule => Rule.required(),
     }),
     defineField({
       name: 'longDescription',
@@ -44,7 +44,7 @@ export const projectType = defineType({
           name: 'alt',
           type: 'string',
           title: 'Alternative Text',
-        }
+        },
       ],
     }),
     defineField({
@@ -62,16 +62,16 @@ export const projectType = defineType({
               name: 'alt',
               type: 'string',
               title: 'Alternative Text',
-            }
+            },
           ],
-        }
+        },
       ],
     }),
     defineField({
       name: 'technologies',
       title: 'Technologies',
       type: 'array',
-      of: [{type: 'reference', to: {type: 'tag'}}],
+      of: [{ type: 'reference', to: { type: 'tag' } }],
     }),
     defineField({
       name: 'githubUrl',
@@ -102,9 +102,9 @@ export const projectType = defineType({
       type: 'string',
       options: {
         list: [
-          {title: 'In Development', value: 'development'},
-          {title: 'Completed', value: 'completed'},
-          {title: 'Maintenance', value: 'maintenance'},
+          { title: 'In Development', value: 'development' },
+          { title: 'Completed', value: 'completed' },
+          { title: 'Maintenance', value: 'maintenance' },
         ],
       },
       initialValue: 'completed',
@@ -113,7 +113,7 @@ export const projectType = defineType({
       name: 'publishedAt',
       title: 'Published at',
       type: 'datetime',
-      initialValue: (new Date()).toISOString(),
+      initialValue: new Date().toISOString(),
     }),
   ],
 
@@ -125,7 +125,7 @@ export const projectType = defineType({
       featured: 'featured',
     },
     prepare(selection) {
-      const {author, featured} = selection
+      const { author, featured } = selection
       return {
         ...selection,
         subtitle: `${author ? `by ${author}` : ''} ${featured ? '⭐ Featured' : ''}`,

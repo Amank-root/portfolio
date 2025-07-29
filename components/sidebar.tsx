@@ -1,6 +1,6 @@
-import Link from "next/link"
-import { FileText, User, Code, Briefcase, Mail, ChevronRight } from "lucide-react"
-import { cn } from "@/lib/utils"
+import Link from 'next/link'
+import { FileText, User, Code, Briefcase, Mail, ChevronRight } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface SidebarProps {
   className?: string
@@ -8,15 +8,15 @@ interface SidebarProps {
 
 export function Sidebar({ className }: SidebarProps) {
   const navItems = [
-    { name: "Home", path: "/", icon: FileText },
-    { name: "About", path: "/about", icon: User },
-    { name: "Projects", path: "/projects", icon: Briefcase },
-    { name: "Skills", path: "/skills", icon: Code },
-    { name: "Contact", path: "/contact", icon: Mail },
+    { name: 'Home', path: '/', icon: FileText },
+    { name: 'About', path: '/about', icon: User },
+    { name: 'Projects', path: '/projects', icon: Briefcase },
+    { name: 'Skills', path: '/skills', icon: Code },
+    { name: 'Contact', path: '/contact', icon: Mail },
   ]
 
   return (
-    <aside className={cn("hidden w-64 flex-shrink-0 border-r border-[#333] bg-[#252526] md:block", className)}>
+    <aside className={cn('hidden w-64 flex-shrink-0 border-r border-[#333] bg-[#252526] md:block', className)}>
       <div className="sticky top-0">
         <div className="p-4 text-sm font-medium text-[#888]">EXPLORER</div>
 
@@ -27,7 +27,7 @@ export function Sidebar({ className }: SidebarProps) {
           </div>
 
           <nav className="space-y-1">
-            {navItems.map((item) => (
+            {navItems.map(item => (
               <Link
                 key={item.path}
                 href={item.path}
@@ -43,4 +43,3 @@ export function Sidebar({ className }: SidebarProps) {
     </aside>
   )
 }
-

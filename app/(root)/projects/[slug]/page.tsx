@@ -1,19 +1,18 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from "react"
-import { useParams } from "next/navigation"
-import Image from "next/image"
-import Link from "next/link"
-import { motion } from "framer-motion"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Github, ExternalLink, Calendar, Clock } from "lucide-react"
-import { getProjectBySlug } from "@/sanity/lib/queries"
-import { Project } from "@/sanity/lib/types"
-import { urlFor } from "@/sanity/lib/image"
-import { PortableText } from "@portabletext/react"
-import { useHasMounted } from "@/components/client-only"
+import { useState, useEffect } from 'react'
+import { useParams } from 'next/navigation'
+import Image from 'next/image'
+import Link from 'next/link'
+import { motion } from 'framer-motion'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { ArrowLeft, Github, ExternalLink, Calendar, Clock } from 'lucide-react'
+import { getProjectBySlug } from '@/sanity/lib/queries'
+import type { Project } from '@/sanity/lib/types'
+import { urlFor } from '@/sanity/lib/image'
+import { PortableText } from '@portabletext/react'
+import { useHasMounted } from '@/components/client-only'
 
 export default function ProjectPage() {
   const params = useParams()
@@ -25,7 +24,7 @@ export default function ProjectPage() {
   useEffect(() => {
     async function loadProject() {
       if (!slug) return
-      
+
       try {
         const projectData = await getProjectBySlug(slug)
         setProject(projectData)
@@ -35,7 +34,7 @@ export default function ProjectPage() {
         setLoading(false)
       }
     }
-    
+
     if (mounted) {
       loadProject()
     }
@@ -60,7 +59,7 @@ export default function ProjectPage() {
     return (
       <div className="flex h-full flex-col items-center justify-center p-6">
         <h1 className="mb-4 text-2xl font-bold">Project Not Found</h1>
-        <p className="mb-6 text-muted-foreground">The project you're looking for doesn't exist.</p>
+        <p className="mb-6 text-muted-foreground">The project you&rsquo;re looking for doesn&rsquo;t exist.</p>
         <Button asChild>
           <Link href="/projects">
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -75,11 +74,7 @@ export default function ProjectPage() {
     <div className="flex h-full flex-col overflow-y-auto">
       {/* Navigation */}
       <div className="border-b bg-card p-6">
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.3 }}
-        >
+        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }}>
           <Button asChild variant="ghost" className="mb-4">
             <Link href="/projects">
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -92,18 +87,10 @@ export default function ProjectPage() {
       {/* Hero Section */}
       <section className="bg-card p-6">
         <div className="mx-auto max-w-4xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <h1 className="mb-4 text-3xl font-bold text-primary md:text-4xl">
-              {project.title}
-            </h1>
-            
-            <p className="mb-6 text-lg text-muted-foreground">
-              {project.description}
-            </p>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+            <h1 className="mb-4 text-3xl font-bold text-primary md:text-4xl">{project.title}</h1>
+
+            <p className="mb-6 text-lg text-muted-foreground">{project.description}</p>
 
             {/* Project Meta */}
             <div className="mb-6 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
@@ -119,10 +106,10 @@ export default function ProjectPage() {
 
             {/* Technologies */}
             <div className="mb-6 flex flex-wrap gap-2">
-              {project.technologies?.map((tech) => (
-                <Badge key={tech._id} variant="secondary">
+              {project.technologies?.map(tech => (
+                <span key={tech._id} className="rounded-full bg-secondary px-2 py-1 text-xs text-secondary-foreground">
                   {tech.name}
-                </Badge>
+                </span>
               ))}
             </div>
 
@@ -164,7 +151,11 @@ export default function ProjectPage() {
             <Card className="overflow-hidden">
               <div className="relative aspect-video w-full">
                 <Image
-                  src={project.mainImage ? urlFor(project.mainImage).width(800).height(450).url() : "https://dummyimage.com/400X200/1f2023/f9f2ed.png&text=" + project.title}
+                  src={
+                    project.mainImage
+                      ? urlFor(project.mainImage).width(800).height(450).url()
+                      : 'https://dummyimage.com/400X200/1f2023/f9f2ed.png&text=' + project.title
+                  }
                   alt={project.mainImage?.alt || project.title}
                   fill
                   className="object-cover"

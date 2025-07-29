@@ -1,4 +1,4 @@
-import {defineField, defineType} from 'sanity'
+import { defineField, defineType } from 'sanity'
 
 export const skillType = defineType({
   name: 'skill',
@@ -9,13 +9,13 @@ export const skillType = defineType({
       name: 'title',
       title: 'Title',
       type: 'string',
-      validation: (Rule) => Rule.required(),
+      validation: Rule => Rule.required(),
     }),
     defineField({
       name: 'description',
       title: 'Description',
       type: 'text',
-      validation: (Rule) => Rule.required(),
+      validation: Rule => Rule.required(),
     }),
     defineField({
       name: 'category',
@@ -23,20 +23,20 @@ export const skillType = defineType({
       type: 'string',
       options: {
         list: [
-          {title: 'Frontend', value: 'frontend'},
-          {title: 'Backend', value: 'backend'},
-          {title: 'Tools', value: 'tools'},
-          {title: 'Other', value: 'other'},
+          { title: 'Frontend', value: 'frontend' },
+          { title: 'Backend', value: 'backend' },
+          { title: 'Tools', value: 'tools' },
+          { title: 'Other', value: 'other' },
         ],
       },
-      validation: (Rule) => Rule.required(),
+      validation: Rule => Rule.required(),
     }),
     defineField({
       name: 'skills',
       title: 'Skills List',
       type: 'array',
-      of: [{type: 'string'}],
-      validation: (Rule) => Rule.required(),
+      of: [{ type: 'string' }],
+      validation: Rule => Rule.required(),
     }),
     defineField({
       name: 'icon',

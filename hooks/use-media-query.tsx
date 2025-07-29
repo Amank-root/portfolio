@@ -1,6 +1,6 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from "react"
+import { useState, useEffect } from 'react'
 
 export function useMediaQuery(query: string): boolean {
   const [matches, setMatches] = useState(false)
@@ -17,9 +17,9 @@ export function useMediaQuery(query: string): boolean {
     setMatches(media.matches)
 
     const listener = () => setMatches(media.matches)
-    media.addEventListener("change", listener)
+    media.addEventListener('change', listener)
 
-    return () => media.removeEventListener("change", listener)
+    return () => media.removeEventListener('change', listener)
   }, [mounted, query])
 
   // Return false during SSR and initial hydration to prevent mismatch
@@ -27,4 +27,3 @@ export function useMediaQuery(query: string): boolean {
 
   return matches
 }
-

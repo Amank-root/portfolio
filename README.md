@@ -28,12 +28,14 @@ A unique portfolio website designed to mimic the Visual Studio Code interface, b
 ## 🚦 Getting Started
 
 1. **Clone the repository**
+
 ```bash
 git clone https://github.com/Amank-root/portfolio.git
 cd portfolio
 ```
 
 2. **Install dependencies**
+
 ```bash
 npm install
 # or
@@ -41,6 +43,7 @@ pnpm install
 ```
 
 3. **Set up environment variables**
+
 ```bash
 # Create a .env.local file and add:
 NEXT_PUBLIC_FORM=your_formspree_form_id
@@ -49,6 +52,7 @@ NETLIFY_NEXT_PLUGIN_SKIP=true
 ```
 
 4. **Run the development server**
+
 ```bash
 npm run dev
 # or
@@ -58,20 +62,20 @@ pnpm dev
 5. **Open [http://localhost:3000](http://localhost:3000) in your browser**
 
 ## 📁 Project Structure
+
 ```markdown
 portfolio/
-├── app/                    # Next.js app directory
-│   ├── about/              # About page
-│   ├── contact/            # Contact page
-│   ├── projects/           # Projects page
-│   ├── skills/             # Skills page
-│   └── layout.tsx          # Root layout
-├── components/             # Reusable components
-├── hooks/                  # Custom hooks
-├── styles/                 # Global styles
-└── public/                 # Static assets
+├── app/ # Next.js app directory
+│ ├── about/ # About page
+│ ├── contact/ # Contact page
+│ ├── projects/ # Projects page
+│ ├── skills/ # Skills page
+│ └── layout.tsx # Root layout
+├── components/ # Reusable components
+├── hooks/ # Custom hooks
+├── styles/ # Global styles
+└── public/ # Static assets
 ```
-
 
 ## 🎨 Customization
 

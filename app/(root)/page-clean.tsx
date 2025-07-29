@@ -1,31 +1,30 @@
-"use client"
+'use client'
 
-import type React from "react"
-import { useState, useEffect } from "react"
-import Image from "next/image"
-import Link from "next/link"
-import { Terminal } from "@/components/terminal"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { motion } from "framer-motion"
-import { ArrowRight, Github, ExternalLink, Download, Code, Briefcase, User, Mail } from "lucide-react"
-import { useMediaQuery } from "@/hooks/use-media-query"
-import { useHasMounted } from "@/components/client-only"
-import { getFeaturedProjects } from "@/sanity/lib/queries"
-import { Project } from "@/sanity/lib/types"
-import { urlFor } from "@/sanity/lib/image"
+import type React from 'react'
+import { useState, useEffect } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { Terminal } from '@/components/terminal'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { motion } from 'framer-motion'
+import { ArrowRight, Github, ExternalLink, Download, Code, Briefcase, User, Mail } from 'lucide-react'
+import { useMediaQuery } from '@/hooks/use-media-query'
+import { useHasMounted } from '@/components/client-only'
+import { getFeaturedProjects } from '@/sanity/lib/queries'
+import type { Project } from '@/sanity/lib/types'
+import { urlFor } from '@/sanity/lib/image'
 
-const fullTextTyping = ["Full Stack Developer", "AI/ML Developer", "Machine Learning Enthusiast"]
+const fullTextTyping = ['Full Stack Developer', 'AI/ML Developer', 'Machine Learning Enthusiast']
 
 export default function Home() {
-  const [text, setText] = useState("")
+  const [text, setText] = useState('')
   const [textIndex, setTextIndex] = useState(0)
   const [charIndex, setCharIndex] = useState(0)
   const [isDeleting, setIsDeleting] = useState(false)
   const [featuredProjects, setFeaturedProjects] = useState<Project[]>([])
   const mounted = useHasMounted()
-  const isMobile = useMediaQuery("(max-width: 768px)")
+  const isMobile = useMediaQuery('(max-width: 768px)')
 
   // Fetch featured projects
   useEffect(() => {
@@ -37,7 +36,7 @@ export default function Home() {
         console.error('Error fetching featured projects:', error)
       }
     }
-    
+
     if (mounted) {
       loadFeaturedProjects()
     }
@@ -106,23 +105,24 @@ export default function Home() {
             Hello, I&apos;m <span className="text-accent">Aman Kushwaha</span>
           </h1>
           <h2 className="mb-6 h-auto text-xl font-semibold text-muted-foreground sm:text-2xl md:text-3xl">
-            {mounted ? (text || "Full Stack Developer") : "Full Stack Developer"}
+            {mounted ? text || 'Full Stack Developer' : 'Full Stack Developer'}
             <span className="animate-blink">|</span>
           </h2>
           <p className="mb-8 text-base text-muted-foreground sm:text-lg">
-            A passionate Full Stack Developer specializing in MERN stack development. I create efficient, scalable, and user-friendly solutions 
-            with a focus on modern web technologies and best practices. Currently pursuing B.Tech in Computer Science.
+            A passionate Full Stack Developer specializing in MERN stack development. I create efficient, scalable, and
+            user-friendly solutions with a focus on modern web technologies and best practices. Currently pursuing
+            B.Tech in Computer Science.
           </p>
           <div className="flex flex-wrap gap-4">
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button asChild size={isMobile ? "default" : "lg"} className="gap-2">
+              <Button asChild size={isMobile ? 'default' : 'lg'} className="gap-2">
                 <Link href="/contact">
                   Contact Me <ArrowRight size={16} />
                 </Link>
               </Button>
             </motion.div>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button asChild variant="outline" size={isMobile ? "default" : "lg"} className="gap-2">
+              <Button asChild variant="outline" size={isMobile ? 'default' : 'lg'} className="gap-2">
                 <Link href="/AmanKushwaha_Resume.pdf" target="_blank" download>
                   Resume <Download size={16} />
                 </Link>
@@ -145,9 +145,7 @@ export default function Home() {
               <span className="text-muted-foreground">$</span>
             </div>
             <div className="terminal-output">
-              <div className="text-green-400">
-                Welcome to my portfolio! 👋
-              </div>
+              <div className="text-green-400">Welcome to my portfolio! 👋</div>
               <div className="mt-2">
                 <span className="text-yellow-400">Skills:</span>
                 <div className="ml-2 mt-1">
@@ -158,8 +156,7 @@ export default function Home() {
                   • TypeScript & JavaScript
                   <br />
                   • MongoDB & PostgreSQL
-                  <br />
-                  • Python & Machine Learning
+                  <br />• Python & Machine Learning
                 </div>
               </div>
               <div className="mt-4">
@@ -212,12 +209,7 @@ export default function Home() {
               description="Explore my technical skills and expertise"
               href="/skills"
             />
-            <QuickLinkCard
-              icon={Mail}
-              title="Contact"
-              description="Get in touch for collaborations"
-              href="/contact"
-            />
+            <QuickLinkCard icon={Mail} title="Contact" description="Get in touch for collaborations" href="/contact" />
           </motion.div>
         </div>
       </section>
@@ -240,15 +232,17 @@ export default function Home() {
             initial="hidden"
             animate="show"
           >
-            {featuredProjects.map((project) => (
+            {featuredProjects.map(project => (
               <motion.div key={project._id} variants={item} className="h-full">
                 <Card className="h-full overflow-hidden bg-card transition-all hover:shadow-lg">
                   <div className="relative h-48 w-full">
-                    <Image 
-                      src={project.mainImage ? urlFor(project.mainImage).width(600).height(300).url() : "/placeholder.svg"} 
-                      alt={project.mainImage?.alt || project.title} 
-                      fill 
-                      className="object-cover" 
+                    <Image
+                      src={
+                        project.mainImage ? urlFor(project.mainImage).width(600).height(300).url() : '/placeholder.svg'
+                      }
+                      alt={project.mainImage?.alt || project.title}
+                      fill
+                      className="object-cover"
                     />
                   </div>
 
@@ -257,10 +251,13 @@ export default function Home() {
                     <p className="mb-4 text-sm text-muted-foreground sm:text-base">{project.description}</p>
 
                     <div className="mb-4 flex flex-wrap gap-2">
-                      {project.technologies?.map((tech) => (
-                        <Badge key={tech._id} variant="secondary" className="text-xs">
+                      {project.technologies?.map(tech => (
+                        <span
+                          key={tech._id}
+                          className="rounded-full bg-secondary px-2 py-1 text-xs text-secondary-foreground"
+                        >
                           {tech.name}
-                        </Badge>
+                        </span>
                       ))}
                     </div>
 

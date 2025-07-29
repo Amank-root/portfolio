@@ -5,6 +5,7 @@ This portfolio website is built with Next.js 15 and fully integrated with Sanity
 ## 🚀 Quick Start
 
 1. **Install dependencies**
+
    ```bash
    npm install
    # or
@@ -12,16 +13,20 @@ This portfolio website is built with Next.js 15 and fully integrated with Sanity
    ```
 
 2. **Set up environment variables**
+
    ```bash
    cp .env.local.example .env.local
    ```
+
    Fill in your Sanity project details in `.env.local`:
+
    ```env
    NEXT_PUBLIC_SANITY_PROJECT_ID="your-project-id"
    NEXT_PUBLIC_SANITY_DATASET="production"
    ```
 
 3. **Start the development server**
+
    ```bash
    npm run dev
    # or
@@ -67,6 +72,7 @@ This portfolio website is built with Next.js 15 and fully integrated with Sanity
 ### Adding Sample Content
 
 1. **Automated (Recommended)**
+
    ```bash
    node setup-sanity.js
    ```
@@ -82,6 +88,7 @@ This portfolio website is built with Next.js 15 and fully integrated with Sanity
 ## 🛠 Features
 
 ### Frontend Features
+
 - ✅ Responsive design with Tailwind CSS
 - ✅ Dark/light theme support
 - ✅ Smooth animations with Framer Motion
@@ -90,6 +97,7 @@ This portfolio website is built with Next.js 15 and fully integrated with Sanity
 - ✅ SEO optimized
 
 ### Content Management Features
+
 - ✅ Real-time content updates
 - ✅ Rich text editing with Portable Text
 - ✅ Image optimization with Sanity
@@ -97,6 +105,7 @@ This portfolio website is built with Next.js 15 and fully integrated with Sanity
 - ✅ Draft/publish workflow
 
 ### Pages & Routing
+
 - ✅ **Home** (`/`) - Hero section with featured projects
 - ✅ **About** (`/about`) - Personal information and experience
 - ✅ **Projects** (`/projects`) - All projects with filtering
@@ -108,6 +117,7 @@ This portfolio website is built with Next.js 15 and fully integrated with Sanity
 ## 🔧 Configuration
 
 ### Environment Variables
+
 ```env
 # Required - Sanity CMS
 NEXT_PUBLIC_SANITY_PROJECT_ID="your-project-id"
@@ -123,6 +133,7 @@ NEXTAUTH_URL="http://localhost:3000"
 ```
 
 ### Sanity Configuration
+
 - Project configuration: `sanity.config.ts`
 - Schema definitions: `sanity/schemaTypes/`
 - Content structure: `sanity/structure.ts`
@@ -150,11 +161,13 @@ NEXTAUTH_URL="http://localhost:3000"
 ## 🚀 Deployment
 
 ### Vercel (Recommended)
+
 1. Connect your GitHub repository to Vercel
 2. Add environment variables in Vercel dashboard
 3. Deploy automatically on git push
 
 ### Other Platforms
+
 - Make sure to set environment variables
 - Build command: `npm run build`
 - Output directory: `.next`
@@ -162,6 +175,7 @@ NEXTAUTH_URL="http://localhost:3000"
 ## 📱 Responsive Design
 
 The portfolio is fully responsive and optimized for:
+
 - 📱 Mobile devices (320px+)
 - 📟 Tablets (768px+)
 - 💻 Desktop (1024px+)
@@ -170,11 +184,13 @@ The portfolio is fully responsive and optimized for:
 ## 🎨 Customization
 
 ### Themes
+
 - Built-in dark/light theme support
 - Customizable color schemes in `tailwind.config.ts`
 - Theme persistence across sessions
 
 ### Content
+
 - All content is managed through Sanity CMS
 - Real-time updates without redeployment
 - Rich text editing capabilities
@@ -191,6 +207,7 @@ The portfolio is fully responsive and optimized for:
 ## 📞 Support
 
 If you need help setting up or customizing your portfolio:
+
 1. Check the documentation
 2. Review the sample data structure
 3. Test with the development environment

@@ -1,83 +1,43 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { useState, useEffect, useRef } from "react"
-import { motion } from "framer-motion"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Terminal } from "@/components/terminal"
-import { toast } from "sonner"
-import { useForm, ValidationError } from "@formspree/react";
-import ReCAPTCHA from "react-google-recaptcha";
-import { Mail, MapPin, Github, Linkedin, Twitter, Send, MessageSquare, User } from "lucide-react"
-import { getContact } from "@/sanity/lib/queries"
-import { Contact } from "@/sanity/lib/types"
+import { useState, useEffect, useRef } from 'react'
+import { motion } from 'framer-motion'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Terminal } from '@/components/terminal'
+import { toast } from 'sonner'
+import { useForm, ValidationError } from '@formspree/react'
+import ReCAPTCHA from 'react-google-recaptcha'
+import { Mail, MapPin, Github, Linkedin, Twitter, Send, MessageSquare, User } from 'lucide-react'
 
 export default function Contact() {
-  const [state, handleSubmit] = useForm(process.env.NEXT_PUBLIC_FORM!);
+  const [state, handleSubmit] = useForm(process.env.NEXT_PUBLIC_FORM!)
   const [showSuccess, setShowSuccess] = useState(false)
-  const [contactData, setContactData] = useState<Contact | null>(null)
-  const [loading, setLoading] = useState(true)
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
+    name: '',
+    email: '',
+    subject: '',
+    message: '',
   })
-  const recaptchaRef = useRef<ReCAPTCHA>(null);
-
-  // Fetch contact data from Sanity
-  useEffect(() => {
-    async function fetchContact() {
-      try {
-        setLoading(true)
-        const data = await getContact()
-        setContactData(data || fallbackContactData)
-      } catch (error) {
-        console.error('Error fetching contact data:', error)
-        setContactData(fallbackContactData)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchContact()
-  }, [])
-
-  // Fallback contact data
-  const fallbackContactData: Contact = {
-    _id: "contact",
-    _type: "contact",
-    title: "Get In Touch",
-    description: "Have a project in mind or want to discuss potential opportunities? Feel free to reach out through the form below or via my contact information.",
-    email: "amank.root@gmail.com",
-    phone: "+91 9876543210",
-    location: "New Delhi, India",
-    socialLinks: [
-      { platform: "GitHub", url: "https://github.com/Amank-root", icon: "Github" },
-      { platform: "LinkedIn", url: "https://linkedin.com/in/amank-root", icon: "Linkedin" },
-      { platform: "Twitter", url: "https://twitter.com/amank_root", icon: "Twitter" }
-    ],
-    formspreeEndpoint: process.env.NEXT_PUBLIC_FORM,
-    recaptchaSiteKey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
-  }
+  const recaptchaRef = useRef<ReCAPTCHA>(null)
 
   // Show toast and success message when form is submitted successfully
   useEffect(() => {
     if (state.succeeded) {
-      toast.success("Message sent successfully!", {
+      toast.success('Message sent successfully!', {
         description: "Thank you for your message. I'll get back to you soon.",
       })
       setShowSuccess(true)
       // Reset form data
       setFormData({
-        name: "",
-        email: "",
-        subject: "",
-        message: "",
+        name: '',
+        email: '',
+        subject: '',
+        message: '',
       })
       // Hide success message after 3 seconds
       const timer = setTimeout(() => {
@@ -107,22 +67,22 @@ export default function Contact() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+    setFormData(prev => ({ ...prev, [name]: value }))
   }
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const recaptchaValue = recaptchaRef.current?.getValue();
-    
+    e.preventDefault()
+    const recaptchaValue = recaptchaRef.current?.getValue()
+
     if (!recaptchaValue) {
-      toast.error("reCAPTCHA Required", {
-        description: "Please complete the reCAPTCHA verification.",
-      });
-      return;
+      toast.error('reCAPTCHA Required', {
+        description: 'Please complete the reCAPTCHA verification.',
+      })
+      return
     }
-    
-    handleSubmit(e);
-  };
+
+    handleSubmit(e)
+  }
 
   return (
     <div className="flex h-full flex-col overflow-y-auto">
@@ -168,7 +128,7 @@ export default function Contact() {
               </CardHeader>
               <CardContent>
                 <form name="contact" onSubmit={handleFormSubmit} className="space-y-4 sm:space-y-6">
-                <input type="hidden" name="form-name" value="contact" />
+                  <input type="hidden" name="form-name" value="contact" />
                   <div className="space-y-3 sm:space-y-4">
                     <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
                       <div className="space-y-1 sm:space-y-2">
@@ -244,11 +204,7 @@ export default function Contact() {
                   </div>
 
                   <div className="mb-4 flex justify-center">
-                    <ReCAPTCHA
-                      ref={recaptchaRef}
-                      sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
-                      size="normal"
-                    />
+                    <ReCAPTCHA ref={recaptchaRef} sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!} size="normal" />
                   </div>
 
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
@@ -350,7 +306,9 @@ export default function Contact() {
                       Email: contact@amank-root.slmail.me Location: New Delhi, Delhi, India
                     </div>
 
-                    <div className="terminal-prompt">echo &quot;I&apos;m looking forward to hearing from you!&quot;</div>
+                    <div className="terminal-prompt">
+                      echo &quot;I&apos;m looking forward to hearing from you!&quot;
+                    </div>
                     <div className="terminal-output">I&apos;m looking forward to hearing from you!</div>
                   </Terminal>
                 </CardContent>
@@ -411,4 +369,3 @@ function SocialButton({ icon: Icon, label, href }: SocialButtonProps) {
     </motion.a>
   )
 }
-

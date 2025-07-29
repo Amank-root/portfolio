@@ -50,7 +50,7 @@
 }
 
 .terminal-prompt::before {
-  content: "$ ";
+  content: '$ ';
   color: hsl(var(--accent));
 }
 
@@ -96,4 +96,3 @@
 .animate-blink {
   animation: blink 1s infinite;
 }
-

@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface Skill {
   name: string
@@ -35,4 +35,3 @@ export function SkillCategory({ category }: SkillCategoryProps) {
     </Card>
   )
 }
-
