@@ -1,5 +1,5 @@
 import { defineType, defineArrayMember } from 'sanity'
-import { ImageIcon } from '@sanity/icons'
+import { ImageIcon, CodeIcon } from '@sanity/icons'
 
 /**
  * This is the schema type for block content used in the post document type
@@ -55,6 +55,65 @@ export const blockContentType = defineType({
             ],
           },
         ],
+      },
+    }),
+    // Code block with syntax highlighting
+    defineArrayMember({
+      type: 'object',
+      name: 'code',
+      title: 'Code Block',
+      icon: CodeIcon,
+      fields: [
+        {
+          name: 'language',
+          title: 'Language',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'JavaScript', value: 'javascript' },
+              { title: 'TypeScript', value: 'typescript' },
+              { title: 'HTML', value: 'html' },
+              { title: 'CSS', value: 'css' },
+              { title: 'JSON', value: 'json' },
+              { title: 'YAML', value: 'yaml' },
+              { title: 'Markdown', value: 'markdown' },
+              { title: 'Python', value: 'python' },
+              { title: 'Bash', value: 'bash' },
+              { title: 'SQL', value: 'sql' },
+              { title: 'React JSX', value: 'jsx' },
+              { title: 'React TSX', value: 'tsx' },
+            ],
+          },
+          initialValue: 'javascript',
+        },
+        {
+          name: 'filename',
+          title: 'Filename (optional)',
+          type: 'string',
+          description: 'Optional filename to display above the code block',
+        },
+        {
+          name: 'code',
+          title: 'Code',
+          type: 'text',
+          options: {
+            rows: 10,
+          },
+          validation: rule => rule.required(),
+        },
+      ],
+      preview: {
+        select: {
+          language: 'language',
+          filename: 'filename',
+        },
+        prepare({ language, filename }) {
+          return {
+            title: filename || 'Code Block',
+            subtitle: language ? `Language: ${language}` : 'No language specified',
+            media: CodeIcon,
+          }
+        },
       },
     }),
     // You can add additional types here. Note that you can't use

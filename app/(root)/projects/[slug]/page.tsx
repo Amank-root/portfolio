@@ -13,6 +13,7 @@ import type { Project } from '@/sanity/lib/types'
 import { urlFor } from '@/sanity/lib/image'
 import { PortableText } from '@portabletext/react'
 import { useHasMounted } from '@/components/client-only'
+import { portableTextComponents } from '@/components/portable-text-components'
 
 export default function ProjectPage() {
   const params = useParams()
@@ -69,6 +70,8 @@ export default function ProjectPage() {
       </div>
     )
   }
+
+  console.log(project)
 
   return (
     <div className="flex h-full flex-col overflow-y-auto">
@@ -154,7 +157,7 @@ export default function ProjectPage() {
                   src={
                     project.mainImage
                       ? urlFor(project.mainImage).width(800).height(450).url()
-                      : 'https://dummyimage.com/400X200/1f2023/f9f2ed.png&text=' + project.title
+                      : 'https://dummyimage.com/600X400/1f2023/f9f2ed.png&text=' + project.title
                   }
                   alt={project.mainImage?.alt || project.title}
                   fill
@@ -176,8 +179,10 @@ export default function ProjectPage() {
               transition={{ duration: 0.5, delay: 0.3 }}
             >
               <Card>
-                <CardContent className="prose prose-slate max-w-none p-6 dark:prose-invert">
-                  <PortableText value={project.longDescription} />
+                <CardContent className="p-6">
+                  <div className="prose prose-slate max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-ul:text-foreground prose-ol:text-foreground prose-li:text-foreground prose-a:text-primary hover:prose-a:text-primary/80">
+                    <PortableText value={project.longDescription} components={portableTextComponents} />
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>
