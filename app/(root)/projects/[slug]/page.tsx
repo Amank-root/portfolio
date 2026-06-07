@@ -1,223 +1,207 @@
-'use client'
-
-import { useState, useEffect } from 'react'
-import { useParams } from 'next/navigation'
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { ArrowLeft, Github, ExternalLink, Calendar, Clock } from 'lucide-react'
-import { getProjectBySlug } from '@/sanity/lib/queries'
-import type { Project } from '@/sanity/lib/types'
+import { Suspense } from 'react'
+import { notFound } from 'next/navigation'
+import { getProject, getProjects } from '@/sanity/lib/queries'
 import { urlFor } from '@/sanity/lib/image'
 import { PortableText } from '@portabletext/react'
-import { useHasMounted } from '@/components/client-only'
 import { portableTextComponents } from '@/components/portable-text-components'
+import { Button } from '@/components/ui/button'
+import { Github, ExternalLink, ArrowLeft, Calendar, Tag } from 'lucide-react'
+import type { Project } from '@/sanity/lib/types'
+import { BlogMarkdownRenderer } from '@/components/blog-markdown-renderer'
 
-export default function ProjectPage() {
-  const params = useParams()
-  const slug = params.slug as string
-  const [project, setProject] = useState<Project | null>(null)
-  const [loading, setLoading] = useState(true)
-  const mounted = useHasMounted()
+// export const revalidate = 60
 
-  useEffect(() => {
-    async function loadProject() {
-      if (!slug) return
+type Props = { params: Promise<{ slug: string }> }
 
-      try {
-        const projectData = await getProjectBySlug(slug)
-        setProject(projectData)
-      } catch (error) {
-        console.error('Error fetching project:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    if (mounted) {
-      loadProject()
-    }
-  }, [slug, mounted])
-
-  if (!mounted || loading) {
-    return (
-      <div className="flex h-full flex-col p-6">
-        <div className="mb-6 h-8 w-32 animate-pulse rounded bg-muted"></div>
-        <div className="mb-4 h-12 w-3/4 animate-pulse rounded bg-muted"></div>
-        <div className="mb-8 h-64 w-full animate-pulse rounded bg-muted"></div>
-        <div className="space-y-4">
-          <div className="h-4 w-full animate-pulse rounded bg-muted"></div>
-          <div className="h-4 w-5/6 animate-pulse rounded bg-muted"></div>
-          <div className="h-4 w-4/6 animate-pulse rounded bg-muted"></div>
-        </div>
-      </div>
-    )
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params
+  const project = await getProject(slug).catch(() => null) as Project | null
+  if (!project) return { title: 'Project Not Found' }
+  return {
+    title: project.title,
+    description: project.description,
   }
+}
 
-  if (!project) {
-    return (
-      <div className="flex h-full flex-col items-center justify-center p-6">
-        <h1 className="mb-4 text-2xl font-bold">Project Not Found</h1>
-        <p className="mb-6 text-muted-foreground">The project you&rsquo;re looking for doesn&rsquo;t exist.</p>
-        <Button asChild>
-          <Link href="/projects">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Projects
-          </Link>
-        </Button>
-      </div>
-    )
-  }
+export async function generateStaticParams() {
+  const projects = await getProjects().catch(() => []) as Project[]
+  return projects.map(p => ({ slug: p.slug.current }))
+}
 
-  console.log(project)
+export default function ProjectPage({ params }: Props) {
+  return (
+    <Suspense fallback={<ProjectPageSkeleton />}>
+      <ProjectPageContent params={params} />
+    </Suspense>
+  )
+}
+
+async function ProjectPageContent({ params }: Props) {
+  const { slug } = await params
+  const project = await getProject(slug).catch(() => null) as Project | null
+
+  if (!project) notFound()
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto">
-      {/* Navigation */}
-      <div className="border-b bg-card p-6">
-        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }}>
-          <Button asChild variant="ghost" className="mb-4">
-            <Link href="/projects">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Projects
-            </Link>
+    <div className="min-h-full px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-4xl">
+        <Link href="/projects">
+          <Button variant="ghost" size="sm" className="mb-6 gap-2 text-xs text-muted-foreground hover:text-foreground">
+            <ArrowLeft size={12} /> Back to Projects
           </Button>
-        </motion.div>
-      </div>
+        </Link>
 
-      {/* Hero Section */}
-      <section className="bg-card p-6">
-        <div className="mx-auto max-w-4xl">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <h1 className="mb-4 text-3xl font-bold text-primary md:text-4xl">{project.title}</h1>
+        {/* Hero image */}
+        {project.mainImage && (
+          <div className="relative h-72 sm:h-96 w-full overflow-hidden rounded-2xl border border-border/50 mb-8">
+            <Image
+              src={urlFor(project.mainImage).width(1200).height(600).url()}
+              alt={project.mainImage.alt || project.title}
+              fill
+              className="object-cover"
+              priority
+            />
+            <div className="absolute inset-0 bg-linear-to-t from-background/60 to-transparent" />
+          </div>
+        )}
 
-            <p className="mb-6 text-lg text-muted-foreground">{project.description}</p>
-
-            {/* Project Meta */}
-            <div className="mb-6 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <Calendar className="h-4 w-4" />
-                <span>{new Date(project.publishedAt).toLocaleDateString()}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Clock className="h-4 w-4" />
-                <span className="capitalize">{project.status}</span>
-              </div>
-            </div>
-
-            {/* Technologies */}
-            <div className="mb-6 flex flex-wrap gap-2">
-              {project.technologies?.map(tech => (
-                <span key={tech._id} className="rounded-full bg-secondary px-2 py-1 text-xs text-secondary-foreground">
-                  {tech.name}
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-2">
+              {project.status && (
+                <span className={`text-xs px-2 py-0.5 rounded-full border ${project.status === 'completed' ? 'bg-accent/15 text-accent border-accent/30' :
+                  project.status === 'development' ? 'bg-yellow-500/15 text-yellow-400 border-yellow-500/30' :
+                    'bg-secondary/15 text-secondary border-secondary/30'
+                  }`}>
+                  {project.status}
                 </span>
+              )}
+              {project.featured && (
+                <span className="text-xs px-2 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/30">
+                  ⭐ Featured
+                </span>
+              )}
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-bold text-foreground">{project.title}</h1>
+            <p className="mt-2 text-muted-foreground leading-relaxed">{project.description}</p>
+          </div>
+
+          <div className="flex gap-2 shrink-0">
+            {project.githubUrl && (
+              <Link href={project.githubUrl} target="_blank">
+                <Button variant="outline" className="gap-2 border-border/50 hover:border-primary/50">
+                  <Github size={14} /> GitHub
+                </Button>
+              </Link>
+            )}
+            {project.demoUrl && (
+              <Link href={project.demoUrl} target="_blank">
+                <Button className="gap-2 bg-primary/10 text-primary border border-primary/30 hover:bg-primary/20">
+                  <ExternalLink size={14} /> Live Demo
+                </Button>
+              </Link>
+            )}
+          </div>
+        </div>
+
+        {/* Technologies */}
+        {project.technologies && project.technologies.length > 0 && (
+          <div className="glass rounded-xl p-5 border border-border/50 mb-8">
+            <h2 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
+              <Tag size={13} /> Tech Stack
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {project.technologies.map(tech => (
+                <span key={tech._id} className="tag-pill">{tech.name}</span>
               ))}
             </div>
+          </div>
+        )}
 
-            {/* Action Buttons */}
-            <div className="flex gap-4">
-              {project.githubUrl && (
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button asChild variant="outline">
-                    <Link href={project.githubUrl} target="_blank">
-                      <Github className="mr-2 h-4 w-4" />
-                      View Source
-                    </Link>
-                  </Button>
-                </motion.div>
-              )}
-              {project.demoUrl && (
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button asChild>
-                    <Link href={project.demoUrl} target="_blank">
-                      <ExternalLink className="mr-2 h-4 w-4" />
-                      Live Demo
-                    </Link>
-                  </Button>
-                </motion.div>
-              )}
+        {/* Long description */}
+        { /* if longdesc starts with # then blogmarkdownrender else portable render */}
+        {
+          project.longDescription && project.longDescription.map((block) => block.children.map((child, i) => child.text).join('')).join('\n\n').startsWith('#') ? (
+            <BlogMarkdownRenderer content={project.longDescription && project.longDescription.map((block) => block.children.map((child, i) => child.text).join('')).join('\n\n') || ""} />
+          ) : (
+            project.longDescription && (
+              <div className="prose-blog">
+                <PortableText value={project.longDescription} components={portableTextComponents} />
+              </div>
+            )
+          )
+        }
+        {/* {console.log(JSON.stringify(project.longDescription))} */}
+        {/* <BlogMarkdownRenderer content={JSON.stringify(project.longDescription)} /> */}
+        {/* {project.longDescription && project.longDescription.map((block) => block.children.map((child, i) => child.text).join('')).join('\n')} */}
+        {/* {project.longDescription && (
+          <div className="prose-blog">
+            <PortableText value={project.longDescription} components={portableTextComponents} />
+          </div>
+        )} */}
+
+        {/* Gallery */}
+        {project.gallery && project.gallery.length > 0 && (
+          <div className="mt-8">
+            <h2 className="text-lg font-semibold mb-4">Gallery</h2>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {project.gallery.map((img, i) => (
+                <div key={i} className="relative h-48 overflow-hidden rounded-xl border border-border/50">
+                  <Image
+                    src={urlFor(img).width(600).height(400).url()}
+                    alt={img.alt || `Screenshot ${i + 1}`}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              ))}
             </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Main Image */}
-      <section className="p-6">
-        <div className="mx-auto max-w-4xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <Card className="overflow-hidden">
-              <div className="relative aspect-video w-full">
-                <Image
-                  src={
-                    project.mainImage
-                      ? urlFor(project.mainImage).width(800).height(450).url()
-                      : 'https://dummyimage.com/600X400/1f2023/f9f2ed.png&text=' + project.title
-                  }
-                  alt={project.mainImage?.alt || project.title}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            </Card>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Project Description */}
-      {project.longDescription && (
-        <section className="p-6">
-          <div className="mx-auto max-w-4xl">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-            >
-              <Card>
-                <CardContent className="p-6">
-                  <div className="prose prose-slate max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-ul:text-foreground prose-ol:text-foreground prose-li:text-foreground prose-a:text-primary hover:prose-a:text-primary/80">
-                    <PortableText value={project.longDescription} components={portableTextComponents} />
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
           </div>
-        </section>
-      )}
+        )}
 
-      {/* Gallery */}
-      {project.gallery && project.gallery.length > 0 && (
-        <section className="p-6">
-          <div className="mx-auto max-w-4xl">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-            >
-              <h2 className="mb-6 text-2xl font-bold">Gallery</h2>
-              <div className="grid gap-4 md:grid-cols-2">
-                {project.gallery.map((image, index) => (
-                  <Card key={index} className="overflow-hidden">
-                    <div className="relative aspect-video w-full">
-                      <Image
-                        src={urlFor(image).width(600).height(400).url()}
-                        alt={image.alt || `${project.title} screenshot ${index + 1}`}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </motion.div>
+        {project.publishedAt && (
+          <div className="mt-8 flex items-center gap-2 text-xs text-muted-foreground">
+            <Calendar size={12} />
+            {new Date(project.publishedAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
           </div>
-        </section>
-      )}
+        )}
+      </div>
+    </div>
+  )
+}
+
+function ProjectPageSkeleton() {
+  return (
+    <div className="min-h-full px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-4xl animate-pulse">
+        <div className="mb-6 h-9 w-32 rounded-full bg-muted/40" />
+        <div className="mb-8 h-72 w-full rounded-2xl bg-muted/40 sm:h-96" />
+        <div className="mb-8 space-y-3">
+          <div className="h-4 w-24 rounded-full bg-muted/30" />
+          <div className="h-10 w-3/4 rounded-lg bg-muted/40" />
+          <div className="h-4 w-full rounded-lg bg-muted/30" />
+          <div className="h-4 w-5/6 rounded-lg bg-muted/30" />
+        </div>
+        <div className="mb-8 rounded-xl border border-border/50 bg-muted/20 p-5">
+          <div className="mb-3 h-4 w-24 rounded-full bg-muted/30" />
+          <div className="flex flex-wrap gap-2">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div key={index} className="h-7 w-20 rounded-full bg-muted/40" />
+            ))}
+          </div>
+        </div>
+        <div className="space-y-4">
+          <div className="h-6 w-40 rounded-lg bg-muted/40" />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="h-48 rounded-xl bg-muted/40" />
+            <div className="h-48 rounded-xl bg-muted/40" />
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
