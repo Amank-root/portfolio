@@ -1,364 +1,213 @@
-'use client'
+"use cache";
 
-import type React from 'react'
-
-import { useState, useEffect } from 'react'
+import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Terminal } from '@/components/terminal'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { motion } from 'framer-motion'
-import { ArrowRight, Github, ExternalLink, Download, Code, Briefcase, User, Mail } from 'lucide-react'
-import { useMediaQuery } from '@/hooks/use-media-query'
-import { useHasMounted } from '@/components/client-only'
-import { getFeaturedProjects } from '@/sanity/lib/queries'
-import type { Project } from '@/sanity/lib/types'
+import { ArrowRight, Github, ExternalLink, Download, Code, Briefcase, User, Mail, BookOpen, Star, Zap } from 'lucide-react'
+import { getFeaturedProjects, getFeaturedBlogPosts, getAbout } from '@/sanity/lib/queries'
 import { urlFor } from '@/sanity/lib/image'
+import { HeroSection } from '@/components/sections/hero-section'
+import { TerminalSection } from '@/components/sections/terminal-section'
+import type { Project, BlogPost } from '@/sanity/lib/types'
 
-const fullTextTyping = ['Full Stack Developer', 'Ai/ML Developer', 'Machine Learning Enthusiast']
+// export const revalidate = 60
 
-export default function Home() {
-  const [text, setText] = useState('')
-  const [textIndex, setTextIndex] = useState(0)
-  const [charIndex, setCharIndex] = useState(0)
-  const [isDeleting, setIsDeleting] = useState(false)
-  const [featuredProjects, setFeaturedProjects] = useState<Project[]>([])
-  const mounted = useHasMounted()
-  const isMobile = useMediaQuery('(max-width: 768px)')
-
-  // Fetch featured projects
-  useEffect(() => {
-    async function loadFeaturedProjects() {
-      try {
-        const projects = await getFeaturedProjects()
-        setFeaturedProjects(projects)
-      } catch (error) {
-        console.error('Error fetching featured projects:', error)
-      }
-    }
-
-    if (mounted) {
-      loadFeaturedProjects()
-    }
-  }, [mounted])
-
-  // Typing effect - only start after component mounts
-  useEffect(() => {
-    if (!mounted) return
-
-    const currentText = fullTextTyping[textIndex]
-    const typingSpeed = isDeleting ? 50 : 100 // Faster when deleting
-    const delayBeforeDelete = 2000 // Wait time before starting to delete
-    const delayBeforeNextWord = 500 // Wait time before typing next word
-
-    const timeout = setTimeout(() => {
-      if (!isDeleting) {
-        if (charIndex < currentText.length) {
-          setText(currentText.slice(0, charIndex + 1))
-          setCharIndex(charIndex + 1)
-        } else {
-          // Wait before starting to delete
-          setTimeout(() => setIsDeleting(true), delayBeforeDelete)
-        }
-      } else {
-        if (charIndex > 0) {
-          setText(currentText.slice(0, charIndex - 1))
-          setCharIndex(charIndex - 1)
-        } else {
-          setIsDeleting(false)
-          setTextIndex((textIndex + 1) % fullTextTyping.length)
-          // Small delay before typing next word
-          setTimeout(() => setCharIndex(0), delayBeforeNextWord)
-        }
-      }
-    }, typingSpeed)
-
-    return () => clearTimeout(timeout)
-  }, [mounted, charIndex, textIndex, isDeleting])
-
-  // Animation variants
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.3,
-      },
-    },
-  }
-
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  }
+export default async function Home() {
+  const [featuredProjects, featuredPosts, about] = await Promise.all([
+    getFeaturedProjects().catch(() => []),
+    getFeaturedBlogPosts().catch(() => []),
+    getAbout().catch(() => null),
+  ])
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto">
-      {/* Hero Section */}
-      <section className="flex min-h-[80vh] flex-col items-center justify-center px-4 py-12 sm:px-6 md:flex-row md:py-20 lg:px-8 lg:py-24">
-        <motion.div
-          className="mb-8 flex flex-col md:mb-0 md:w-1/2 md:pr-8"
-          initial={mounted ? { opacity: 0, y: 20 } : false}
-          animate={mounted ? { opacity: 1, y: 0 } : undefined}
-          transition={{ duration: 0.5 }}
-        >
-          <h1 className="mb-4 text-3xl font-bold text-primary sm:text-4xl md:text-5xl lg:text-6xl">
-            Hello, I&apos;m <span className="text-accent">Aman Kushwaha</span>
-          </h1>
-          <h2 className="mb-6 h-auto text-xl font-semibold text-muted-foreground sm:text-2xl md:text-3xl">
-            {mounted ? text || 'Full Stack Developer' : 'Full Stack Developer'}
-            <span className="animate-blink">|</span>
-          </h2>
-          <p className="mb-8 text-base text-muted-foreground sm:text-lg">
-            A passionate Full Stack Developer specializing in MERN stack development. I create efficient, scalable, and
-            user-friendly solutions with a focus on modern web technologies and best practices. Currently pursuing
-            B.Tech in Computer Science.
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button asChild size={isMobile ? 'default' : 'lg'} className="gap-2">
-                <Link href="/contact">
-                  Contact Me <ArrowRight size={16} />
-                </Link>
-              </Button>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button asChild variant="outline" size={isMobile ? 'default' : 'lg'} className="gap-2">
-                <Link href="/AmanKushwaha_Resume.pdf" target="_blank" download>
-                  Resume <Download size={16} />
-                </Link>
-              </Button>
-            </motion.div>
+    <div className="flex flex-col">
+      {/* Hero */}
+      <HeroSection about={about} />
+
+      {/* Quick Nav Cards */}
+      <section className="px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-8">
+            <span className="section-label">
+              <span className="dot-separator" />
+              Navigate
+            </span>
+            <h2 className="mt-2 text-2xl font-bold">Explore My Work</h2>
           </div>
-        </motion.div>
-
-        <motion.div
-          className="relative h-48 w-48 overflow-hidden rounded-full border-4 border-accent sm:h-56 sm:w-56 md:h-64 md:w-64 lg:h-80 lg:w-80"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
-        >
-          <Image src="/aman-pic.jpg" alt="Profile" fill className="object-cover" priority />
-        </motion.div>
-      </section>
-
-      {/* Quick Links */}
-      <section className="bg-card px-4 py-12 sm:px-6 lg:px-8">
-        <motion.div
-          className="mx-auto grid max-w-6xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
-          variants={container}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: '-100px' }}
-        >
-          <motion.div variants={item}>
-            <QuickLinkCard icon={Code} title="Skills" description="Check out my technical expertise" href="/skills" />
-          </motion.div>
-          <motion.div variants={item}>
-            <QuickLinkCard
-              icon={Briefcase}
-              title="Projects"
-              description="Browse through my portfolio of recent work"
-              href="/projects"
-            />
-          </motion.div>
-          <motion.div variants={item}>
-            <QuickLinkCard
-              icon={User}
-              title="About Me"
-              description="Learn more about my background and experience"
-              href="/about"
-            />
-          </motion.div>
-          <motion.div variants={item}>
-            <QuickLinkCard
-              icon={Mail}
-              title="Contact"
-              description="Get in touch for collaborations or opportunities"
-              href="/contact"
-            />
-          </motion.div>
-        </motion.div>
-      </section>
-
-      {/* Terminal Section */}
-      <section className="px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-4xl">
-          <motion.h2
-            className="mb-6 text-xl font-bold text-primary sm:text-2xl"
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            Terminal
-          </motion.h2>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            <Terminal>
-              <div className="terminal-prompt">whoami</div>
-              <div className="terminal-output mb-4">Aman Kushwaha (alias: amank-root)</div>
-
-              <div className="terminal-prompt">cat introduction.txt</div>
-              <div className="terminal-output mb-4">
-                Hello! I&apos;m a Full Stack Developer with expertise in the MERN stack. I have a strong foundation in
-                web development and a passion for creating innovative solutions. Currently pursuing my B.Tech in
-                Computer Science, I combine academic knowledge with practical development experience.
-              </div>
-
-              <div className="terminal-prompt">ls skills/</div>
-              <div className="terminal-output mb-4">
-                <span className="syntax-string">frontend/</span> <span className="syntax-string">backend/</span>{' '}
-                <span className="syntax-string">database/</span> <span className="syntax-string">tools/</span>
-              </div>
-
-              <div className="terminal-prompt">ls skills/frontend/</div>
-              <div className="terminal-output mb-4">
-                <span className="syntax-variable">React.js</span> <span className="syntax-variable">Next.js</span>{' '}
-                <span className="syntax-variable">JavaScript</span> <span className="syntax-variable">Tailwind</span>
-              </div>
-
-              <div className="terminal-prompt">echo $CONTACT_INFO</div>
-              <div className="terminal-output">
-                GitHub: github.com/amank-root | LinkedIn: linkedin.com/in/amank-root
-              </div>
-            </Terminal>
-          </motion.div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              { icon: Code, title: 'Skills', desc: 'Tech stack & expertise', href: '/skills', color: 'primary' },
+              { icon: Briefcase, title: 'Projects', desc: 'Portfolio of work', href: '/projects', color: 'accent' },
+              { icon: User, title: 'About', desc: 'My story & journey', href: '/about', color: 'secondary' },
+              { icon: BookOpen, title: 'Blog', desc: 'Thoughts & tutorials', href: '/blog', color: 'primary' },
+              { icon: Mail, title: 'Contact', desc: 'Let\'s collaborate', href: '/contact', color: 'accent' },
+            ].map((item) => (
+              <Link key={item.href} href={item.href} className="group">
+                <div className="glass rounded-xl p-5 hover-card border-border/50 hover:border-primary/30 transition-all duration-300">
+                  <div className={`mb-3 inline-flex rounded-lg p-2.5 ${item.color === 'primary' ? 'bg-primary/10' : item.color === 'accent' ? 'bg-accent/10' : 'bg-secondary/10'}`}>
+                    <item.icon size={18} className={item.color === 'primary' ? 'text-primary' : item.color === 'accent' ? 'text-accent' : 'text-secondary'} />
+                  </div>
+                  <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">{item.title}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">{item.desc}</p>
+                  <div className="mt-3 flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                    Explore <ArrowRight size={12} />
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
+
+      {/* Terminal */}
+      <TerminalSection />
 
       {/* Featured Projects */}
-      <section className="bg-card px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-            <motion.h2
-              className="text-xl font-bold text-primary sm:text-2xl"
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
-              Featured Projects
-            </motion.h2>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
-              <Button asChild variant="outline" size="sm" className="gap-2">
-                <Link href="/projects">
-                  View All <ArrowRight size={16} />
+      {featuredProjects.length > 0 && (
+        <section className="px-4 py-16 sm:px-6 lg:px-8 bg-background-elevated/30">
+          <div className="mx-auto max-w-5xl">
+            <div className="mb-8 flex items-end justify-between">
+              <div>
+                <span className="section-label">
+                  <Zap size={12} />
+                  Featured Work
+                </span>
+                <h2 className="mt-2 text-2xl font-bold">Recent Projects</h2>
+              </div>
+              <Link href="/projects">
+                <Button variant="outline" size="sm" className="gap-2 text-xs border-border/50 hover:border-primary/50">
+                  View All <ArrowRight size={12} />
+                </Button>
+              </Link>
+            </div>
+            <div className="grid gap-5 sm:grid-cols-2">
+              {(featuredProjects as Project[]).slice(0, 4).map((project) => (
+                <div key={project._id} className="group glass rounded-xl overflow-hidden hover-card border-border/50 hover:border-primary/20">
+                  <div className="relative h-44 w-full overflow-hidden">
+                    <Image
+                      src={
+                        project.mainImage
+                          ? urlFor(project.mainImage).width(600).height(300).url()
+                          : `https://dummyimage.com/600X300/0d1117/00c8ff.png&text=${encodeURIComponent(project.title)}`
+                      }
+                      alt={project.mainImage?.alt || project.title}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-linear-to-t from-background/80 to-transparent" />
+                    {project.status && (
+                      <div className="absolute top-3 right-3">
+                        <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${project.status === 'completed' ? 'bg-accent/20 text-accent border border-accent/30' :
+                          project.status === 'development' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' :
+                            'bg-secondary/20 text-secondary border border-secondary/30'
+                          }`}>
+                          {project.status}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="p-5">
+                    <h3 className="font-bold text-foreground group-hover:text-primary transition-colors mb-1">
+                      <Link href={`/projects/${project.slug.current}`}>
+                        {project.title}
+                      </Link>
+                    </h3>
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{project.description}</p>
+
+                    <div className="flex flex-wrap gap-1.5 mb-4">
+                      {project.technologies?.slice(0, 4).map(tech => (
+                        <span key={tech._id} className="tag-pill">{tech.name}</span>
+                      ))}
+                      {(project.technologies?.length || 0) > 4 && (
+                        <span className="tag-pill">+{(project.technologies?.length || 0) - 4}</span>
+                      )}
+                    </div>
+
+                    <div className="flex gap-2">
+                      {project.githubUrl && (
+                        <Link href={project.githubUrl} target="_blank">
+                          <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7 border-border/50 hover:border-primary/50">
+                            <Github size={12} /> Code
+                          </Button>
+                        </Link>
+                      )}
+                      {project.demoUrl && (
+                        <Link href={project.demoUrl} target="_blank">
+                          <Button size="sm" className="gap-1.5 text-xs h-7 bg-primary/10 text-primary hover:bg-primary/20 border border-primary/30">
+                            <ExternalLink size={12} /> Demo
+                          </Button>
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Featured Blog Posts */}
+      {featuredPosts.length > 0 && (
+        <section className="px-4 py-16 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-5xl">
+            <div className="mb-8 flex items-end justify-between">
+              <div>
+                <span className="section-label">
+                  <Star size={12} />
+                  Latest Writing
+                </span>
+                <h2 className="mt-2 text-2xl font-bold">From the Blog</h2>
+              </div>
+              <Link href="/blog">
+                <Button variant="outline" size="sm" className="gap-2 text-xs border-border/50 hover:border-primary/50">
+                  All Posts <ArrowRight size={12} />
+                </Button>
+              </Link>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-3">
+              {(featuredPosts as BlogPost[]).map((post) => (
+                <Link key={post._id} href={`/blog/${post.slug.current}`} className="group">
+                  <div className="glass rounded-xl overflow-hidden hover-card border-border/50 hover:border-primary/20 h-full">
+                    {post.mainImage && (
+                      <div className="relative h-36 overflow-hidden">
+                        <Image
+                          src={urlFor(post.mainImage).width(400).height(200).url()}
+                          alt={post.mainImage.alt || post.title}
+                          fill
+                          className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-linear-to-t from-background/60 to-transparent" />
+                      </div>
+                    )}
+                    <div className="p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        {post.categories?.[0] && (
+                          <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                            {post.categories[0].title}
+                          </span>
+                        )}
+                        {post.readTime && (
+                          <span className="text-[10px] text-muted-foreground">{post.readTime} min read</span>
+                        )}
+                      </div>
+                      <h3 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-2">{post.title}</h3>
+                      {post.excerpt && (
+                        <p className="text-xs text-muted-foreground line-clamp-2">{post.excerpt}</p>
+                      )}
+                      <div className="mt-3 text-xs text-muted-foreground">
+                        {post.publishedAt && new Date(post.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </div>
+                    </div>
+                  </div>
                 </Link>
-              </Button>
-            </motion.div>
+              ))}
+            </div>
           </div>
-
-          <motion.div
-            className="grid gap-6 sm:grid-cols-2"
-            variants={container}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, margin: '-100px' }}
-          >
-            {featuredProjects.map(project => (
-              <motion.div
-                key={project._id}
-                variants={item}
-                whileHover={{ y: -5, transition: { duration: 0.2 } }}
-                className="overflow-hidden rounded-lg border border-border bg-background shadow-md transition-all"
-              >
-                <div className="relative h-48 w-full">
-                  <Image
-                    src={
-                      project.mainImage
-                        ? urlFor(project.mainImage).width(600).height(300).url()
-                        : 'https://dummyimage.com/600X300/1f2023/f9f2ed.png&text=' + project.title
-                    }
-                    alt={project.mainImage?.alt || project.title}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-
-                <div className="p-4 sm:p-6">
-                  <h3 className="mb-2 text-lg font-bold text-accent sm:text-xl">{project.title}</h3>
-                  <p className="mb-4 text-sm text-muted-foreground sm:text-base">{project.description}</p>
-
-                  <div className="mb-4 flex flex-wrap gap-2">
-                    {project.technologies?.map(tech => (
-                      <span
-                        key={tech._id}
-                        className="rounded-full bg-secondary px-2 py-1 text-xs text-secondary-foreground"
-                      >
-                        {tech.name}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="flex gap-3">
-                    {project.githubUrl && (
-                      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                        <Button asChild size="sm" variant="outline" className="gap-1 text-xs sm:gap-2 sm:text-sm">
-                          <Link href={project.githubUrl} target="_blank">
-                            <Github size={14} /> GitHub
-                          </Link>
-                        </Button>
-                      </motion.div>
-                    )}
-                    {project.demoUrl && (
-                      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                        <Button asChild size="sm" className="gap-1 text-xs sm:gap-2 sm:text-sm">
-                          <Link href={project.demoUrl} target="_blank">
-                            <ExternalLink size={14} /> Live Demo
-                          </Link>
-                        </Button>
-                      </motion.div>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
+        </section>
+      )}
     </div>
-  )
-}
-
-interface QuickLinkCardProps {
-  icon: React.ElementType
-  title: string
-  description: string
-  href: string
-}
-
-function QuickLinkCard({ icon: Icon, title, description, href }: QuickLinkCardProps) {
-  return (
-    <motion.div whileHover={{ y: -5, transition: { duration: 0.2 } }}>
-      <Card className="h-full transition-all hover:border-accent hover:shadow-md">
-        <CardContent className="flex h-full flex-col items-center p-4 text-center sm:p-6">
-          <div className="mb-4 rounded-full bg-accent/10 p-3">
-            <Icon className="h-5 w-5 text-accent sm:h-6 sm:w-6" />
-          </div>
-          <h3 className="mb-2 text-base font-semibold sm:text-lg">{title}</h3>
-          <p className="mb-4 text-xs text-muted-foreground sm:text-sm">{description}</p>
-          <motion.div className="mt-auto" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button asChild variant="outline" size="sm">
-              <Link href={href}>Explore</Link>
-            </Button>
-          </motion.div>
-        </CardContent>
-      </Card>
-    </motion.div>
   )
 }

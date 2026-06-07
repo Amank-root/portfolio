@@ -1,7 +1,7 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  cacheComponents: true,
   images: {
     remotePatterns: [
       {
@@ -14,6 +14,14 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
+  },
+  // experimental: {
+  //   reactCompiler: true,
+  // },
 }
 
 export default nextConfig

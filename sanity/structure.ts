@@ -1,13 +1,11 @@
 import type { StructureResolver } from 'sanity/structure'
 
-// https://www.sanity.io/docs/structure-builder-cheat-sheet
 export const structure: StructureResolver = S =>
   S.list()
-    .title('Portfolio')
+    .title('Portfolio CMS')
     .items([
-      // Portfolio sections
       S.listItem()
-        .title('Portfolio Content')
+        .title('📁 Portfolio Content')
         .child(
           S.list()
             .title('Portfolio Content')
@@ -21,22 +19,33 @@ export const structure: StructureResolver = S =>
             ])
         ),
       S.divider(),
-      // Blog sections
       S.listItem()
-        .title('Blog Content')
+        .title('✍️ Blog Content')
         .child(
           S.list()
             .title('Blog Content')
             .items([
-              S.documentTypeListItem('post').title('Posts'),
+              S.documentTypeListItem('post').title('Blog Posts'),
               S.documentTypeListItem('category').title('Categories'),
               S.documentTypeListItem('author').title('Authors'),
+            ])
+        ),
+      S.divider(),
+      S.listItem()
+        .title('📊 Analytics & Engagement')
+        .child(
+          S.list()
+            .title('Analytics')
+            .items([
+              S.documentTypeListItem('pageView').title('Page Views'),
+              S.documentTypeListItem('blogReaction').title('Reactions'),
+              S.documentTypeListItem('blogComment').title('Comments'),
             ])
         ),
       S.divider(),
       ...S.documentTypeListItems().filter(
         item =>
           item.getId() &&
-          !['post', 'category', 'author', 'project', 'skill', 'about', 'contact', 'tag'].includes(item.getId()!)
+          !['post', 'category', 'author', 'project', 'skill', 'about', 'contact', 'tag', 'pageView', 'blogReaction', 'blogComment'].includes(item.getId()!)
       ),
     ])

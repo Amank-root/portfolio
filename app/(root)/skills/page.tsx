@@ -1,315 +1,128 @@
-'use client'
-
-import type React from 'react'
-import { useState, useEffect, useMemo } from 'react'
-
-import { motion } from 'framer-motion'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Code, Server, Wrench, Braces, Database, Globe, GitBranch, Cloud, Palette } from 'lucide-react'
-import { useHasMounted } from '@/components/client-only'
+import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import { getSkills } from '@/sanity/lib/queries'
-import { Skill } from '@/sanity/lib/types'
+import { Code2, Globe, Server, Wrench, Cpu } from 'lucide-react'
+import type { Skill } from '@/sanity/lib/types'
 
-interface SkillCardProps {
-  icon: React.ElementType
-  title: string
-  description: string
-  skills: string[]
+export const metadata: Metadata = {
+  title: 'Skills',
+  description: 'Technical skills and expertise of Aman Kushwaha — frontend, backend, databases, and tools.',
 }
 
-function SkillCard({ icon: Icon, title, description, skills }: SkillCardProps) {
+// export const revalidate = 60
+
+const categoryConfig: Record<string, { label: string; icon: typeof Code2; color: string }> = {
+  frontend: { label: 'Frontend', icon: Globe, color: 'text-primary' },
+  backend: { label: 'Backend', icon: Server, color: 'text-accent' },
+  tools: { label: 'Tools & DevOps', icon: Wrench, color: 'text-secondary' },
+  other: { label: 'Other', icon: Cpu, color: 'text-muted-foreground' },
+}
+
+const FALLBACK_SKILLS: Skill[] = [
+  { _id: '1', title: 'Frontend', description: '', category: 'frontend', skills: ['React.js', 'Next.js', 'TypeScript', 'Tailwind CSS', 'Framer Motion', 'HTML5', 'CSS3'] },
+  { _id: '2', title: 'Backend', description: '', category: 'backend', skills: ['Node.js', 'Express.js', 'FastAPI', 'Python', 'REST APIs', 'GraphQL', 'WebSockets'] },
+  { _id: '3', title: 'Database & Cloud', description: '', category: 'tools', skills: ['MongoDB', 'PostgreSQL', 'Redis', 'Firebase', 'Sanity CMS', 'Vercel', 'AWS S3'] },
+  { _id: '4', title: 'AI & Tools', description: '', category: 'other', skills: ['Machine Learning', 'TensorFlow', 'Git', 'Docker', 'Linux', 'Figma', 'Postman'] },
+]
+
+export default function SkillsPage() {
   return (
-    <motion.div whileHover={{ y: -5, transition: { duration: 0.2 } }}>
-      <Card className="h-full">
-        <CardHeader className="pb-3">
-          <div className="flex items-center gap-2">
-            <div className="rounded-md bg-primary/10 p-1.5 sm:p-2">
-              <Icon className="h-4 w-4 text-primary sm:h-5 sm:w-5" />
-            </div>
-            <CardTitle className="text-sm sm:text-base lg:text-lg">{title}</CardTitle>
-          </div>
-          <CardDescription className="mt-2 text-xs sm:text-sm">{description}</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-2 pt-0">
-          <div className="mt-2 flex flex-wrap gap-1.5 sm:gap-2">
-            {skills.map((skill, index) => (
-              <motion.span
-                key={index}
-                className="inline-flex rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-secondary-foreground sm:text-sm"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                {skill}
-              </motion.span>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
+    <Suspense fallback={<SkillsPageSkeleton />}>
+      <SkillsPageContent />
+    </Suspense>
   )
 }
 
-export default function Skills() {
-  const mounted = useHasMounted()
-  const [skills, setSkills] = useState<Skill[]>([])
-  const [loading, setLoading] = useState(true)
+async function SkillsPageContent() {
+  const sanitySkills = await getSkills().catch(() => []) as Skill[]
+  const skills = sanitySkills.length > 0 ? sanitySkills : FALLBACK_SKILLS
 
-  // Fallback skills data
-  const fallbackSkills: Skill[] = useMemo(
-    () => [
-      {
-        _id: 'frontend',
-        _type: 'skill',
-        title: 'Frontend Development',
-        description: 'Creating responsive and interactive user interfaces',
-        category: 'frontend',
-        skills: ['React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'HTML5', 'CSS3'],
-        icon: 'Code',
-        order: 1,
-      },
-      {
-        _id: 'backend',
-        _type: 'skill',
-        title: 'Backend Development',
-        description: 'Building robust server-side applications and APIs',
-        category: 'backend',
-        skills: ['Node.js', 'Express.js', 'Python', 'MongoDB', 'PostgreSQL', 'REST APIs'],
-        icon: 'Server',
-        order: 2,
-      },
-      {
-        _id: 'tools',
-        _type: 'skill',
-        title: 'Development Tools',
-        description: 'Tools and technologies for efficient development',
-        category: 'tools',
-        skills: ['Git', 'VS Code', 'Docker', 'AWS', 'Vercel', 'Figma'],
-        icon: 'Wrench',
-        order: 3,
-      },
-    ],
-    []
-  )
-
-  // Fetch skills from Sanity
-  useEffect(() => {
-    async function fetchSkills() {
-      try {
-        setLoading(true)
-        const skillsData = await getSkills()
-        setSkills(skillsData || fallbackSkills)
-      } catch (error) {
-        console.error('Error fetching skills:', error)
-        setSkills(fallbackSkills)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    if (mounted) {
-      fetchSkills()
-    }
-  }, [mounted, fallbackSkills])
-
-  // Group skills by category
-  const skillsByCategory = useMemo(() => {
-    return skills.reduce(
-      (acc, skill) => {
-        if (!acc[skill.category]) {
-          acc[skill.category] = []
-        }
-        acc[skill.category].push(skill)
-        return acc
-      },
-      {} as Record<string, Skill[]>
-    )
-  }, [skills])
-
-  // Icon mapping
-  const iconMap: Record<string, React.ElementType> = useMemo(
-    () => ({
-      Code,
-      Server,
-      Wrench,
-      Braces,
-      Database,
-      Globe,
-      GitBranch,
-      Cloud,
-      Palette,
-    }),
-    []
-  )
-
-  // Get icon component
-  const getIcon = (iconName?: string) => {
-    if (!iconName) return Code
-    return iconMap[iconName] || Code
-  }
-
-  // Animation variants
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.3,
-      },
-    },
-  }
-
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  }
+  const grouped = skills.reduce<Record<string, Skill[]>>((acc, skill) => {
+    const cat = skill.category || 'other'
+    if (!acc[cat]) acc[cat] = []
+    acc[cat].push(skill)
+    return acc
+  }, {})
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto">
-      {/* Hero Section */}
-      <section className="bg-card px-3 py-8 sm:px-4 sm:py-12 lg:px-8">
-        <div className="mx-auto max-w-6xl">
-          <motion.h1
-            className="mb-3 text-xl font-bold text-primary sm:mb-4 sm:text-2xl md:text-3xl lg:text-4xl"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            Skills & Expertise
-          </motion.h1>
-          <motion.p
-            className="max-w-3xl text-sm text-muted-foreground sm:text-base lg:text-lg"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            As a Full Stack Developer, I specialize in the MERN stack and modern web technologies. Here&apos;s an
-            overview of my technical skills and areas of expertise.
-          </motion.p>
+    <div className="min-h-full px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-4xl">
+        <div className="mb-12">
+          <span className="section-label mb-3 flex items-center gap-2">
+            <Code2 size={12} />
+            Expertise
+          </span>
+          <h1 className="text-4xl font-bold gradient-text">Skills</h1>
+          <p className="mt-3 text-muted-foreground max-w-lg">
+            My technical toolkit — continuously growing and evolving.
+          </p>
         </div>
-      </section>
 
-      {/* Loading State */}
-      {loading && (
-        <section className="px-3 py-6 sm:px-4 sm:py-8 lg:px-8">
-          <div className="mx-auto max-w-6xl">
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="h-32 animate-pulse rounded-lg bg-muted"></div>
-              ))}
+        <div className="space-y-8">
+          {Object.entries(grouped).map(([category, categorySkills]) => {
+            const config = categoryConfig[category] || categoryConfig.other
+            return (
+              <div key={category} className="glass rounded-xl p-6 border border-border/50">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="p-2 rounded-lg bg-muted/50">
+                    <config.icon size={16} className={config.color} />
+                  </div>
+                  <h2 className="font-semibold text-foreground">{config.label}</h2>
+                </div>
+
+                {categorySkills.map((group) => (
+                  <div key={group._id} className="mb-5 last:mb-0">
+                    {group.title && group.title !== config.label && (
+                      <h3 className="text-sm font-medium text-muted-foreground mb-3">{group.title}</h3>
+                    )}
+                    <div className="flex flex-wrap gap-2">
+                      {group.skills?.map((skill) => (
+                        <div
+                          key={skill}
+                          className="group flex items-center gap-1.5 rounded-lg border border-border/50 bg-muted/30 px-3 py-1.5 text-sm text-foreground/80 hover:border-primary/30 hover:text-primary hover:bg-primary/5 transition-all duration-200 cursor-default"
+                        >
+                          <span className="w-1.5 h-1.5 rounded-full bg-primary/40 group-hover:bg-primary transition-colors" />
+                          {skill}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function SkillsPageSkeleton() {
+  return (
+    <div className="min-h-full px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-4xl animate-pulse">
+        <div className="mb-12 space-y-3">
+          <div className="h-4 w-24 rounded-full bg-muted/40" />
+          <div className="h-10 w-40 rounded-lg bg-muted/40" />
+          <div className="h-4 w-full max-w-lg rounded-lg bg-muted/30" />
+        </div>
+
+        <div className="space-y-8">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <div key={index} className="rounded-xl border border-border/50 bg-muted/20 p-6">
+              <div className="mb-5 flex items-center gap-3">
+                <div className="h-8 w-8 rounded-lg bg-muted/40" />
+                <div className="h-5 w-32 rounded-lg bg-muted/40" />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {Array.from({ length: 7 }).map((_, skillIndex) => (
+                  <div key={skillIndex} className="h-8 w-24 rounded-lg bg-muted/30" />
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
-      )}
-
-      {/* Skills Grid */}
-      {!loading && (
-        <section className="px-3 py-6 sm:px-4 sm:py-8 lg:px-8">
-          <div className="mx-auto max-w-6xl">
-            <Tabs defaultValue="frontend" className="w-full">
-              <TabsList className="grid w-full h-auto grid-cols-2 gap-1 p-1 sm:grid-cols-4 sm:gap-2">
-                <TabsTrigger value="frontend" className="text-xs font-medium sm:text-sm">
-                  Frontend
-                </TabsTrigger>
-                <TabsTrigger value="backend" className="text-xs font-medium sm:text-sm">
-                  Backend
-                </TabsTrigger>
-                <TabsTrigger value="tools" className="text-xs font-medium sm:text-sm">
-                  Tools
-                </TabsTrigger>
-                <TabsTrigger value="all" className="text-xs font-medium sm:text-sm">
-                  All
-                </TabsTrigger>
-              </TabsList>
-
-              {/* Frontend Skills */}
-              <TabsContent value="frontend" className="mt-4 sm:mt-6">
-                <motion.div
-                  className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 lg:gap-6"
-                  variants={container}
-                  initial="hidden"
-                  animate="show"
-                >
-                  {skillsByCategory.frontend?.map(skill => (
-                    <motion.div key={skill._id} variants={item} className="h-full">
-                      <SkillCard
-                        icon={getIcon(skill.icon)}
-                        title={skill.title}
-                        description={skill.description}
-                        skills={skill.skills}
-                      />
-                    </motion.div>
-                  ))}
-                </motion.div>
-              </TabsContent>
-
-              {/* Backend Skills */}
-              <TabsContent value="backend" className="mt-4 sm:mt-6">
-                <motion.div
-                  className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 lg:gap-6"
-                  variants={container}
-                  initial="hidden"
-                  animate="show"
-                >
-                  {skillsByCategory.backend?.map(skill => (
-                    <motion.div key={skill._id} variants={item} className="h-full">
-                      <SkillCard
-                        icon={getIcon(skill.icon)}
-                        title={skill.title}
-                        description={skill.description}
-                        skills={skill.skills}
-                      />
-                    </motion.div>
-                  ))}
-                </motion.div>
-              </TabsContent>
-
-              {/* Tools Skills */}
-              <TabsContent value="tools" className="mt-4 sm:mt-6">
-                <motion.div
-                  className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 lg:gap-6"
-                  variants={container}
-                  initial="hidden"
-                  animate="show"
-                >
-                  {skillsByCategory.tools?.map(skill => (
-                    <motion.div key={skill._id} variants={item} className="h-full">
-                      <SkillCard
-                        icon={getIcon(skill.icon)}
-                        title={skill.title}
-                        description={skill.description}
-                        skills={skill.skills}
-                      />
-                    </motion.div>
-                  ))}
-                </motion.div>
-              </TabsContent>
-
-              {/* All Skills */}
-              <TabsContent value="all" className="mt-4 sm:mt-6">
-                <motion.div
-                  className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 lg:gap-6"
-                  variants={container}
-                  initial="hidden"
-                  animate="show"
-                >
-                  {skills.map(skill => (
-                    <motion.div key={skill._id} variants={item} className="h-full">
-                      <SkillCard
-                        icon={getIcon(skill.icon)}
-                        title={skill.title}
-                        description={skill.description}
-                        skills={skill.skills}
-                      />
-                    </motion.div>
-                  ))}
-                </motion.div>
-              </TabsContent>
-            </Tabs>
-          </div>
-        </section>
-      )}
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

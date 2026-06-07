@@ -9,6 +9,7 @@ import { tagType } from './tagType'
 import { skillType } from './skillType'
 import { aboutType } from './aboutType'
 import { contactType } from './contactType'
+import { pageViewType, blogReactionType, blogCommentType } from './analyticsType'
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -21,5 +22,8 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     skillType,
     aboutType,
     contactType,
+    pageViewType,
+    blogReactionType,
+    blogCommentType,
   ],
 }
