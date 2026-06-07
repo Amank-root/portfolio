@@ -30,7 +30,7 @@ export const projectType = defineType({
     defineField({
       name: 'longDescription',
       title: 'Long Description',
-      type: 'blockContent',
+      type: 'text',
     }),
     defineField({
       name: 'mainImage',
