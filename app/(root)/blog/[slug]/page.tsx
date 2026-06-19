@@ -46,8 +46,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       images: ogImageUrl ? [ogImageUrl] : [],
     },
-    ...(post.seo?.noIndex && { robots: { index: false, follow: false } }),
-    ...(post.seo?.canonicalUrl && { alternates: { canonical: post.seo.canonicalUrl } }),
+    ...(post.seo?.noIndex ? { robots: { index: false, follow: false } } : { robots : {index: true, follow: true }}),
+    ...(post.seo?.canonicalUrl ? { alternates: { canonical: post.seo.canonicalUrl } } : {alternates: { canonical: `/blog/${slug}`}}),
   }
 }
 

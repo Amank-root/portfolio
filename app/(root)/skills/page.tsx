@@ -7,6 +7,9 @@ import type { Skill } from '@/sanity/lib/types'
 export const metadata: Metadata = {
   title: 'Skills',
   description: 'Technical skills and expertise of Aman Kushwaha — frontend, backend, databases, and tools.',
+  alternates: {
+    canonical: `/skills`
+  }
 }
 
 // export const revalidate = 60

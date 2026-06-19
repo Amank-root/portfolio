@@ -17,6 +17,9 @@ import type { About } from '@/sanity/lib/types'
 export const metadata: Metadata = {
   title: 'About',
   description: 'Learn about Aman Kushwaha — Full Stack Developer, MERN specialist, and AI/ML enthusiast.',
+  alternates: {
+    canonical: `/about`
+  }
 }
 
 // export const revalidate = 60

@@ -10,6 +10,9 @@ import type { BlogPost } from '@/sanity/lib/types'
 export const metadata: Metadata = {
   title: 'Blog',
   description: 'Thoughts, tutorials, and insights on web development, AI/ML, and technology.',
+  alternates: {
+    canonical: `/blog`
+  }
 }
 
 // export const revalidate = 60

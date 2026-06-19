@@ -12,6 +12,9 @@ import { Suspense } from 'react';
 export const metadata: Metadata = {
   title: 'Projects',
   description: 'Portfolio of web development, AI/ML, and full-stack projects by Aman Kushwaha.',
+  alternates: {
+    canonical: `/projects`
+  }
 }
 
 // export const revalidate = 60

@@ -10,8 +10,15 @@ import { urlFor } from '@/sanity/lib/image'
 import { HeroSection } from '@/components/sections/hero-section'
 import { TerminalSection } from '@/components/sections/terminal-section'
 import type { Project, BlogPost } from '@/sanity/lib/types'
+import { Metadata } from 'next';
 
 // export const revalidate = 60
+export const metadata: Metadata = {
+  title: 'Home',
+  alternates: {
+    canonical: `/`
+  }
+}
 
 export default async function Home() {
   const [featuredProjects, featuredPosts, about] = await Promise.all([

@@ -19,12 +19,15 @@ const firaCode = Fira_Code({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Aman Kushwaha ~ Full Stack Developer',
+    default: 'Aman Kushwaha ~ Data Scientist',
     template: '%s | Aman Kushwaha',
   },
+  alternates: {
+    canonical: '/'
+  },
   description:
-    'Aman Kushwaha — Full Stack Developer specializing in MERN stack, Next.js, and AI/ML. Building scalable, modern web applications.',
-  keywords: ['Full Stack Developer', 'MERN Stack', 'Next.js', 'React', 'TypeScript', 'AI/ML', 'Aman Kushwaha'],
+    'Aman Kushwaha — Results-driven Data Science undergraduate with hands-on experience in machine learning, AI systems, full-stack development, and open-source projects. Passionate about building scalable solutions, learning emerging technologies, and collaborating with diverse teams to solve complex challenges. Seeking opportunities to contribute technical expertise while continuing to grow as an engineer.',
+  keywords: ['Data Scientist', 'Full Stack Developer', 'MERN Stack', 'Next.js', 'React', 'TypeScript', 'AI/ML', 'Aman Kushwaha', 'amank-root', "amank root"],
   authors: [{ name: 'Aman Kushwaha' }],
   creator: 'Aman Kushwaha',
   openGraph: {
@@ -33,17 +36,17 @@ export const metadata: Metadata = {
     url: 'https://amankushwaha.dev',
     siteName: 'Aman Kushwaha Portfolio',
     title: 'Aman Kushwaha ~ Full Stack Developer',
-    description: 'Full Stack Developer specializing in MERN stack, Next.js, and AI/ML.',
+    description: 'Results-driven Data Science undergraduate with hands-on experience in machine learning, AI systems, full-stack development, and open-source projects. Passionate about building scalable solutions, learning emerging technologies, and collaborating with diverse teams to solve complex challenges. Seeking opportunities to contribute technical expertise while continuing to grow as an engineer.',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Aman Kushwaha ~ Full Stack Developer',
-    description: 'Full Stack Developer specializing in MERN stack, Next.js, and AI/ML.',
+    description: 'Results-driven Data Science undergraduate with hands-on experience in machine learning, AI systems, full-stack development, and open-source projects. Passionate about building scalable solutions, learning emerging technologies, and collaborating with diverse teams to solve complex challenges. Seeking opportunities to contribute technical expertise while continuing to grow as an engineer.',
     creator: '@AmanKushwaha_28',
   },
   icons: {
-    icon: '/ak-logo.svg',
-    shortcut: '/ak-logo.svg',
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
   },
   robots: {
     index: true,

@@ -114,9 +114,7 @@ export function HeroSection({ about }: HeroSectionProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
             >
-              Full Stack Developer specializing in MERN stack & Next.js. Building
-              scalable, performant web applications with clean code and great UX.
-              Currently pursuing B.Tech in Computer Science.
+              Results-driven Data Science undergraduate with hands-on experience in machine learning, AI systems, full-stack development, and open-source projects. Passionate about building scalable solutions, learning emerging technologies, and collaborating with diverse teams to solve complex challenges. Seeking opportunities to contribute technical expertise while continuing to grow as an engineer.
             </motion.p>
 
             {/* CTA Buttons */}
