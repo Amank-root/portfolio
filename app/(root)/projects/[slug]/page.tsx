@@ -16,6 +16,16 @@ import { BlogMarkdownRenderer } from '@/components/blog-markdown-renderer'
 
 type Props = { params: Promise<{ slug: string }> }
 
+// longDescription can be a Portable Text array (legacy docs) or a plain
+// markdown string (docs created while the field was typed as `text`).
+function flattenLongDescription(value: Project['longDescription']): string {
+  if (!value) return ''
+  if (typeof value === 'string') return value
+  return value
+    .map(block => (block.children ?? []).map(child => child.text).join(''))
+    .join('\n\n')
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const project = await getProject(slug).catch(() => null) as Project | null
@@ -125,27 +135,26 @@ async function ProjectPageContent({ params }: Props) {
           </div>
         )}
 
-        {/* Long description */}
-        { /* if longdesc starts with # then blogmarkdownrender else portable render */}
-        {
-          project.longDescription && project.longDescription.map((block) => block.children.map((child, i) => child.text).join('')).join('\n\n').startsWith('#') ? (
-            <BlogMarkdownRenderer content={project.longDescription && project.longDescription.map((block) => block.children.map((child, i) => child.text).join('')).join('\n\n') || ""} />
-          ) : (
-            project.longDescription && (
+        {/* Long description: markdown-flavored content -> markdown renderer, else Portable Text */}
+        {(() => {
+          const text = flattenLongDescription(project.longDescription)
+          if (!text) return null
+          if (text.trimStart().startsWith('#')) {
+            return <BlogMarkdownRenderer content={text} />
+          }
+          if (Array.isArray(project.longDescription)) {
+            return (
               <div className="prose-blog">
                 <PortableText value={project.longDescription} components={portableTextComponents} />
               </div>
             )
+          }
+          return (
+            <div className="prose-blog">
+              {text.split('\n').map((line, i) => line.trim() && <p key={i} className="mb-4 text-foreground/85 leading-7">{line}</p>)}
+            </div>
           )
-        }
-        {/* {console.log(JSON.stringify(project.longDescription))} */}
-        {/* <BlogMarkdownRenderer content={JSON.stringify(project.longDescription)} /> */}
-        {/* {project.longDescription && project.longDescription.map((block) => block.children.map((child, i) => child.text).join('')).join('\n')} */}
-        {/* {project.longDescription && (
-          <div className="prose-blog">
-            <PortableText value={project.longDescription} components={portableTextComponents} />
-          </div>
-        )} */}
+        })()}
 
         {/* Gallery */}
         {project.gallery && project.gallery.length > 0 && (
