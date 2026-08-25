@@ -30,7 +30,7 @@ export interface Project {
   title: string
   slug: { current: string }
   description: string
-  longDescription?: PortableTextBlock[]
+  longDescription?: PortableTextBlock[] | string
   mainImage: SanityImage
   gallery?: SanityImage[]
   technologies: Tag[]
