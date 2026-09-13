@@ -1,10 +1,15 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useSyncExternalStore } from 'react'
+
+const subscribe = () => () => {}
 
 export function useHasMounted() {
-  const [mounted, setMounted] = useState(false)
-  useEffect(() => { setMounted(true) }, [])
-  return mounted
+  // SSR-safe hydration detection (same pattern next-themes uses).
+  return useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false
+  )
 }
 
 interface ClientOnlyProps {

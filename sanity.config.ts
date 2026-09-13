@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 import { visionTool } from '@sanity/vision'
 import { defineConfig } from 'sanity'
@@ -14,8 +14,5 @@ export default defineConfig({
   projectId,
   dataset,
   schema,
-  plugins: [
-    structureTool({ structure }),
-    visionTool({ defaultApiVersion: apiVersion }),
-  ],
+  plugins: [structureTool({ structure }), visionTool({ defaultApiVersion: apiVersion })],
 })

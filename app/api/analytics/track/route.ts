@@ -26,8 +26,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, skipped: true })
     }
 
-    const country = req.headers.get('x-vercel-ip-country') ||
-      req.headers.get('cf-ipcountry') || 'Unknown'
+    const country = req.headers.get('x-vercel-ip-country') || req.headers.get('cf-ipcountry') || 'Unknown'
 
     await writeClient.create({
       _type: 'pageView',
@@ -42,6 +41,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true })
   } catch (error) {
+    // Fail open: analytics must never break page rendering. The returned
+    // status follows the 500 pattern used by sibling routes.
+    console.error('[analytics] failed to track view', error)
     return NextResponse.json({ error: 'Failed to track view' }, { status: 500 })
   }
 }

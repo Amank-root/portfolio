@@ -21,7 +21,7 @@ interface BlogCommentsProps {
 }
 
 export function BlogComments({ blogSlug, initialComments = [] }: BlogCommentsProps) {
-  const [comments, setComments] = useState<Comment[]>(initialComments)
+  const [comments] = useState<Comment[]>(initialComments)
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [content, setContent] = useState('')
@@ -45,7 +45,9 @@ export function BlogComments({ blogSlug, initialComments = [] }: BlogCommentsPro
       toast.success('Comment submitted for review!', {
         description: 'Your comment will appear after moderation.',
       })
-      setName(''); setEmail(''); setContent('')
+      setName('')
+      setEmail('')
+      setContent('')
       setShowForm(false)
     } catch {
       toast.error('Failed to submit comment. Please try again.')
@@ -118,7 +120,13 @@ export function BlogComments({ blogSlug, initialComments = [] }: BlogCommentsPro
               <div className="flex items-center justify-between">
                 <p className="text-xs text-muted-foreground">Comments are moderated before appearing.</p>
                 <Button type="submit" size="sm" disabled={submitting} className="gap-2">
-                  {submitting ? 'Submitting...' : <><Send size={12} /> Submit</>}
+                  {submitting ? (
+                    'Submitting...'
+                  ) : (
+                    <>
+                      <Send size={12} /> Submit
+                    </>
+                  )}
                 </Button>
               </div>
             </form>
@@ -152,7 +160,11 @@ export function BlogComments({ blogSlug, initialComments = [] }: BlogCommentsPro
                     {comment.createdAt && (
                       <span className="text-xs text-muted-foreground flex items-center gap-1">
                         <Clock size={10} />
-                        {new Date(comment.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        {new Date(comment.createdAt).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                        })}
                       </span>
                     )}
                   </div>

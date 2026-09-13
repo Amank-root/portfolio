@@ -1,23 +1,23 @@
-"use cache";
+'use cache'
 
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { ArrowRight, Github, ExternalLink, Download, Code, Briefcase, User, Mail, BookOpen, Star, Zap } from 'lucide-react'
+import { ArrowRight, Github, ExternalLink, Code, Briefcase, User, Mail, BookOpen, Star, Zap } from 'lucide-react'
 import { getFeaturedProjects, getFeaturedBlogPosts, getAbout } from '@/sanity/lib/queries'
 import { urlFor } from '@/sanity/lib/image'
 import { HeroSection } from '@/components/sections/hero-section'
 import { TerminalSection } from '@/components/sections/terminal-section'
 import type { Project, BlogPost } from '@/sanity/lib/types'
-import { Metadata } from 'next';
+import { Metadata } from 'next'
 
 // export const revalidate = 60
 export const metadata: Metadata = {
   title: 'Home',
   alternates: {
-    canonical: `/`
-  }
+    canonical: `/`,
+  },
 }
 
 export default async function Home() {
@@ -48,14 +48,27 @@ export default async function Home() {
               { icon: Briefcase, title: 'Projects', desc: 'Portfolio of work', href: '/projects', color: 'accent' },
               { icon: User, title: 'About', desc: 'My story & journey', href: '/about', color: 'secondary' },
               { icon: BookOpen, title: 'Blog', desc: 'Thoughts & tutorials', href: '/blog', color: 'primary' },
-              { icon: Mail, title: 'Contact', desc: 'Let\'s collaborate', href: '/contact', color: 'accent' },
-            ].map((item) => (
+              { icon: Mail, title: 'Contact', desc: "Let's collaborate", href: '/contact', color: 'accent' },
+            ].map(item => (
               <Link key={item.href} href={item.href} className="group">
                 <div className="glass rounded-xl p-5 hover-card border-border/50 hover:border-primary/30 transition-all duration-300">
-                  <div className={`mb-3 inline-flex rounded-lg p-2.5 ${item.color === 'primary' ? 'bg-primary/10' : item.color === 'accent' ? 'bg-accent/10' : 'bg-secondary/10'}`}>
-                    <item.icon size={18} className={item.color === 'primary' ? 'text-primary' : item.color === 'accent' ? 'text-accent' : 'text-secondary'} />
+                  <div
+                    className={`mb-3 inline-flex rounded-lg p-2.5 ${item.color === 'primary' ? 'bg-primary/10' : item.color === 'accent' ? 'bg-accent/10' : 'bg-secondary/10'}`}
+                  >
+                    <item.icon
+                      size={18}
+                      className={
+                        item.color === 'primary'
+                          ? 'text-primary'
+                          : item.color === 'accent'
+                            ? 'text-accent'
+                            : 'text-secondary'
+                      }
+                    />
                   </div>
-                  <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">{item.title}</h3>
+                  <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                    {item.title}
+                  </h3>
                   <p className="mt-1 text-sm text-muted-foreground">{item.desc}</p>
                   <div className="mt-3 flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
                     Explore <ArrowRight size={12} />
@@ -89,8 +102,11 @@ export default async function Home() {
               </Link>
             </div>
             <div className="grid gap-5 sm:grid-cols-2">
-              {(featuredProjects as Project[]).slice(0, 4).map((project) => (
-                <div key={project._id} className="group glass rounded-xl overflow-hidden hover-card border-border/50 hover:border-primary/20">
+              {(featuredProjects as Project[]).slice(0, 4).map(project => (
+                <div
+                  key={project._id}
+                  className="group glass rounded-xl overflow-hidden hover-card border-border/50 hover:border-primary/20"
+                >
                   <div className="relative h-44 w-full overflow-hidden">
                     <Image
                       src={
@@ -105,10 +121,15 @@ export default async function Home() {
                     <div className="absolute inset-0 bg-linear-to-t from-background/80 to-transparent" />
                     {project.status && (
                       <div className="absolute top-3 right-3">
-                        <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${project.status === 'completed' ? 'bg-accent/20 text-accent border border-accent/30' :
-                          project.status === 'development' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' :
-                            'bg-secondary/20 text-secondary border border-secondary/30'
-                          }`}>
+                        <span
+                          className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
+                            project.status === 'completed'
+                              ? 'bg-accent/20 text-accent border border-accent/30'
+                              : project.status === 'development'
+                                ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                                : 'bg-secondary/20 text-secondary border border-secondary/30'
+                          }`}
+                        >
                           {project.status}
                         </span>
                       </div>
@@ -117,15 +138,15 @@ export default async function Home() {
 
                   <div className="p-5">
                     <h3 className="font-bold text-foreground group-hover:text-primary transition-colors mb-1">
-                      <Link href={`/projects/${project.slug.current}`}>
-                        {project.title}
-                      </Link>
+                      <Link href={`/projects/${project.slug.current}`}>{project.title}</Link>
                     </h3>
                     <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{project.description}</p>
 
                     <div className="flex flex-wrap gap-1.5 mb-4">
                       {project.technologies?.slice(0, 4).map(tech => (
-                        <span key={tech._id} className="tag-pill">{tech.name}</span>
+                        <span key={tech._id} className="tag-pill">
+                          {tech.name}
+                        </span>
                       ))}
                       {(project.technologies?.length || 0) > 4 && (
                         <span className="tag-pill">+{(project.technologies?.length || 0) - 4}</span>
@@ -135,14 +156,21 @@ export default async function Home() {
                     <div className="flex gap-2">
                       {project.githubUrl && (
                         <Link href={project.githubUrl} target="_blank">
-                          <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7 border-border/50 hover:border-primary/50">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="gap-1.5 text-xs h-7 border-border/50 hover:border-primary/50"
+                          >
                             <Github size={12} /> Code
                           </Button>
                         </Link>
                       )}
                       {project.demoUrl && (
                         <Link href={project.demoUrl} target="_blank">
-                          <Button size="sm" className="gap-1.5 text-xs h-7 bg-primary/10 text-primary hover:bg-primary/20 border border-primary/30">
+                          <Button
+                            size="sm"
+                            className="gap-1.5 text-xs h-7 bg-primary/10 text-primary hover:bg-primary/20 border border-primary/30"
+                          >
                             <ExternalLink size={12} /> Demo
                           </Button>
                         </Link>
@@ -175,7 +203,7 @@ export default async function Home() {
               </Link>
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
-              {(featuredPosts as BlogPost[]).map((post) => (
+              {(featuredPosts as BlogPost[]).map(post => (
                 <Link key={post._id} href={`/blog/${post.slug.current}`} className="group">
                   <div className="glass rounded-xl overflow-hidden hover-card border-border/50 hover:border-primary/20 h-full">
                     {post.mainImage && (
@@ -200,12 +228,17 @@ export default async function Home() {
                           <span className="text-[10px] text-muted-foreground">{post.readTime} min read</span>
                         )}
                       </div>
-                      <h3 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-2">{post.title}</h3>
-                      {post.excerpt && (
-                        <p className="text-xs text-muted-foreground line-clamp-2">{post.excerpt}</p>
-                      )}
+                      <h3 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-2">
+                        {post.title}
+                      </h3>
+                      {post.excerpt && <p className="text-xs text-muted-foreground line-clamp-2">{post.excerpt}</p>}
                       <div className="mt-3 text-xs text-muted-foreground">
-                        {post.publishedAt && new Date(post.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        {post.publishedAt &&
+                          new Date(post.publishedAt).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                          })}
                       </div>
                     </div>
                   </div>

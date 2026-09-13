@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const REACTIONS = [
@@ -19,16 +19,24 @@ interface BlogReactionsProps {
 export function BlogReactions({ blogSlug, initialReactions = [] }: BlogReactionsProps) {
   const [reactions, setReactions] = useState<Record<string, number>>(() => {
     const map: Record<string, number> = {}
-    initialReactions.forEach(r => { map[r.type] = r.count })
+    initialReactions.forEach(r => {
+      map[r.type] = r.count
+    })
     return map
   })
   const [userReactions, setUserReactions] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState<string | null>(null)
   const [particles, setParticles] = useState<{ id: string; emoji: string; x: number; y: number }[]>([])
+  const particleId = useRef(0)
 
+  // Hydrate user reactions from localStorage when the post changes.
+  // Skipped in SSR; functional updates keep this effect's state-sync clean.
   useEffect(() => {
+    // from localStorage; safe one-shot read per slug, state is idempotent.
     const stored = localStorage.getItem(`reactions-${blogSlug}`)
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (stored) setUserReactions(new Set(JSON.parse(stored)))
+    else setUserReactions(new Set())
   }, [blogSlug])
 
   const react = async (type: string, e: React.MouseEvent) => {
@@ -39,8 +47,8 @@ export function BlogReactions({ blogSlug, initialReactions = [] }: BlogReactions
     const emoji = REACTIONS.find(r => r.type === type)?.emoji || '❤️'
 
     // Add particle effect
-    const rect = (e.target as HTMLElement).getBoundingClientRect()
-    const id = Math.random().toString(36).substr(2, 9)
+    const id = 'p' + particleId.current
+    particleId.current += 1
     if (!hasReacted) {
       setParticles(prev => [...prev, { id, emoji, x: e.clientX, y: e.clientY }])
       setTimeout(() => setParticles(prev => prev.filter(p => p.id !== id)), 1000)
@@ -91,9 +99,7 @@ export function BlogReactions({ blogSlug, initialReactions = [] }: BlogReactions
       </AnimatePresence>
 
       <div className="glass rounded-2xl p-6 border border-border/50">
-        <h3 className="text-sm font-semibold text-foreground mb-4 text-center">
-          React to this post
-        </h3>
+        <h3 className="text-sm font-semibold text-foreground mb-4 text-center">React to this post</h3>
         <div className="flex items-center justify-center gap-3 flex-wrap">
           {REACTIONS.map(({ type, emoji, label }) => {
             const count = reactions[type] || 0

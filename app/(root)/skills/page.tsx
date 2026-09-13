@@ -8,8 +8,8 @@ export const metadata: Metadata = {
   title: 'Skills',
   description: 'Technical skills and expertise of Aman Kushwaha — frontend, backend, databases, and tools.',
   alternates: {
-    canonical: `/skills`
-  }
+    canonical: `/skills`,
+  },
 }
 
 // export const revalidate = 60
@@ -22,10 +22,34 @@ const categoryConfig: Record<string, { label: string; icon: typeof Code2; color:
 }
 
 const FALLBACK_SKILLS: Skill[] = [
-  { _id: '1', title: 'Frontend', description: '', category: 'frontend', skills: ['React.js', 'Next.js', 'TypeScript', 'Tailwind CSS', 'Framer Motion', 'HTML5', 'CSS3'] },
-  { _id: '2', title: 'Backend', description: '', category: 'backend', skills: ['Node.js', 'Express.js', 'FastAPI', 'Python', 'REST APIs', 'GraphQL', 'WebSockets'] },
-  { _id: '3', title: 'Database & Cloud', description: '', category: 'tools', skills: ['MongoDB', 'PostgreSQL', 'Redis', 'Firebase', 'Sanity CMS', 'Vercel', 'AWS S3'] },
-  { _id: '4', title: 'AI & Tools', description: '', category: 'other', skills: ['Machine Learning', 'TensorFlow', 'Git', 'Docker', 'Linux', 'Figma', 'Postman'] },
+  {
+    _id: '1',
+    title: 'Frontend',
+    description: '',
+    category: 'frontend',
+    skills: ['React.js', 'Next.js', 'TypeScript', 'Tailwind CSS', 'Framer Motion', 'HTML5', 'CSS3'],
+  },
+  {
+    _id: '2',
+    title: 'Backend',
+    description: '',
+    category: 'backend',
+    skills: ['Node.js', 'Express.js', 'FastAPI', 'Python', 'REST APIs', 'GraphQL', 'WebSockets'],
+  },
+  {
+    _id: '3',
+    title: 'Database & Cloud',
+    description: '',
+    category: 'tools',
+    skills: ['MongoDB', 'PostgreSQL', 'Redis', 'Firebase', 'Sanity CMS', 'Vercel', 'AWS S3'],
+  },
+  {
+    _id: '4',
+    title: 'AI & Tools',
+    description: '',
+    category: 'other',
+    skills: ['Machine Learning', 'TensorFlow', 'Git', 'Docker', 'Linux', 'Figma', 'Postman'],
+  },
 ]
 
 export default function SkillsPage() {
@@ -37,7 +61,7 @@ export default function SkillsPage() {
 }
 
 async function SkillsPageContent() {
-  const sanitySkills = await getSkills().catch(() => []) as Skill[]
+  const sanitySkills = (await getSkills().catch(() => [])) as Skill[]
   const skills = sanitySkills.length > 0 ? sanitySkills : FALLBACK_SKILLS
 
   const grouped = skills.reduce<Record<string, Skill[]>>((acc, skill) => {
@@ -73,13 +97,13 @@ async function SkillsPageContent() {
                   <h2 className="font-semibold text-foreground">{config.label}</h2>
                 </div>
 
-                {categorySkills.map((group) => (
+                {categorySkills.map(group => (
                   <div key={group._id} className="mb-5 last:mb-0">
                     {group.title && group.title !== config.label && (
                       <h3 className="text-sm font-medium text-muted-foreground mb-3">{group.title}</h3>
                     )}
                     <div className="flex flex-wrap gap-2">
-                      {group.skills?.map((skill) => (
+                      {group.skills?.map(skill => (
                         <div
                           key={skill}
                           className="group flex items-center gap-1.5 rounded-lg border border-border/50 bg-muted/30 px-3 py-1.5 text-sm text-foreground/80 hover:border-primary/30 hover:text-primary hover:bg-primary/5 transition-all duration-200 cursor-default"

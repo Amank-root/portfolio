@@ -9,7 +9,11 @@ const writeClient = client.withConfig({
 
 const IngestSchema = z.object({
   title: z.string().min(5).max(200),
-  slug: z.string().min(2).max(100).regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with hyphens'),
+  slug: z
+    .string()
+    .min(2)
+    .max(100)
+    .regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with hyphens'),
   content: z.string().min(10),
   excerpt: z.string().max(300).optional(),
   tags: z.array(z.string()).optional(),
@@ -30,23 +34,18 @@ export async function POST(req: NextRequest) {
     const parsed = IngestSchema.safeParse(body)
 
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: 'Validation failed', details: parsed.error.flatten() },
-        { status: 422 }
-      )
+      return NextResponse.json({ error: 'Validation failed', details: parsed.error.flatten() }, { status: 422 })
     }
 
     const { title, slug, content, excerpt, tags, readTime, published, featured } = parsed.data
 
     // Check if slug already exists
-    const existing = await client.fetch(
-      `*[_type == "post" && slug.current == $slug][0]._id`,
-      { slug }
-    )
+    const existing = await client.fetch(`*[_type == "post" && slug.current == $slug][0]._id`, { slug })
 
     if (existing) {
       // Update existing post
-      await writeClient.patch(existing)
+      await writeClient
+        .patch(existing)
         .set({
           title,
           markdownBody: content,
@@ -106,7 +105,8 @@ export async function GET(req: NextRequest) {
     example: {
       title: 'Building a Real-time Chat App with Next.js',
       slug: 'real-time-chat-nextjs',
-      content: '# Introduction\n\nIn this post...\n\n```mermaid\nflowchart TD\n  A[User] --> B[Next.js]\n  B --> C[WebSocket]\n```',
+      content:
+        '# Introduction\n\nIn this post...\n\n```mermaid\nflowchart TD\n  A[User] --> B[Next.js]\n  B --> C[WebSocket]\n```',
       excerpt: 'Learn how to build real-time features with Next.js and WebSockets',
       tags: ['nextjs', 'websockets', 'realtime'],
       readTime: 8,

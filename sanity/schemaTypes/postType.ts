@@ -9,7 +9,7 @@ export const postType = defineType({
       name: 'title',
       title: 'Title',
       type: 'string',
-      validation: (Rule) => Rule.required().min(10).max(120),
+      validation: Rule => Rule.required().min(10).max(120),
     }),
     defineField({
       name: 'slug',
@@ -19,7 +19,7 @@ export const postType = defineType({
         source: 'title',
         maxLength: 96,
       },
-      validation: (Rule) => Rule.required(),
+      validation: Rule => Rule.required(),
     }),
     defineField({
       name: 'excerpt',
@@ -27,7 +27,7 @@ export const postType = defineType({
       type: 'text',
       rows: 3,
       description: 'Short description shown in blog listing. Used for SEO meta description.',
-      validation: (Rule) => Rule.max(200),
+      validation: Rule => Rule.max(200),
     }),
     defineField({
       name: 'author',

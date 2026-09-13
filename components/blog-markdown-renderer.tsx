@@ -45,10 +45,7 @@ function CodeBlock({ language, children }: { language: string; children: string 
           },
           flowchart: { useMaxWidth: true, htmlLabels: true },
         })
-        const { svg } = await mermaid.render(
-          `mermaid-${Math.random().toString(36).substr(2, 9)}`,
-          children
-        )
+        const { svg } = await mermaid.render(`mermaid-${Math.random().toString(36).substr(2, 9)}`, children)
         if (containerRef.current) {
           containerRef.current.innerHTML = svg
         }
@@ -65,7 +62,7 @@ function CodeBlock({ language, children }: { language: string; children: string 
   if (isMermaid) {
     return (
       <div className="mermaid-container">
-        <div className="text-xs text-muted-foreground mb-3 font-mono">// Diagram</div>
+        <div className="text-xs text-muted-foreground mb-3 font-mono">{'\/\/ Diagram'}</div>
         <div ref={containerRef} className="flex justify-center overflow-x-auto" />
       </div>
     )
@@ -110,13 +107,8 @@ export function BlogMarkdownRenderer({ content }: BlogMarkdownRendererProps) {
         components={{
           code({ className, children, ...props }) {
             const match = /language-(\w+)/.exec(className || '')
-            const isBlock = !props.style // rough heuristic for inline vs block
             if (match && children) {
-              return (
-                <CodeBlock language={match[1]}>
-                  {String(children).replace(/\n$/, '')}
-                </CodeBlock>
-              )
+              return <CodeBlock language={match[1]}>{String(children).replace(/\n$/, '')}</CodeBlock>
             }
             return (
               <code className="font-mono text-sm bg-muted px-1.5 py-0.5 rounded text-primary" {...props}>
@@ -136,10 +128,23 @@ export function BlogMarkdownRenderer({ content }: BlogMarkdownRendererProps) {
             <td className="border border-border px-4 py-2.5 text-sm text-foreground/85">{children}</td>
           ),
           img: ({ src, alt }) => (
-            <img src={src} alt={alt} className="rounded-lg border border-border my-6 w-full max-w-full" loading="lazy" />
+            // renderer: images come from Sanity CDN with optimized srcset already;
+            // swapping to next/image here would break the renderer's generic contract.
+            // eslint-disable-next-line @next/next/no-img-element -- PortableText
+            <img
+              src={src}
+              alt={alt}
+              className="rounded-lg border border-border my-6 w-full max-w-full"
+              loading="lazy"
+            />
           ),
           a: ({ href, children }) => (
-            <a href={href} target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-4 hover:text-primary/80 transition-colors">
+            <a
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary underline underline-offset-4 hover:text-primary/80 transition-colors"
+            >
               {children}
             </a>
           ),
@@ -148,27 +153,21 @@ export function BlogMarkdownRenderer({ content }: BlogMarkdownRendererProps) {
               {children}
             </blockquote>
           ),
-          h1: ({ children }) => (
-            <h1 className="text-3xl font-bold mb-6 mt-10 gradient-text">{children}</h1>
-          ),
+          h1: ({ children }) => <h1 className="text-3xl font-bold mb-6 mt-10 gradient-text">{children}</h1>,
           h2: ({ children, id }) => (
-            <h2 id={id} className="text-2xl font-semibold mb-4 mt-8 text-foreground border-b border-border/30 pb-2">{children}</h2>
+            <h2 id={id} className="text-2xl font-semibold mb-4 mt-8 text-foreground border-b border-border/30 pb-2">
+              {children}
+            </h2>
           ),
           h3: ({ children, id }) => (
-            <h3 id={id} className="text-xl font-semibold mb-3 mt-6 text-foreground">{children}</h3>
+            <h3 id={id} className="text-xl font-semibold mb-3 mt-6 text-foreground">
+              {children}
+            </h3>
           ),
-          p: ({ children }) => (
-            <p className="mb-4 leading-7 text-foreground/85">{children}</p>
-          ),
-          ul: ({ children }) => (
-            <ul className="mb-4 pl-6 space-y-1.5 list-disc marker:text-primary">{children}</ul>
-          ),
-          ol: ({ children }) => (
-            <ol className="mb-4 pl-6 space-y-1.5 list-decimal marker:text-primary">{children}</ol>
-          ),
-          li: ({ children }) => (
-            <li className="text-foreground/85 leading-relaxed">{children}</li>
-          ),
+          p: ({ children }) => <p className="mb-4 leading-7 text-foreground/85">{children}</p>,
+          ul: ({ children }) => <ul className="mb-4 pl-6 space-y-1.5 list-disc marker:text-primary">{children}</ul>,
+          ol: ({ children }) => <ol className="mb-4 pl-6 space-y-1.5 list-decimal marker:text-primary">{children}</ol>,
+          li: ({ children }) => <li className="text-foreground/85 leading-relaxed">{children}</li>,
           hr: () => <hr className="border-border my-8" />,
         }}
       >

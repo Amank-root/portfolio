@@ -87,10 +87,7 @@ export function ContactClient({ contact }: ContactClientProps) {
         >
           {/* Contact Form */}
           <motion.div variants={item}>
-            <ContactForm
-              formspreeEndpoint={contact?.formspreeEndpoint}
-              recaptchaSiteKey={contact?.recaptchaSiteKey}
-            />
+            <ContactForm formspreeEndpoint={contact?.formspreeEndpoint} recaptchaSiteKey={contact?.recaptchaSiteKey} />
           </motion.div>
 
           {/* Contact Info */}
@@ -103,12 +100,7 @@ export function ContactClient({ contact }: ContactClientProps) {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <ContactItem
-                    icon={Mail}
-                    title="Email"
-                    value={email}
-                    href={`mailto:${email}`}
-                  />
+                  <ContactItem icon={Mail} title="Email" value={email} href={`mailto:${email}`} />
                   <ContactItem icon={MapPin} title="Location" value={location} />
                 </CardContent>
               </Card>
@@ -117,22 +109,13 @@ export function ContactClient({ contact }: ContactClientProps) {
             <motion.div variants={item}>
               <Card className="glass border-border/50">
                 <CardHeader>
-                  <CardTitle className="text-lg sm:text-xl font-semibold text-foreground">
-                    Social Media
-                  </CardTitle>
+                  <CardTitle className="text-lg sm:text-xl font-semibold text-foreground">Social Media</CardTitle>
                 </CardHeader>
                 <CardContent className="flex flex-wrap gap-3">
                   {socialLinks.map((link, idx) => {
                     const iconName = link.platform.toLowerCase()
                     const Icon = ICON_MAP[iconName] || Globe
-                    return (
-                      <SocialButton
-                        key={idx}
-                        icon={Icon}
-                        label={link.platform}
-                        href={link.url}
-                      />
-                    )
+                    return <SocialButton key={idx} icon={Icon} label={link.platform} href={link.url} />
                   })}
                 </CardContent>
               </Card>
@@ -141,16 +124,14 @@ export function ContactClient({ contact }: ContactClientProps) {
             <motion.div variants={item}>
               <Card className="glass border-border/50">
                 <CardHeader>
-                  <CardTitle className="text-lg sm:text-xl font-semibold text-foreground">
-                    Terminal
-                  </CardTitle>
+                  <CardTitle className="text-lg sm:text-xl font-semibold text-foreground">Terminal</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Terminal>
                     <div className="terminal-prompt">cat contact_info.txt</div>
                     <div className="terminal-output mb-4">
                       Email: {email}
-                      {"\n"}
+                      {'\n'}
                       Location: {location}
                     </div>
 

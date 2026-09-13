@@ -28,8 +28,7 @@ export function Header() {
       {/* Tabs */}
       <div className="flex flex-1 overflow-x-auto scrollbar-none">
         {tabs.map(tab => {
-          const isActive = pathname === tab.path ||
-            (tab.path !== '/' && pathname.startsWith(tab.path))
+          const isActive = pathname === tab.path || (tab.path !== '/' && pathname.startsWith(tab.path))
           return (
             <Link
               key={tab.path}
@@ -41,9 +40,7 @@ export function Header() {
                   : 'bg-background-elevated/50 text-muted-foreground hover:bg-background/50 hover:text-foreground'
               )}
             >
-              {isActive && (
-                <span className="absolute top-0 left-0 right-0 h-[2px] bg-primary" />
-              )}
+              {isActive && <span className="absolute top-0 left-0 right-0 h-[2px] bg-primary" />}
               <span className="mr-2">{tab.name}</span>
               {isActive ? (
                 <CircleDot size={10} className="text-primary" />

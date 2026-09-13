@@ -139,17 +139,45 @@ export const pageViewsByPathQuery = groq`
 `
 
 // ===== FETCH FUNCTIONS =====
-export async function getProjects() { return client.fetch(projectsQuery) }
-export async function getFeaturedProjects() { return client.fetch(featuredProjectsQuery) }
-export async function getProject(slug: string) { return client.fetch(projectQuery, { slug }) }
-export async function getProjectBySlug(slug: string) { return client.fetch(projectQuery, { slug }) }
-export async function getSkills() { return client.fetch(skillsQuery) }
-export async function getAbout() { return client.fetch(aboutQuery) }
-export async function getContact() { return client.fetch(contactQuery) }
-export async function getBlogPosts() { return client.fetch(blogPostsQuery) }
-export async function getFeaturedBlogPosts() { return client.fetch(featuredBlogPostsQuery) }
-export async function getBlogPost(slug: string) { return client.fetch(blogPostQuery, { slug }) }
-export async function getBlogSlugs() { return client.fetch(blogSlugsQuery) }
-export async function getRelatedPosts(slug: string) { return client.fetch(relatedPostsQuery, { slug }) }
-export async function getBlogReactions(blogSlug: string) { return client.fetch(blogReactionsQuery, { blogSlug }) }
-export async function getBlogComments(blogSlug: string) { return client.fetch(blogCommentsQuery, { blogSlug }) }
+export async function getProjects() {
+  return client.fetch(projectsQuery)
+}
+export async function getFeaturedProjects() {
+  return client.fetch(featuredProjectsQuery)
+}
+export async function getProject(slug: string) {
+  return client.fetch(projectQuery, { slug })
+}
+export async function getProjectBySlug(slug: string) {
+  return client.fetch(projectQuery, { slug })
+}
+export async function getSkills() {
+  return client.fetch(skillsQuery)
+}
+export async function getAbout() {
+  return client.fetch(aboutQuery)
+}
+export async function getContact() {
+  return client.fetch(contactQuery)
+}
+export async function getBlogPosts() {
+  return client.fetch(blogPostsQuery)
+}
+export async function getFeaturedBlogPosts() {
+  return client.fetch(featuredBlogPostsQuery)
+}
+export async function getBlogPost(slug: string) {
+  return client.fetch(blogPostQuery, { slug })
+}
+export async function getBlogSlugs() {
+  return client.fetch(blogSlugsQuery)
+}
+export async function getRelatedPosts(slug: string) {
+  return client.fetch(relatedPostsQuery, { slug })
+}
+export async function getBlogReactions(blogSlug: string) {
+  return client.fetch(blogReactionsQuery, { blogSlug })
+}
+export async function getBlogComments(blogSlug: string) {
+  return client.fetch(blogCommentsQuery, { blogSlug })
+}

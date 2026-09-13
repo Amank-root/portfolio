@@ -1,4 +1,4 @@
-"use cache";
+'use cache'
 
 import type { Metadata } from 'next'
 import Image from 'next/image'
@@ -8,24 +8,21 @@ import { urlFor } from '@/sanity/lib/image'
 import { PortableText } from '@portabletext/react'
 import { portableTextComponents } from '@/components/portable-text-components'
 import { Button } from '@/components/ui/button'
-import {
-  Briefcase, GraduationCap, Heart, Download, ExternalLink,
-  Calendar, MapPin, Code2, User, Clock
-} from 'lucide-react'
+import { Briefcase, GraduationCap, Heart, Download, Calendar, MapPin, User } from 'lucide-react'
 import type { About } from '@/sanity/lib/types'
 
 export const metadata: Metadata = {
   title: 'About',
   description: 'Learn about Aman Kushwaha — Full Stack Developer, MERN specialist, and AI/ML enthusiast.',
   alternates: {
-    canonical: `/about`
-  }
+    canonical: `/about`,
+  },
 }
 
 // export const revalidate = 60
 
 export default async function AboutPage() {
-  const about = await getAbout().catch(() => null) as About | null
+  const about = (await getAbout().catch(() => null)) as About | null
 
   // Resume URL: prefer Sanity CMS asset, fallback to static file
   const resumeUrl = about?.resumeFile?.asset?.url || '/AmanKushwaha_Resume.pdf'
@@ -80,9 +77,7 @@ export default async function AboutPage() {
           </div>
 
           <div className="flex-1">
-            <h2 className="text-2xl font-bold mb-4 text-foreground">
-              {about?.title || 'About Me'}
-            </h2>
+            <h2 className="text-2xl font-bold mb-4 text-foreground">{about?.title || 'About Me'}</h2>
 
             {about?.bio ? (
               <div className="prose-blog">
@@ -91,13 +86,13 @@ export default async function AboutPage() {
             ) : (
               <div className="space-y-3 text-muted-foreground leading-relaxed">
                 <p>
-                  I&apos;m a passionate Full Stack Developer currently pursuing B.Tech in Computer Science
-                  and Engineering. I love creating efficient, scalable, and user-friendly solutions using
-                  modern web technologies.
+                  I&apos;m a passionate Full Stack Developer currently pursuing B.Tech in Computer Science and
+                  Engineering. I love creating efficient, scalable, and user-friendly solutions using modern web
+                  technologies.
                 </p>
                 <p>
-                  My expertise spans across the MERN stack, Next.js, TypeScript, and AI/ML development.
-                  I enjoy taking on challenging projects that push the boundaries of what&apos;s possible.
+                  My expertise spans across the MERN stack, Next.js, TypeScript, and AI/ML development. I enjoy taking
+                  on challenging projects that push the boundaries of what&apos;s possible.
                 </p>
               </div>
             )}
@@ -128,7 +123,10 @@ export default async function AboutPage() {
             </h2>
             <div className="space-y-4">
               {about.experiences.map((exp, i) => (
-                <div key={i} className="glass rounded-xl p-5 border border-border/50 hover:border-primary/20 transition-colors">
+                <div
+                  key={i}
+                  className="glass rounded-xl p-5 border border-border/50 hover:border-primary/20 transition-colors"
+                >
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
                     <div>
                       <h3 className="font-semibold text-foreground">{exp.title}</h3>
@@ -136,9 +134,17 @@ export default async function AboutPage() {
                     </div>
                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground whitespace-nowrap">
                       <Calendar size={11} />
-                      {exp.startDate ? new Date(exp.startDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : ''}
+                      {exp.startDate
+                        ? new Date(exp.startDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+                        : ''}
                       {' — '}
-                      {exp.current ? <span className="text-accent font-medium">Present</span> : exp.endDate ? new Date(exp.endDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : ''}
+                      {exp.current ? (
+                        <span className="text-accent font-medium">Present</span>
+                      ) : exp.endDate ? (
+                        new Date(exp.endDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+                      ) : (
+                        ''
+                      )}
                     </div>
                   </div>
                   {exp.description && (
@@ -147,7 +153,9 @@ export default async function AboutPage() {
                   {exp.skills && exp.skills.length > 0 && (
                     <div className="flex flex-wrap gap-1.5">
                       {exp.skills.map(skill => (
-                        <span key={skill} className="tag-pill text-[11px]">{skill}</span>
+                        <span key={skill} className="tag-pill text-[11px]">
+                          {skill}
+                        </span>
                       ))}
                     </div>
                   )}
@@ -176,12 +184,16 @@ export default async function AboutPage() {
                       <Calendar size={11} />
                       {edu.startDate ? new Date(edu.startDate).getFullYear() : ''}
                       {' — '}
-                      {edu.current ? <span className="text-accent font-medium">Present</span> : edu.endDate ? new Date(edu.endDate).getFullYear() : ''}
+                      {edu.current ? (
+                        <span className="text-accent font-medium">Present</span>
+                      ) : edu.endDate ? (
+                        new Date(edu.endDate).getFullYear()
+                      ) : (
+                        ''
+                      )}
                     </div>
                   </div>
-                  {edu.description && (
-                    <p className="text-sm text-muted-foreground">{edu.description}</p>
-                  )}
+                  {edu.description && <p className="text-sm text-muted-foreground">{edu.description}</p>}
                 </div>
               ))}
             </div>
@@ -197,7 +209,10 @@ export default async function AboutPage() {
             </h2>
             <div className="flex flex-wrap gap-3">
               {about.interests.map((interest, i) => (
-                <div key={i} className="glass rounded-full px-4 py-2 border border-border/50 hover:border-primary/30 transition-colors">
+                <div
+                  key={i}
+                  className="glass rounded-full px-4 py-2 border border-border/50 hover:border-primary/30 transition-colors"
+                >
                   <span className="text-sm text-foreground/80">{interest.name}</span>
                 </div>
               ))}
