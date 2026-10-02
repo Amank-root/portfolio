@@ -43,12 +43,38 @@
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
 
+  /* These four tokens are defined in :root/.dark and used across the app
+     (bg-background-elevated, text-foreground-muted, ...), but were never mapped
+     into @theme — so every one of those utility classes compiled to nothing
+     and rendered unstyled. Mapping them here makes them real. */
+  --color-background-elevated: hsl(var(--background-elevated));
+  --color-background-card: hsl(var(--background-card));
+  --color-background-overlay: hsl(var(--background-overlay));
+  --color-foreground-muted: hsl(var(--foreground-muted));
+  --color-foreground-subtle: hsl(var(--foreground-subtle));
+
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
 
   --font-sans: var(--font-inter);
   --font-mono: var(--font-fira-code);
+
+  /* Fluid type scale: headings scale smoothly with the viewport instead of
+     jumping at fixed breakpoints. */
+  --text-display: clamp(2.5rem, 1.6rem + 4vw, 4.25rem);
+  --text-display--line-height: 1.08;
+  --text-display--letter-spacing: -0.03em;
+  --text-section: clamp(1.75rem, 1.3rem + 2vw, 2.5rem);
+  --text-section--line-height: 1.15;
+  --text-section--letter-spacing: -0.025em;
+}
+
+/* Dark is the default; `.dark` is applied by next-themes before paint. */
+@layer base {
+  html:not(.light) {
+    color-scheme: dark;
+  }
 }
 
 /*
@@ -345,9 +371,75 @@
   }
 }
 
-@layer utilities {
-  /* ===== DESIGN TOKENS ===== */
-  :root {
+/* ===== DESIGN TOKENS =====
+   Two full palettes. Previously only `:root` existed with dark values, so the
+   theme toggle flipped a class that changed nothing — "light mode" rendered the
+   exact same dark UI. Both palettes are now defined explicitly.
+
+   Brand hues are held constant across themes; only lightness/chroma shift, so
+   the identity of the site doesn't change when you flip the switch.
+
+   Light-mode values are chosen to clear WCAG AA (4.5:1) for body text against
+   their background — the cyan/green brand colors are darkened because the
+   neon dark-theme values only reach ~2.5:1 on white. */
+@layer base {
+  :root,
+  .light {
+    color-scheme: light;
+
+    /* Background scale */
+    --background: 0 0% 100%;
+    --background-elevated: 220 20% 98%;
+    --background-card: 0 0% 100%;
+    --background-overlay: 220 20% 96%;
+
+    /* Foreground */
+    --foreground: 222 30% 12%;
+    --foreground-muted: 220 12% 38%;
+    --foreground-subtle: 220 10% 52%;
+
+    /* Brand - darkened for contrast on light backgrounds */
+    --primary: 199 89% 32%;
+    --primary-foreground: 0 0% 100%;
+
+    --accent: 158 72% 26%;
+    --accent-foreground: 0 0% 100%;
+
+    --secondary: 258 55% 45%;
+    --secondary-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --muted: 220 18% 95%;
+    --muted-foreground: 220 10% 40%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 30% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 30% 12%;
+
+    --border: 220 16% 88%;
+    --input: 220 16% 90%;
+    --ring: 199 89% 32%;
+
+    --radius: 0.6rem;
+
+    /* Softer glows — a 0.15-alpha neon glow is invisible on white anyway. */
+    --glow-primary: 8 145 190;
+    --glow-accent: 30 150 90;
+    --glow-secondary: 120 90 220;
+
+    /* Ambient background wash */
+    --ambient-1: rgba(8, 145, 190, 0.05);
+    --ambient-2: rgba(120, 90, 220, 0.05);
+    --ambient-3: rgba(30, 150, 90, 0.04);
+  }
+
+  .dark {
+    color-scheme: dark;
+
     /* Background scale */
     --background: 220 16% 8%;
     --background-elevated: 220 14% 11%;
@@ -356,52 +448,47 @@
 
     /* Foreground */
     --foreground: 210 30% 96%;
-    --foreground-muted: 215 20% 65%;
-    --foreground-subtle: 215 15% 45%;
+    --foreground-muted: 215 20% 68%;
+    --foreground-subtle: 215 15% 50%;
 
     /* Brand - Electric Cyan/Blue */
     --primary: 198 100% 55%;
     --primary-foreground: 220 16% 8%;
-    --primary-glow: 198 100% 55%;
 
     /* Accent - Neon Green */
     --accent: 152 80% 50%;
     --accent-foreground: 220 16% 8%;
 
     /* Secondary - Warm Purple */
-    --secondary: 260 60% 60%;
+    --secondary: 260 60% 66%;
     --secondary-foreground: 210 30% 96%;
 
-    /* Destructive */
-    --destructive: 0 84% 60%;
+    --destructive: 0 84% 62%;
     --destructive-foreground: 210 30% 96%;
 
-    /* Muted */
     --muted: 220 14% 16%;
-    --muted-foreground: 215 20% 55%;
+    --muted-foreground: 215 20% 62%;
 
-    /* Card */
     --card: 220 13% 13%;
     --card-foreground: 210 30% 96%;
 
-    /* Popover */
     --popover: 220 14% 11%;
     --popover-foreground: 210 30% 96%;
 
-    /* Border & Input */
     --border: 220 12% 20%;
     --input: 220 12% 18%;
     --ring: 198 100% 55%;
 
     --radius: 0.6rem;
 
-    /* Custom glow colors */
     --glow-primary: 0 200 255;
     --glow-accent: 40 230 120;
     --glow-secondary: 150 120 255;
-  }
 
-  /* ===== BASE STYLES ===== */
+    --ambient-1: rgba(0, 200, 255, 0.05);
+    --ambient-2: rgba(150, 120, 255, 0.05);
+    --ambient-3: rgba(40, 230, 120, 0.04);
+  }
 }
 @layer base {
   * {
@@ -410,14 +497,16 @@
 
   html {
     scroll-behavior: smooth;
+    /* Anchor targets clear the sticky header instead of hiding under it. */
+    scroll-padding-top: 4rem;
   }
 
   body {
     @apply bg-background text-foreground antialiased;
     background-image:
-      radial-gradient(ellipse at 20% 50%, rgba(0, 200, 255, 0.03) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 20%, rgba(150, 120, 255, 0.03) 0%, transparent 50%),
-      radial-gradient(ellipse at 50% 80%, rgba(40, 230, 120, 0.02) 0%, transparent 50%);
+      radial-gradient(ellipse at 20% 50%, var(--ambient-1) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, var(--ambient-2) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 80%, var(--ambient-3) 0%, transparent 50%);
     background-attachment: fixed;
   }
 
@@ -445,6 +534,19 @@
     background: hsl(var(--primary) / 0.25);
     color: hsl(var(--foreground));
   }
+
+  /* Respect users who ask for less motion: the site leans heavily on
+     framer-motion entrance animations and infinite loops. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
 /* ===== TYPOGRAPHY ===== */
@@ -455,8 +557,15 @@
   h4,
   h5,
   h6 {
-    font-family: var(--font-clash), var(--font-inter), sans-serif;
+    /* --font-clash was never defined, so headings silently fell back to
+       Inter with a tighter tracking than intended. */
+    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
     letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
   }
 }
 

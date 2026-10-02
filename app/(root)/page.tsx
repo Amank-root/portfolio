@@ -1,5 +1,5 @@
 'use cache'
-
+import { cacheLife } from 'next/cache'
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -8,6 +8,7 @@ import { ArrowRight, Github, ExternalLink, Code, Briefcase, User, Mail, BookOpen
 import { getFeaturedProjects, getFeaturedBlogPosts, getAbout } from '@/sanity/lib/queries'
 import { urlFor } from '@/sanity/lib/image'
 import { HeroSection } from '@/components/sections/hero-section'
+import { projectPlaceholder } from '@/lib/placeholder'
 import { TerminalSection } from '@/components/sections/terminal-section'
 import type { Project, BlogPost } from '@/sanity/lib/types'
 import { Metadata } from 'next'
@@ -20,7 +21,28 @@ export const metadata: Metadata = {
   },
 }
 
+type Tone = 'primary' | 'accent' | 'secondary'
+
+/** Icon treatment per card, hoisted out of the JSX to drop nested ternaries. */
+const TONE: Record<Tone, { bg: string; text: string; ring: string }> = {
+  primary: { bg: 'bg-primary/10', text: 'text-primary', ring: 'ring-1 ring-primary/20' },
+  accent: { bg: 'bg-accent/10', text: 'text-accent', ring: 'ring-1 ring-accent/20' },
+  secondary: { bg: 'bg-secondary/10', text: 'text-secondary', ring: 'ring-1 ring-secondary/20' },
+}
+
+const NAV_CARDS: { icon: typeof Code; title: string; desc: string; href: string; tone: Tone }[] = [
+  { icon: Code, title: 'Skills', desc: 'Tech stack & expertise', href: '/skills', tone: 'primary' },
+  { icon: Briefcase, title: 'Projects', desc: 'Portfolio of work', href: '/projects', tone: 'accent' },
+  { icon: User, title: 'About', desc: 'My story & journey', href: '/about', tone: 'secondary' },
+  { icon: BookOpen, title: 'Blog', desc: 'Thoughts & tutorials', href: '/blog', tone: 'primary' },
+  { icon: Mail, title: 'Contact', desc: "Let's collaborate", href: '/contact', tone: 'accent' },
+]
+
 export default async function Home() {
+  // Explicit lifetime: the Sanity reads below are already cached, this scopes the
+  // rendered page itself. `days` keeps it in the App Shell and prerenders.
+  cacheLife('days')
+
   const [featuredProjects, featuredPosts, about] = await Promise.all([
     getFeaturedProjects().catch(() => []),
     getFeaturedBlogPosts().catch(() => []),
@@ -40,43 +62,35 @@ export default async function Home() {
               <span className="dot-separator" />
               Navigate
             </span>
-            <h2 className="mt-2 text-2xl font-bold">Explore My Work</h2>
+            <h2 className="mt-2 text-section font-bold">Explore My Work</h2>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              { icon: Code, title: 'Skills', desc: 'Tech stack & expertise', href: '/skills', color: 'primary' },
-              { icon: Briefcase, title: 'Projects', desc: 'Portfolio of work', href: '/projects', color: 'accent' },
-              { icon: User, title: 'About', desc: 'My story & journey', href: '/about', color: 'secondary' },
-              { icon: BookOpen, title: 'Blog', desc: 'Thoughts & tutorials', href: '/blog', color: 'primary' },
-              { icon: Mail, title: 'Contact', desc: "Let's collaborate", href: '/contact', color: 'accent' },
-            ].map(item => (
-              <Link key={item.href} href={item.href} className="group">
-                <div className="glass rounded-xl p-5 hover-card border-border/50 hover:border-primary/30 transition-all duration-300">
-                  <div
-                    className={`mb-3 inline-flex rounded-lg p-2.5 ${item.color === 'primary' ? 'bg-primary/10' : item.color === 'accent' ? 'bg-accent/10' : 'bg-secondary/10'}`}
-                  >
-                    <item.icon
-                      size={18}
-                      className={
-                        item.color === 'primary'
-                          ? 'text-primary'
-                          : item.color === 'accent'
-                            ? 'text-accent'
-                            : 'text-secondary'
-                      }
-                    />
-                  </div>
-                  <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
+          <ul className="grid list-none gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {NAV_CARDS.map(item => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className="group glass hover-card block h-full rounded-xl border-border/50 p-5 transition-all duration-300 hover:border-primary/30 focus-visible:border-primary/50"
+                >
+                  <span className={`mb-3 inline-flex rounded-lg p-2.5 ${TONE[item.tone].bg} ${TONE[item.tone].ring}`}>
+                    <item.icon size={18} className={TONE[item.tone].text} aria-hidden />
+                  </span>
+                  <h3 className="font-semibold text-foreground transition-colors group-hover:text-primary">
                     {item.title}
                   </h3>
                   <p className="mt-1 text-sm text-muted-foreground">{item.desc}</p>
-                  <div className="mt-3 flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                  {/* Always visible to assistive tech; the hover reveal is a
+                      visual flourish only. */}
+                  <span
+                    className="mt-3 flex items-center gap-1 text-xs text-primary transition-all duration-300 group-hover:gap-2"
+                    aria-hidden
+                  >
                     Explore <ArrowRight size={12} />
-                  </div>
-                </div>
-              </Link>
+                  </span>
+                  <span className="sr-only">{`Explore ${item.title}`}</span>
+                </Link>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       </section>
 
@@ -93,7 +107,7 @@ export default async function Home() {
                   <Zap size={12} />
                   Featured Work
                 </span>
-                <h2 className="mt-2 text-2xl font-bold">Recent Projects</h2>
+                <h2 className="mt-2 text-section font-bold">Recent Projects</h2>
               </div>
               <Link href="/projects">
                 <Button variant="outline" size="sm" className="gap-2 text-xs border-border/50 hover:border-primary/50">
@@ -112,10 +126,11 @@ export default async function Home() {
                       src={
                         project.mainImage
                           ? urlFor(project.mainImage).width(600).height(300).url()
-                          : `https://dummyimage.com/600X300/0d1117/00c8ff.png&text=${encodeURIComponent(project.title)}`
+                          : projectPlaceholder(project.title)
                       }
-                      alt={project.mainImage?.alt || project.title}
+                      alt={project.mainImage?.alt || `${project.title} project preview`}
                       fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 560px"
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-linear-to-t from-background/80 to-transparent" />
@@ -194,7 +209,7 @@ export default async function Home() {
                   <Star size={12} />
                   Latest Writing
                 </span>
-                <h2 className="mt-2 text-2xl font-bold">From the Blog</h2>
+                <h2 className="mt-2 text-section font-bold">From the Blog</h2>
               </div>
               <Link href="/blog">
                 <Button variant="outline" size="sm" className="gap-2 text-xs border-border/50 hover:border-primary/50">
@@ -210,8 +225,9 @@ export default async function Home() {
                       <div className="relative h-36 overflow-hidden">
                         <Image
                           src={urlFor(post.mainImage).width(400).height(200).url()}
-                          alt={post.mainImage.alt || post.title}
+                          alt={post.mainImage.alt || `${post.title} cover`}
                           fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 400px"
                           className="object-cover transition-transform duration-500 group-hover:scale-105"
                         />
                         <div className="absolute inset-0 bg-linear-to-t from-background/60 to-transparent" />

@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { User, Code, Briefcase, Mail, ChevronRight, BookOpen, Home } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { motion } from 'framer-motion'
 
 interface SidebarProps {
   className?: string
@@ -29,7 +28,10 @@ export function Sidebar({ className }: SidebarProps) {
         className
       )}
     >
-      <div className="sticky top-0 flex flex-col h-full">
+      {/* h-[calc(100svh-2.5rem)] rather than sticky/h-full: the parent flex row
+          is `overflow-hidden`, so a sticky child never gets a scroll container
+          to stick within and the explorer doesn't stay put on long pages. */}
+      <div className="flex h-[calc(100vh-3.5rem)] flex-col overflow-y-auto">
         {/* Explorer header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-border/30">
           <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Explorer</span>
@@ -48,42 +50,35 @@ export function Sidebar({ className }: SidebarProps) {
           </div>
 
           <nav className="space-y-0.5">
-            {navItems.map((item, i) => {
+            {navItems.map(item => {
               const isActive = pathname === item.path || (item.path !== '/' && pathname.startsWith(item.path))
               return (
-                <motion.div
-                  key={item.path}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                >
+                <div key={item.path}>
                   <Link
                     href={item.path}
+                    aria-current={isActive ? 'page' : undefined}
                     className={cn(
-                      'group flex items-center rounded-md px-2 py-1.5 text-sm transition-all duration-200',
+                      'group relative flex items-center rounded-md px-2 py-1.5 text-sm transition-all duration-200',
                       isActive
-                        ? 'bg-primary/10 text-primary border border-primary/20'
+                        ? 'border border-primary/20 bg-primary/10 text-primary'
                         : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
                     )}
                   >
-                    {isActive && (
-                      <motion.div
-                        className="absolute left-0 w-0.5 h-6 bg-primary rounded-r"
-                        layoutId="activeIndicator"
-                      />
-                    )}
+                    {isActive && <span className="absolute -left-2 h-6 w-0.5 rounded-r bg-primary" aria-hidden />}
                     <item.icon
                       size={14}
                       className={cn('mr-2 shrink-0', isActive ? 'text-primary' : 'text-muted-foreground')}
+                      aria-hidden
                     />
                     <span className="flex-1 truncate">{item.name}</span>
                     <span
-                      className={cn('text-[10px] font-mono', isActive ? 'text-primary/60' : 'text-muted-foreground/40')}
+                      className={cn('font-mono text-[10px]', isActive ? 'text-primary/60' : 'text-muted-foreground/40')}
+                      aria-hidden
                     >
                       .{item.ext}
                     </span>
                   </Link>
-                </motion.div>
+                </div>
               )
             })}
           </nav>

@@ -2,17 +2,32 @@ import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { getSkills } from '@/sanity/lib/queries'
 import { Code2, Globe, Server, Wrench, Cpu } from 'lucide-react'
+import { JsonLd } from '@/components/json-ld'
+import { breadcrumbSchema, collectionSchema, graph } from '@/lib/seo'
+import { absoluteUrl, siteConfig } from '@/lib/site'
 import type { Skill } from '@/sanity/lib/types'
+
+const SKILLS_DESCRIPTION =
+  'The technical toolkit of Aman Kushwaha — frontend (React, Next.js, TypeScript, Tailwind), backend (Node.js, Python, FastAPI), databases, cloud and AI/ML tooling.'
 
 export const metadata: Metadata = {
   title: 'Skills',
-  description: 'Technical skills and expertise of Aman Kushwaha — frontend, backend, databases, and tools.',
+  description: SKILLS_DESCRIPTION,
   alternates: {
-    canonical: `/skills`,
+    canonical: '/skills',
+  },
+  openGraph: {
+    title: `Skills | ${siteConfig.name}`,
+    description: SKILLS_DESCRIPTION,
+    url: absoluteUrl('/skills'),
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `Skills | ${siteConfig.name}`,
+    description: SKILLS_DESCRIPTION,
   },
 }
-
-// export const revalidate = 60
 
 const categoryConfig: Record<string, { label: string; icon: typeof Code2; color: string }> = {
   frontend: { label: 'Frontend', icon: Globe, color: 'text-primary' },
@@ -54,9 +69,20 @@ const FALLBACK_SKILLS: Skill[] = [
 
 export default function SkillsPage() {
   return (
-    <Suspense fallback={<SkillsPageSkeleton />}>
-      <SkillsPageContent />
-    </Suspense>
+    <>
+      <JsonLd
+        data={graph(
+          collectionSchema({ name: 'Skills', path: '/skills', description: SKILLS_DESCRIPTION }),
+          breadcrumbSchema([
+            { name: 'Home', path: '/' },
+            { name: 'Skills', path: '/skills' },
+          ])
+        )}
+      />
+      <Suspense fallback={<SkillsPageSkeleton />}>
+        <SkillsPageContent />
+      </Suspense>
+    </>
   )
 }
 
@@ -79,7 +105,7 @@ async function SkillsPageContent() {
             <Code2 size={12} />
             Expertise
           </span>
-          <h1 className="text-4xl font-bold gradient-text">Skills</h1>
+          <h1 className="text-display font-bold gradient-text">Skills</h1>
           <p className="mt-3 text-muted-foreground max-w-lg">
             My technical toolkit — continuously growing and evolving.
           </p>

@@ -14,43 +14,59 @@ import { BlogComments } from '@/components/blog-comments'
 import { CalendarDays, Clock, ArrowLeft, Tag, User, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { PageViewTracker } from '@/components/page-view-tracker'
+import { JsonLd } from '@/components/json-ld'
+import { blogPostingSchema, breadcrumbSchema, graph } from '@/lib/seo'
+import { absoluteUrl, siteConfig } from '@/lib/site'
 import type { BlogCategory, BlogPost } from '@/sanity/lib/types'
-
-// export const revalidate = 60
 
 type Props = { params: Promise<{ slug: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const post = (await getBlogPost(slug).catch(() => null)) as BlogPost | null
-  if (!post) return { title: 'Post Not Found' }
+  if (!post) return { title: 'Post Not Found', robots: { index: false, follow: false } }
 
   const title = post.seo?.metaTitle || post.title
-  const description = post.seo?.metaDescription || post.excerpt || `Read "${post.title}" on Aman Kushwaha's blog`
-  const ogImageUrl =
-    post.seo?.ogImage?.asset?.url || (post.mainImage ? urlFor(post.mainImage).width(1200).height(630).url() : undefined)
+  const description = post.seo?.metaDescription || post.excerpt || `Read "${post.title}" on ${siteConfig.name}'s blog`
+  const ogImageUrl = post.seo?.ogImage?.asset?.url
+    ? urlFor(post.seo.ogImage).width(1200).height(630).fit('crop').url()
+    : post.mainImage
+      ? urlFor(post.mainImage).width(1200).height(630).fit('crop').url()
+      : absoluteUrl('/opengraph-image')
+
+  const url = absoluteUrl(`/blog/${slug}`)
 
   return {
     title,
     description,
+    keywords: post.tags,
+    authors: [{ name: post.author?.name || siteConfig.name, url: siteConfig.url }],
+    creator: post.author?.name || siteConfig.name,
+    alternates: {
+      canonical: post.seo?.canonicalUrl || `/blog/${slug}`,
+    },
     openGraph: {
+      type: 'article',
+      url,
+      siteName: siteConfig.name,
+      locale: siteConfig.locale,
       title,
       description,
-      type: 'article',
       publishedTime: post.publishedAt,
-      authors: ['Aman Kushwaha'],
-      images: ogImageUrl ? [{ url: ogImageUrl, width: 1200, height: 630 }] : [],
+      modifiedTime: post.publishedAt,
+      authors: [post.author?.name || siteConfig.name],
+      section: post.categories?.[0]?.title,
+      tags: post.tags,
+      images: [{ url: ogImageUrl, width: 1200, height: 630, alt: title, type: 'image/png' }],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-      images: ogImageUrl ? [ogImageUrl] : [],
+      creator: siteConfig.author.twitter,
+      images: [{ url: ogImageUrl, width: 1200, height: 630, alt: title }],
     },
-    ...(post.seo?.noIndex ? { robots: { index: false, follow: false } } : { robots: { index: true, follow: true } }),
-    ...(post.seo?.canonicalUrl
-      ? { alternates: { canonical: post.seo.canonicalUrl } }
-      : { alternates: { canonical: `/blog/${slug}` } }),
+    robots: post.seo?.noIndex ? { index: false, follow: false } : { index: true, follow: true },
   }
 }
 
@@ -86,26 +102,27 @@ async function BlogPostContent({ params }: Props) {
   }
   const aggregatedReactions = Object.entries(reactionCounts).map(([type, count]) => ({ type, count }))
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
-    headline: post.title,
-    description: post.excerpt,
-    image: post.mainImage ? urlFor(post.mainImage).url() : undefined,
-    author: {
-      '@type': 'Person',
-      name: post.author?.name || 'Aman Kushwaha',
-    },
-    datePublished: post.publishedAt,
-    publisher: {
-      '@type': 'Person',
-      name: 'Aman Kushwaha',
-    },
-  }
+  const jsonLd = graph(
+    blogPostingSchema({
+      title: post.title,
+      description: post.excerpt,
+      slug,
+      publishedAt: post.publishedAt,
+      authorName: post.author?.name,
+      image: post.mainImage ? urlFor(post.mainImage).width(1200).height(630).fit('crop').url() : undefined,
+      categories: post.categories?.map(c => c.title),
+      keywords: post.tags,
+    }),
+    breadcrumbSchema([
+      { name: 'Home', path: '/' },
+      { name: 'Blog', path: '/blog' },
+      { name: post.title, path: `/blog/${slug}` },
+    ])
+  )
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <JsonLd data={jsonLd} />
       <PageViewTracker path={`/blog/${slug}`} blogSlug={slug} />
 
       <article className="min-h-full">
@@ -115,8 +132,9 @@ async function BlogPostContent({ params }: Props) {
             <div className="relative h-72 sm:h-96 overflow-hidden">
               <Image
                 src={urlFor(post.mainImage).width(1400).height(600).url()}
-                alt={post.mainImage.alt || post.title}
+                alt={post.mainImage.alt || `${post.title} cover`}
                 fill
+                sizes="(max-width: 1024px) 100vw, 1024px"
                 className="object-cover"
                 priority
               />
@@ -151,9 +169,7 @@ async function BlogPostContent({ params }: Props) {
               </div>
 
               {/* Title */}
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight text-foreground mb-6">
-                {post.title}
-              </h1>
+              <h1 className="text-display font-bold text-foreground mb-6">{post.title}</h1>
 
               {/* Meta */}
               <div className="glass rounded-xl px-5 py-4 border border-border/30 mb-8">
@@ -262,8 +278,9 @@ async function BlogPostContent({ params }: Props) {
                           <div className="relative h-32 overflow-hidden">
                             <Image
                               src={urlFor(related.mainImage).width(300).height(150).url()}
-                              alt={related.mainImage.alt || related.title}
+                              alt={related.mainImage.alt || `${related.title} cover`}
                               fill
+                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 300px"
                               className="object-cover transition-transform duration-300 group-hover:scale-105"
                             />
                           </div>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { Terminal, Maximize2, Minus, X } from 'lucide-react'
+import { Terminal } from 'lucide-react'
 
 const COMMANDS = [
   { prompt: 'whoami', output: 'Aman Kushwaha (alias: amank-root)' },
@@ -102,39 +102,39 @@ export function TerminalSection() {
               <div className="w-3 h-3 rounded-full bg-yellow-500/80 hover:bg-yellow-500 cursor-pointer transition-colors" />
               <div className="w-3 h-3 rounded-full bg-green-500/80 hover:bg-green-500 cursor-pointer transition-colors" />
             </div>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono">
-              <Terminal size={12} />
-              <span>bash — amank-root@portfolio</span>
-            </div>
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Minus size={12} className="cursor-pointer hover:text-foreground" />
-              <Maximize2 size={12} className="cursor-pointer hover:text-foreground" />
-              <X size={12} className="cursor-pointer hover:text-red-400" />
-            </div>
+            <span className="font-mono text-xs text-muted-foreground">
+              <Terminal size={12} className="mr-2 inline align-[-2px]" aria-hidden />
+              bash — amank-root@portfolio
+            </span>
+            {/* Decorative dots only. They previously carried cursor-pointer and
+                hover states, promising minimize/maximize/close that did nothing. */}
           </div>
 
           {/* Terminal body */}
           <div
             ref={containerRef}
-            className="bg-[#0d1117] p-5 font-mono text-sm min-h-[300px] max-h-[400px] overflow-y-auto"
+            className="min-h-[300px] max-h-[400px] overflow-y-auto bg-[#0d1117] p-5 font-mono text-sm"
           >
-            {/* Intro line */}
-            <div className="text-green-400/60 text-xs mb-4">
-              Welcome to Aman&apos;s Portfolio Terminal v2.0.0 — Type &apos;help&apos; for commands
+            <div className="mb-4 text-xs text-emerald-400/70">
+              Welcome to the portfolio terminal — type &apos;help&apos; for commands
             </div>
 
             {lines.map((line, i) => (
               <div key={i} className="mb-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-accent font-semibold">amank</span>
-                  <span className="text-muted-foreground/60">@</span>
-                  <span className="text-primary/80">portfolio</span>
-                  <span className="text-muted-foreground/60 mr-1">~$</span>
-                  <span className="text-foreground">{line.prompt}</span>
-                  {line.typing && currentCmd < COMMANDS.length && <span className="animate-blink text-primary">█</span>}
+                <div className="flex flex-wrap items-center gap-x-2">
+                  <span className="font-semibold text-[#7ee787]">amank</span>
+                  <span className="text-slate-500">@</span>
+                  <span className="text-[#79c0ff]">portfolio</span>
+                  <span className="mr-1 text-slate-500">~$</span>
+                  <span className="text-slate-100">{line.prompt}</span>
+                  {line.typing && currentCmd < COMMANDS.length && (
+                    <span className="animate-blink text-[#79c0ff]" aria-hidden>
+                      █
+                    </span>
+                  )}
                 </div>
                 {line.output && (
-                  <div className="mt-1 ml-0 text-muted-foreground/80 whitespace-pre-wrap leading-relaxed pl-2 border-l border-border/30">
+                  <div className="mt-1 whitespace-pre-wrap border-l border-white/10 pl-3 leading-relaxed text-slate-300">
                     {line.output}
                   </div>
                 )}
@@ -144,11 +144,13 @@ export function TerminalSection() {
             {/* Active prompt */}
             {currentCmd >= COMMANDS.length && (
               <div className="flex items-center gap-2">
-                <span className="text-accent font-semibold">amank</span>
-                <span className="text-muted-foreground/60">@</span>
-                <span className="text-primary/80">portfolio</span>
-                <span className="text-muted-foreground/60 mr-1">~$</span>
-                <span className="animate-blink text-primary">█</span>
+                <span className="font-semibold text-[#7ee787]">amank</span>
+                <span className="text-slate-500">@</span>
+                <span className="text-[#79c0ff]">portfolio</span>
+                <span className="mr-1 text-slate-500">~$</span>
+                <span className="animate-blink text-[#79c0ff]" aria-hidden>
+                  █
+                </span>
               </div>
             )}
           </div>

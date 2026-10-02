@@ -1,20 +1,44 @@
 import type { Metadata } from 'next'
 import { getContact } from '@/sanity/lib/queries'
 import { ContactClient } from '@/components/contact-client'
+import { JsonLd } from '@/components/json-ld'
+import { breadcrumbSchema, graph } from '@/lib/seo'
+import { absoluteUrl, siteConfig } from '@/lib/site'
 import type { Contact } from '@/sanity/lib/types'
 import { Suspense } from 'react'
 
+const CONTACT_DESCRIPTION = `Get in touch with ${siteConfig.name} — available for full stack development, AI/ML and data science collaborations, freelance work and full-time roles.`
+
 export const metadata: Metadata = {
   title: 'Contact',
-  description: 'Get in touch with Aman Kushwaha for collaborations, opportunities, or just to say hi.',
+  description: CONTACT_DESCRIPTION,
   alternates: {
-    canonical: `/contact`,
+    canonical: '/contact',
+  },
+  openGraph: {
+    title: `Contact | ${siteConfig.name}`,
+    description: CONTACT_DESCRIPTION,
+    url: absoluteUrl('/contact'),
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `Contact | ${siteConfig.name}`,
+    description: CONTACT_DESCRIPTION,
   },
 }
 
 export default function ContactPage() {
   return (
     <div className="min-h-full">
+      <JsonLd
+        data={graph(
+          breadcrumbSchema([
+            { name: 'Home', path: '/' },
+            { name: 'Contact', path: '/contact' },
+          ])
+        )}
+      />
       <Suspense fallback={<ContactPageSkeleton />}>
         <ContactPageContent />
       </Suspense>

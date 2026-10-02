@@ -14,7 +14,11 @@ import { metadata as studioMetadata, viewport } from 'next-sanity/studio'
 import { connection } from 'next/server'
 import { Suspense } from 'react'
 
-// export const dynamic = 'force-static'
+// Sanity Studio is a fully client-rendered app behind a key-authenticated route.
+// It has no meaningful static shell to prerender, so it opts out of instant
+// navigation validation. The `connection()` below keeps the surrounding tree
+// from being prerendered.
+export const instant = false
 
 export const metadata: Metadata = {
   ...studioMetadata,

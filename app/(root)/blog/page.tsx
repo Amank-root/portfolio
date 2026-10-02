@@ -5,23 +5,49 @@ import { Suspense } from 'react'
 import { getBlogPosts } from '@/sanity/lib/queries'
 import { urlFor } from '@/sanity/lib/image'
 import { CalendarDays, Clock, BookOpen, ArrowRight } from 'lucide-react'
+import { JsonLd } from '@/components/json-ld'
+import { breadcrumbSchema, collectionSchema, graph } from '@/lib/seo'
+import { absoluteUrl, siteConfig } from '@/lib/site'
 import type { BlogPost } from '@/sanity/lib/types'
+
+const BLOG_DESCRIPTION =
+  'Writing on web development, system design, AI/ML and software engineering by Aman Kushwaha — tutorials, build notes and lessons learned.'
 
 export const metadata: Metadata = {
   title: 'Blog',
-  description: 'Thoughts, tutorials, and insights on web development, AI/ML, and technology.',
+  description: BLOG_DESCRIPTION,
   alternates: {
-    canonical: `/blog`,
+    canonical: '/blog',
+  },
+  openGraph: {
+    title: `Blog | ${siteConfig.name}`,
+    description: BLOG_DESCRIPTION,
+    url: absoluteUrl('/blog'),
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `Blog | ${siteConfig.name}`,
+    description: BLOG_DESCRIPTION,
   },
 }
 
-// export const revalidate = 60
-
 export default function BlogPage() {
   return (
-    <Suspense fallback={<BlogPageSkeleton />}>
-      <BlogPageContent />
-    </Suspense>
+    <>
+      <JsonLd
+        data={graph(
+          collectionSchema({ name: 'Blog', path: '/blog', description: BLOG_DESCRIPTION }),
+          breadcrumbSchema([
+            { name: 'Home', path: '/' },
+            { name: 'Blog', path: '/blog' },
+          ])
+        )}
+      />
+      <Suspense fallback={<BlogPageSkeleton />}>
+        <BlogPageContent />
+      </Suspense>
+    </>
   )
 }
 
@@ -40,7 +66,7 @@ async function BlogPageContent() {
             <BookOpen size={12} />
             Writing
           </span>
-          <h1 className="text-4xl font-bold gradient-text">Blog</h1>
+          <h1 className="text-display font-bold gradient-text">Blog</h1>
           <p className="mt-3 text-muted-foreground max-w-lg">
             Thoughts on web development, system design, AI/ML, and the occasional life lesson.
           </p>
