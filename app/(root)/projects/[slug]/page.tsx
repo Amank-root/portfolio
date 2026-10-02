@@ -21,26 +21,24 @@ type Props = { params: Promise<{ slug: string }> }
 function flattenLongDescription(value: Project['longDescription']): string {
   if (!value) return ''
   if (typeof value === 'string') return value
-  return value
-    .map(block => (block.children ?? []).map(child => child.text).join(''))
-    .join('\n\n')
+  return value.map(block => (block.children ?? []).map(child => child.text).join('')).join('\n\n')
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const project = await getProject(slug).catch(() => null) as Project | null
+  const project = (await getProject(slug).catch(() => null)) as Project | null
   if (!project) return { title: 'Project Not Found' }
   return {
     title: project.title,
     description: project.description,
     alternates: {
-      canonical: `/projects/${slug}`
-    }
+      canonical: `/projects/${slug}`,
+    },
   }
 }
 
 export async function generateStaticParams() {
-  const projects = await getProjects().catch(() => []) as Project[]
+  const projects = (await getProjects().catch(() => [])) as Project[]
   return projects.map(p => ({ slug: p.slug.current }))
 }
 
@@ -54,7 +52,7 @@ export default function ProjectPage({ params }: Props) {
 
 async function ProjectPageContent({ params }: Props) {
   const { slug } = await params
-  const project = await getProject(slug).catch(() => null) as Project | null
+  const project = (await getProject(slug).catch(() => null)) as Project | null
 
   if (!project) notFound()
 
@@ -86,10 +84,15 @@ async function ProjectPageContent({ params }: Props) {
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
               {project.status && (
-                <span className={`text-xs px-2 py-0.5 rounded-full border ${project.status === 'completed' ? 'bg-accent/15 text-accent border-accent/30' :
-                  project.status === 'development' ? 'bg-yellow-500/15 text-yellow-400 border-yellow-500/30' :
-                    'bg-secondary/15 text-secondary border-secondary/30'
-                  }`}>
+                <span
+                  className={`text-xs px-2 py-0.5 rounded-full border ${
+                    project.status === 'completed'
+                      ? 'bg-accent/15 text-accent border-accent/30'
+                      : project.status === 'development'
+                        ? 'bg-yellow-500/15 text-yellow-400 border-yellow-500/30'
+                        : 'bg-secondary/15 text-secondary border-secondary/30'
+                  }`}
+                >
                   {project.status}
                 </span>
               )}
@@ -129,7 +132,9 @@ async function ProjectPageContent({ params }: Props) {
             </h2>
             <div className="flex flex-wrap gap-2">
               {project.technologies.map(tech => (
-                <span key={tech._id} className="tag-pill">{tech.name}</span>
+                <span key={tech._id} className="tag-pill">
+                  {tech.name}
+                </span>
               ))}
             </div>
           </div>
@@ -151,7 +156,14 @@ async function ProjectPageContent({ params }: Props) {
           }
           return (
             <div className="prose-blog">
-              {text.split('\n').map((line, i) => line.trim() && <p key={i} className="mb-4 text-foreground/85 leading-7">{line}</p>)}
+              {text.split('\n').map(
+                (line, i) =>
+                  line.trim() && (
+                    <p key={i} className="mb-4 text-foreground/85 leading-7">
+                      {line}
+                    </p>
+                  )
+              )}
             </div>
           )
         })()}

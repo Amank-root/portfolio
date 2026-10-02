@@ -31,12 +31,8 @@ export function MobileNav() {
             )}
           >
             <item.icon size={18} className={isActive ? 'text-primary' : ''} />
-            <span className={cn('text-[9px] font-medium', isActive ? 'text-primary' : '')}>
-              {item.name}
-            </span>
-            {isActive && (
-              <span className="absolute bottom-0 w-8 h-0.5 bg-primary rounded-t-full" />
-            )}
+            <span className={cn('text-[9px] font-medium', isActive ? 'text-primary' : '')}>{item.name}</span>
+            {isActive && <span className="absolute bottom-0 w-8 h-0.5 bg-primary rounded-t-full" />}
           </Link>
         )
       })}

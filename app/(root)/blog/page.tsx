@@ -4,15 +4,15 @@ import Link from 'next/link'
 import { Suspense } from 'react'
 import { getBlogPosts } from '@/sanity/lib/queries'
 import { urlFor } from '@/sanity/lib/image'
-import { CalendarDays, Clock, Tag, BookOpen, ArrowRight, Search } from 'lucide-react'
+import { CalendarDays, Clock, BookOpen, ArrowRight } from 'lucide-react'
 import type { BlogPost } from '@/sanity/lib/types'
 
 export const metadata: Metadata = {
   title: 'Blog',
   description: 'Thoughts, tutorials, and insights on web development, AI/ML, and technology.',
   alternates: {
-    canonical: `/blog`
-  }
+    canonical: `/blog`,
+  },
 }
 
 // export const revalidate = 60
@@ -26,7 +26,7 @@ export default function BlogPage() {
 }
 
 async function BlogPageContent() {
-  const posts = await getBlogPosts().catch(() => []) as BlogPost[]
+  const posts = (await getBlogPosts().catch(() => [])) as BlogPost[]
 
   const featured = posts.filter(p => p.featured).slice(0, 1)[0]
   const rest = posts.filter(p => !p.featured || p._id !== featured?._id)
@@ -50,7 +50,9 @@ async function BlogPageContent() {
           <div className="text-center py-24">
             <BookOpen size={48} className="mx-auto mb-4 text-muted-foreground/30" />
             <h2 className="text-xl font-semibold text-foreground mb-2">No posts yet</h2>
-            <p className="text-muted-foreground text-sm">Check back soon — content is being published from Sanity CMS.</p>
+            <p className="text-muted-foreground text-sm">
+              Check back soon — content is being published from Sanity CMS.
+            </p>
           </div>
         ) : (
           <>
@@ -91,7 +93,11 @@ async function BlogPageContent() {
                         {featured.publishedAt && (
                           <span className="flex items-center gap-1">
                             <CalendarDays size={12} />
-                            {new Date(featured.publishedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                            {new Date(featured.publishedAt).toLocaleDateString('en-US', {
+                              month: 'long',
+                              day: 'numeric',
+                              year: 'numeric',
+                            })}
                           </span>
                         )}
                         {featured.readTime && (
@@ -115,7 +121,7 @@ async function BlogPageContent() {
               <>
                 <h2 className="text-lg font-semibold text-foreground mb-5">All Posts</h2>
                 <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                  {rest.map((post) => (
+                  {rest.map(post => (
                     <Link key={post._id} href={`/blog/${post.slug.current}`} className="group">
                       <article className="glass rounded-xl overflow-hidden border-border/50 hover:border-primary/20 hover-card transition-all duration-300 h-full flex flex-col">
                         {post.mainImage ? (
@@ -137,7 +143,10 @@ async function BlogPageContent() {
                         <div className="p-5 flex flex-col flex-1">
                           <div className="flex flex-wrap gap-1.5 mb-3">
                             {post.categories?.slice(0, 2).map(cat => (
-                              <span key={cat._id} className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-primary/8 text-primary/80 border border-primary/15">
+                              <span
+                                key={cat._id}
+                                className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-primary/8 text-primary/80 border border-primary/15"
+                              >
                                 {cat.title}
                               </span>
                             ))}
@@ -150,7 +159,13 @@ async function BlogPageContent() {
                           )}
                           <div className="flex items-center gap-3 text-xs text-muted-foreground mt-auto pt-3 border-t border-border/30">
                             {post.publishedAt && (
-                              <span>{new Date(post.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                              <span>
+                                {new Date(post.publishedAt).toLocaleDateString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  year: 'numeric',
+                                })}
+                              </span>
                             )}
                             {post.readTime && (
                               <span className="flex items-center gap-1">

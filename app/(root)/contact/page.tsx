@@ -8,8 +8,8 @@ export const metadata: Metadata = {
   title: 'Contact',
   description: 'Get in touch with Aman Kushwaha for collaborations, opportunities, or just to say hi.',
   alternates: {
-    canonical: `/contact`
-  }
+    canonical: `/contact`,
+  },
 }
 
 export default function ContactPage() {

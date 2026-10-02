@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { FileText, User, Code, Briefcase, Mail, ChevronRight, BookOpen, BarChart3, Home } from 'lucide-react'
+import { User, Code, Briefcase, Mail, ChevronRight, BookOpen, Home } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
 
@@ -23,13 +23,16 @@ export function Sidebar({ className }: SidebarProps) {
   ]
 
   return (
-    <aside className={cn('hidden w-60 shrink-0 border-r border-border/50 bg-background-elevated md:flex md:flex-col', className)}>
+    <aside
+      className={cn(
+        'hidden w-60 shrink-0 border-r border-border/50 bg-background-elevated md:flex md:flex-col',
+        className
+      )}
+    >
       <div className="sticky top-0 flex flex-col h-full">
         {/* Explorer header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-border/30">
-          <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-            Explorer
-          </span>
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Explorer</span>
           <div className="flex gap-1">
             <div className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
             <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/70" />
@@ -46,8 +49,7 @@ export function Sidebar({ className }: SidebarProps) {
 
           <nav className="space-y-0.5">
             {navItems.map((item, i) => {
-              const isActive = pathname === item.path ||
-                (item.path !== '/' && pathname.startsWith(item.path))
+              const isActive = pathname === item.path || (item.path !== '/' && pathname.startsWith(item.path))
               return (
                 <motion.div
                   key={item.path}
@@ -72,16 +74,12 @@ export function Sidebar({ className }: SidebarProps) {
                     )}
                     <item.icon
                       size={14}
-                      className={cn(
-                        'mr-2 shrink-0',
-                        isActive ? 'text-primary' : 'text-muted-foreground'
-                      )}
+                      className={cn('mr-2 shrink-0', isActive ? 'text-primary' : 'text-muted-foreground')}
                     />
                     <span className="flex-1 truncate">{item.name}</span>
-                    <span className={cn(
-                      'text-[10px] font-mono',
-                      isActive ? 'text-primary/60' : 'text-muted-foreground/40'
-                    )}>
+                    <span
+                      className={cn('text-[10px] font-mono', isActive ? 'text-primary/60' : 'text-muted-foreground/40')}
+                    >
                       .{item.ext}
                     </span>
                   </Link>

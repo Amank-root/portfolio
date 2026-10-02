@@ -3,8 +3,16 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import {
-  BarChart3, Eye, MessageSquare, Heart, TrendingUp, FileText,
-  Lock, ArrowUpRight, RefreshCw, Globe, Smartphone, Monitor, AlertCircle
+  BarChart3,
+  Eye,
+  MessageSquare,
+  Heart,
+  TrendingUp,
+  FileText,
+  Lock,
+  ArrowUpRight,
+  RefreshCw,
+  AlertCircle,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -55,27 +63,25 @@ export default function DashboardPage() {
   useEffect(() => {
     const stored = sessionStorage.getItem('dashboard-key')
     if (stored) {
+      // key from sessionStorage on first mount; safe one-shot read.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setKey(stored)
-      fetchData(stored).then(() => setAuthenticated(true)).catch(() => {})
+      fetchData(stored)
+        .then(() => setAuthenticated(true))
+        .catch(() => {})
     }
   }, [fetchData])
 
   if (!authenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-sm"
-        >
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-sm">
           <div className="glass rounded-2xl p-8 border border-border/50 text-center">
             <div className="w-16 h-16 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-6">
               <Lock size={24} className="text-primary" />
             </div>
             <h1 className="text-2xl font-bold gradient-text mb-2">Dashboard</h1>
-            <p className="text-muted-foreground text-sm mb-8">
-              Enter your dashboard key to access analytics
-            </p>
+            <p className="text-muted-foreground text-sm mb-8">Enter your dashboard key to access analytics</p>
             <form onSubmit={login} className="space-y-4">
               <Input
                 type="password"
@@ -129,7 +135,10 @@ export default function DashboardPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => { setAuthenticated(false); sessionStorage.removeItem('dashboard-key') }}
+              onClick={() => {
+                setAuthenticated(false)
+                sessionStorage.removeItem('dashboard-key')
+              }}
               className="text-muted-foreground text-xs"
             >
               Logout
@@ -143,7 +152,13 @@ export default function DashboardPage() {
             { label: 'Total Views', value: data?.totalViews || 0, icon: Eye, color: 'primary', change: '+12%' },
             { label: 'Blog Views', value: data?.blogViews || 0, icon: FileText, color: 'accent', change: '+8%' },
             { label: 'Reactions', value: data?.totalReactions || 0, icon: Heart, color: 'secondary', change: '+24%' },
-            { label: 'Comments', value: data?.totalComments || 0, icon: MessageSquare, color: 'primary', change: '+5%' },
+            {
+              label: 'Comments',
+              value: data?.totalComments || 0,
+              icon: MessageSquare,
+              color: 'primary',
+              change: '+5%',
+            },
           ].map((stat, i) => (
             <motion.div
               key={stat.label}
@@ -153,11 +168,23 @@ export default function DashboardPage() {
               className="glass rounded-xl p-5 border border-border/50"
             >
               <div className="flex items-start justify-between mb-3">
-                <div className={`p-2 rounded-lg ${stat.color === 'primary' ? 'bg-primary/10' : stat.color === 'accent' ? 'bg-accent/10' : 'bg-secondary/10'}`}>
-                  <stat.icon size={16} className={stat.color === 'primary' ? 'text-primary' : stat.color === 'accent' ? 'text-accent' : 'text-secondary'} />
+                <div
+                  className={`p-2 rounded-lg ${stat.color === 'primary' ? 'bg-primary/10' : stat.color === 'accent' ? 'bg-accent/10' : 'bg-secondary/10'}`}
+                >
+                  <stat.icon
+                    size={16}
+                    className={
+                      stat.color === 'primary'
+                        ? 'text-primary'
+                        : stat.color === 'accent'
+                          ? 'text-accent'
+                          : 'text-secondary'
+                    }
+                  />
                 </div>
                 <span className="text-xs text-accent flex items-center gap-0.5">
-                  <ArrowUpRight size={10} />{stat.change}
+                  <ArrowUpRight size={10} />
+                  {stat.change}
                 </span>
               </div>
               <div className="text-2xl font-bold text-foreground">{stat.value.toLocaleString()}</div>

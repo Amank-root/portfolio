@@ -20,9 +20,7 @@ export const portableTextComponents: PortableTextComponents = {
               style={{ maxHeight: '500px' }}
             />
           </div>
-          {value.alt && (
-            <p className="mt-2 text-center text-sm text-muted-foreground italic">{value.alt}</p>
-          )}
+          {value.alt && <p className="mt-2 text-center text-sm text-muted-foreground italic">{value.alt}</p>}
         </div>
       )
     },
@@ -50,7 +48,9 @@ export const portableTextComponents: PortableTextComponents = {
   },
   block: {
     h1: ({ children }) => <h1 className="mb-6 mt-10 text-3xl font-bold gradient-text">{children}</h1>,
-    h2: ({ children }) => <h2 className="mb-4 mt-8 text-2xl font-semibold text-foreground border-b border-border/30 pb-2">{children}</h2>,
+    h2: ({ children }) => (
+      <h2 className="mb-4 mt-8 text-2xl font-semibold text-foreground border-b border-border/30 pb-2">{children}</h2>
+    ),
     h3: ({ children }) => <h3 className="mb-3 mt-6 text-xl font-semibold text-foreground">{children}</h3>,
     h4: ({ children }) => <h4 className="mb-2 mt-4 text-lg font-semibold text-foreground">{children}</h4>,
     blockquote: ({ children }) => (
@@ -78,8 +78,12 @@ export const portableTextComponents: PortableTextComponents = {
     ),
   },
   list: {
-    bullet: ({ children }) => <ul className="mb-4 list-disc pl-6 text-foreground/85 space-y-1.5 marker:text-primary">{children}</ul>,
-    number: ({ children }) => <ol className="mb-4 list-decimal pl-6 text-foreground/85 space-y-1.5 marker:text-primary">{children}</ol>,
+    bullet: ({ children }) => (
+      <ul className="mb-4 list-disc pl-6 text-foreground/85 space-y-1.5 marker:text-primary">{children}</ul>
+    ),
+    number: ({ children }) => (
+      <ol className="mb-4 list-decimal pl-6 text-foreground/85 space-y-1.5 marker:text-primary">{children}</ol>
+    ),
   },
   listItem: {
     bullet: ({ children }) => <li className="leading-relaxed">{children}</li>,

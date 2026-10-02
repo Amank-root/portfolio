@@ -2,16 +2,19 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { Terminal, ChevronRight, Maximize2, Minus, X } from 'lucide-react'
+import { Terminal, Maximize2, Minus, X } from 'lucide-react'
 
 const COMMANDS = [
   { prompt: 'whoami', output: 'Aman Kushwaha (alias: amank-root)' },
-  { prompt: 'cat profile.json', output: `{
+  {
+    prompt: 'cat profile.json',
+    output: `{
   "role": "Full Stack Developer",
   "stack": ["React", "Next.js", "Node.js", "TypeScript"],
   "education": "B.Tech CS @ MDU, Rohtak",
   "status": "Available for hire 🟢"
-}` },
+}`,
+  },
   { prompt: 'ls skills/', output: 'frontend/  backend/  database/  devops/  ml/' },
   { prompt: 'cat interests.txt', output: 'Building scalable apps · Open source · AI/ML · System design · Clean code' },
   { prompt: 'echo $CONTACT', output: 'github.com/amank-root | linkedin.com/in/amank-root' },
@@ -45,7 +48,8 @@ export function TerminalSection() {
         }, 60)
         return () => clearTimeout(t)
       } else {
-        setPhase('output')
+        const t = setTimeout(() => setPhase('output'), 60)
+        return () => clearTimeout(t)
       }
     } else if (phase === 'output') {
       const t = setTimeout(() => {
@@ -127,9 +131,7 @@ export function TerminalSection() {
                   <span className="text-primary/80">portfolio</span>
                   <span className="text-muted-foreground/60 mr-1">~$</span>
                   <span className="text-foreground">{line.prompt}</span>
-                  {line.typing && currentCmd < COMMANDS.length && (
-                    <span className="animate-blink text-primary">█</span>
-                  )}
+                  {line.typing && currentCmd < COMMANDS.length && <span className="animate-blink text-primary">█</span>}
                 </div>
                 {line.output && (
                   <div className="mt-1 ml-0 text-muted-foreground/80 whitespace-pre-wrap leading-relaxed pl-2 border-l border-border/30">

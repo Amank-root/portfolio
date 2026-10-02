@@ -7,11 +7,10 @@
  * https://github.com/sanity-io/next-sanity
  */
 
-
-import {NextStudio} from 'next-sanity/studio'
+import { NextStudio } from 'next-sanity/studio'
 import config from '../../../sanity.config'
-import type {Metadata} from 'next'
-import {metadata as studioMetadata, viewport} from 'next-sanity/studio'
+import type { Metadata } from 'next'
+import { metadata as studioMetadata, viewport } from 'next-sanity/studio'
 import { connection } from 'next/server'
 import { Suspense } from 'react'
 
@@ -28,7 +27,7 @@ export const metadata: Metadata = {
   },
 }
 
-export {viewport}
+export { viewport }
 
 async function Connection() {
   await connection()

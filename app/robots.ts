@@ -1,7 +1,7 @@
 // app/robots.ts
 import { MetadataRoute } from 'next'
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://www.amankushwaha.dev"
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.amankushwaha.dev'
 
 export default function robots(): MetadataRoute.Robots {
   const isProduction = process.env.NEXT_PUBLIC_ENV === 'production'
@@ -19,7 +19,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/dashboard', '/studio', '/api']
+      disallow: ['/dashboard', '/studio', '/api'],
     },
     sitemap: BASE_URL,
   }

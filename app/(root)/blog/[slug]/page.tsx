@@ -22,12 +22,13 @@ type Props = { params: Promise<{ slug: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const post = await getBlogPost(slug).catch(() => null) as BlogPost | null
+  const post = (await getBlogPost(slug).catch(() => null)) as BlogPost | null
   if (!post) return { title: 'Post Not Found' }
 
   const title = post.seo?.metaTitle || post.title
   const description = post.seo?.metaDescription || post.excerpt || `Read "${post.title}" on Aman Kushwaha's blog`
-  const ogImageUrl = post.seo?.ogImage?.asset?.url || (post.mainImage ? urlFor(post.mainImage).width(1200).height(630).url() : undefined)
+  const ogImageUrl =
+    post.seo?.ogImage?.asset?.url || (post.mainImage ? urlFor(post.mainImage).width(1200).height(630).url() : undefined)
 
   return {
     title,
@@ -46,13 +47,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       images: ogImageUrl ? [ogImageUrl] : [],
     },
-    ...(post.seo?.noIndex ? { robots: { index: false, follow: false } } : { robots : {index: true, follow: true }}),
-    ...(post.seo?.canonicalUrl ? { alternates: { canonical: post.seo.canonicalUrl } } : {alternates: { canonical: `/blog/${slug}`}}),
+    ...(post.seo?.noIndex ? { robots: { index: false, follow: false } } : { robots: { index: true, follow: true } }),
+    ...(post.seo?.canonicalUrl
+      ? { alternates: { canonical: post.seo.canonicalUrl } }
+      : { alternates: { canonical: `/blog/${slug}` } }),
   }
 }
 
 export async function generateStaticParams() {
-  const slugs = await getBlogSlugs().catch(() => []) as { slug: string }[]
+  const slugs = (await getBlogSlugs().catch(() => [])) as { slug: string }[]
   return slugs.map(({ slug }) => ({ slug }))
 }
 
@@ -126,7 +129,11 @@ async function BlogPostContent({ params }: Props) {
           <div className="relative px-4 sm:px-6 lg:px-8 -mt-24 sm:-mt-32">
             <div className="mx-auto max-w-3xl">
               <Link href="/blog">
-                <Button variant="ghost" size="sm" className="mb-6 gap-2 text-xs text-muted-foreground hover:text-foreground">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="mb-6 gap-2 text-xs text-muted-foreground hover:text-foreground"
+                >
                   <ArrowLeft size={12} /> Back to Blog
                 </Button>
               </Link>
@@ -134,7 +141,10 @@ async function BlogPostContent({ params }: Props) {
               {/* Categories */}
               <div className="flex flex-wrap gap-2 mb-4">
                 {post.categories?.map((cat: BlogCategory) => (
-                  <span key={cat._id} className="text-xs font-medium px-3 py-1 rounded-full bg-primary/15 text-primary border border-primary/25">
+                  <span
+                    key={cat._id}
+                    className="text-xs font-medium px-3 py-1 rounded-full bg-primary/15 text-primary border border-primary/25"
+                  >
                     {cat.title}
                   </span>
                 ))}
@@ -169,7 +179,11 @@ async function BlogPostContent({ params }: Props) {
                   {post.publishedAt && (
                     <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
                       <CalendarDays size={13} />
-                      {new Date(post.publishedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                      {new Date(post.publishedAt).toLocaleDateString('en-US', {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
                     </span>
                   )}
                   {post.readTime && (
@@ -234,7 +248,7 @@ async function BlogPostContent({ params }: Props) {
             </div>
 
             {/* Comments */}
-            <BlogComments blogSlug={slug} initialComments={commentsData as any} />
+            <BlogComments blogSlug={slug} initialComments={commentsData} />
 
             {/* Related posts */}
             {(relatedPosts as BlogPost[]).length > 0 && (
@@ -255,7 +269,9 @@ async function BlogPostContent({ params }: Props) {
                           </div>
                         )}
                         <div className="p-4">
-                          <h4 className="text-sm font-medium group-hover:text-primary transition-colors line-clamp-2 mb-2">{related.title}</h4>
+                          <h4 className="text-sm font-medium group-hover:text-primary transition-colors line-clamp-2 mb-2">
+                            {related.title}
+                          </h4>
                           <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
                             Read <ArrowRight size={10} />
                           </div>

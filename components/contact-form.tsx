@@ -39,6 +39,7 @@ export function ContactForm({ formspreeEndpoint, recaptchaSiteKey }: ContactForm
       toast.success('Message sent successfully!', {
         description: "Thank you for your message. I'll get back to you soon.",
       })
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- form submission success
       setShowSuccess(true)
       // Reset form data and recaptcha token
       setFormData({ name: '', email: '', subject: '', message: '' })

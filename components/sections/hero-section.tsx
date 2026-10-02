@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -21,12 +21,14 @@ export function HeroSection({ about }: HeroSectionProps) {
   const [textIndex, setTextIndex] = useState(0)
   const [charIndex, setCharIndex] = useState(0)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => { setMounted(true) }, [])
+  const mounted = useRef(false)
 
   useEffect(() => {
-    if (!mounted) return
+    mounted.current = true
+  }, [])
+
+  useEffect(() => {
+    if (!mounted.current) return
     const currentText = TYPING_TEXTS[textIndex]
     const speed = isDeleting ? 40 : 90
 
@@ -90,10 +92,7 @@ export function HeroSection({ about }: HeroSectionProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              Hey, I&apos;m{' '}
-              <span className="gradient-text glow-text-primary">
-                Aman Kushwaha
-              </span>
+              Hey, I&apos;m <span className="gradient-text glow-text-primary">Aman Kushwaha</span>
             </motion.h1>
 
             {/* Typing text */}
@@ -114,7 +113,10 @@ export function HeroSection({ about }: HeroSectionProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
             >
-              Results-driven Data Science undergraduate with hands-on experience in machine learning, AI systems, full-stack development, and open-source projects. Passionate about building scalable solutions, learning emerging technologies, and collaborating with diverse teams to solve complex challenges. Seeking opportunities to contribute technical expertise while continuing to grow as an engineer.
+              Results-driven Data Science undergraduate with hands-on experience in machine learning, AI systems,
+              full-stack development, and open-source projects. Passionate about building scalable solutions, learning
+              emerging technologies, and collaborating with diverse teams to solve complex challenges. Seeking
+              opportunities to contribute technical expertise while continuing to grow as an engineer.
             </motion.p>
 
             {/* CTA Buttons */}
@@ -178,7 +180,10 @@ export function HeroSection({ about }: HeroSectionProps) {
             {/* Decorative rings */}
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="w-72 h-72 sm:w-80 sm:h-80 rounded-full border border-primary/10 animate-rotate-slow" />
-              <div className="absolute w-64 h-64 sm:w-72 sm:h-72 rounded-full border border-accent/10" style={{ animationDirection: 'reverse' }} />
+              <div
+                className="absolute w-64 h-64 sm:w-72 sm:h-72 rounded-full border border-accent/10"
+                style={{ animationDirection: 'reverse' }}
+              />
             </div>
 
             {/* Image container */}
@@ -187,13 +192,7 @@ export function HeroSection({ about }: HeroSectionProps) {
               whileHover={{ scale: 1.03 }}
               transition={{ type: 'spring', stiffness: 200 }}
             >
-              <Image
-                src="/aman-pic.jpg"
-                alt="Aman Kushwaha"
-                fill
-                className="object-cover"
-                priority
-              />
+              <Image src="/aman-pic.jpg" alt="Aman Kushwaha" fill className="object-cover" priority />
               {/* Subtle overlay */}
               <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-primary/10" />
             </motion.div>
@@ -230,7 +229,7 @@ export function HeroSection({ about }: HeroSectionProps) {
             { label: 'Technologies', value: '20+' },
             { label: 'GitHub Stars', value: '50+' },
             { label: 'Contributions', value: '200+' },
-          ].map((stat) => (
+          ].map(stat => (
             <div key={stat.label} className="glass rounded-xl p-4 text-center border-border/30">
               <div className="text-2xl font-bold gradient-text">{stat.value}</div>
               <div className="text-xs text-muted-foreground mt-1">{stat.label}</div>
