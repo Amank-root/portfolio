@@ -21,7 +21,10 @@ const securityHeaders = [
       // rendered as broken-image icons in project write-ups.
       "img-src 'self' blob: data: https://cdn.sanity.io https://dummyimage.com https://img.shields.io https://badgen.net",
       "font-src 'self' data:",
-      "connect-src 'self' https://*.api.sanity.io https://*.apicdn.sanity.io https://www.google.com/recaptcha/",
+      // Formspree must be here, not just in form-action: `useForm` submits with
+      // fetch(), and connect-src is what governs fetch/XHR. With only form-action
+      // allowing it, the POST was blocked and surfaced as a bare "Failed to fetch".
+      "connect-src 'self' https://*.api.sanity.io https://*.apicdn.sanity.io https://www.google.com/recaptcha/ https://formspree.io",
       "frame-src 'self' https://*.sanity.io https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/",
       "object-src 'none'",
       "base-uri 'self'",
