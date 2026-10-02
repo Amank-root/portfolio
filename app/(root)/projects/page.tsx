@@ -1,148 +1,185 @@
 'use cache'
+import { cacheLife } from 'next/cache'
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { getProjects } from '@/sanity/lib/queries'
 import { urlFor } from '@/sanity/lib/image'
-import { Button } from '@/components/ui/button'
-import { Github, ExternalLink, Briefcase, ArrowRight } from 'lucide-react'
+import { ArrowUpRight, Github } from 'lucide-react'
+import { PageHeader, Reveal } from '@/components/section'
+import { SpotlightCard } from '@/components/spotlight-card'
+import { JsonLd } from '@/components/json-ld'
+import { breadcrumbSchema, collectionSchema, graph } from '@/lib/seo'
+import { absoluteUrl, siteConfig } from '@/lib/site'
+import { projectPlaceholder } from '@/lib/placeholder'
 import type { Project } from '@/sanity/lib/types'
+
+const PROJECTS_DESCRIPTION =
+  'Selected projects by Aman Kushwaha — full stack web apps, AI/ML systems and developer tooling built with Next.js, TypeScript, React and Python.'
 
 export const metadata: Metadata = {
   title: 'Projects',
-  description: 'Portfolio of web development, AI/ML, and full-stack projects by Aman Kushwaha.',
+  description: PROJECTS_DESCRIPTION,
   alternates: {
-    canonical: `/projects`,
+    canonical: '/projects',
+  },
+  openGraph: {
+    title: `Projects | ${siteConfig.name}`,
+    description: PROJECTS_DESCRIPTION,
+    url: absoluteUrl('/projects'),
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `Projects | ${siteConfig.name}`,
+    description: PROJECTS_DESCRIPTION,
   },
 }
 
-// export const revalidate = 60
-
-const statusColors: Record<string, string> = {
-  completed: 'bg-accent/20 text-accent border-accent/30',
-  development: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-  maintenance: 'bg-secondary/20 text-secondary border-secondary/30',
+function formatDate(value?: string): string {
+  if (!value) return ''
+  return new Date(value).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
 }
 
 export default async function ProjectsPage() {
+  cacheLife('days')
+
   const projects = (await getProjects().catch(() => [])) as Project[]
 
   return (
-    <div className="min-h-full px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-5xl">
-        <div className="mb-12">
-          <span className="section-label mb-3 flex items-center gap-2">
-            <Briefcase size={12} />
-            Portfolio
-          </span>
-          <h1 className="text-4xl font-bold gradient-text">Projects</h1>
-          <p className="mt-3 text-muted-foreground max-w-lg">
-            A collection of projects I&apos;ve built — from full-stack web apps to AI/ML experiments.
-          </p>
-        </div>
+    <>
+      <JsonLd
+        data={graph(
+          collectionSchema({ name: 'Projects', path: '/projects', description: PROJECTS_DESCRIPTION }),
+          breadcrumbSchema([
+            { name: 'Home', path: '/' },
+            { name: 'Projects', path: '/projects' },
+          ])
+        )}
+      />
+
+      <div className="container">
+        <PageHeader
+          eyebrow="Selected work"
+          title="Things I've built."
+          lede="Products, tools and experiments — mostly full-stack web work, increasingly with a machine learning component. Each entry links to a write-up where there is one."
+        />
 
         {projects.length === 0 ? (
-          <div className="text-center py-24">
-            <Briefcase size={48} className="mx-auto mb-4 text-muted-foreground/30" />
-            <h2 className="text-xl font-semibold mb-2">No projects yet</h2>
-            <p className="text-muted-foreground text-sm">Add projects in Sanity Studio to see them here.</p>
-          </div>
+          <p className="py-24 text-center text-foreground-muted">
+            Nothing published yet — projects are added from the CMS.
+          </p>
         ) : (
-          <div className="grid gap-6 sm:grid-cols-2">
-            {projects.map(project => (
-              <div
-                key={project._id}
-                className="group glass rounded-xl overflow-hidden border border-border/50 hover:border-primary/25 hover-card flex flex-col"
-              >
-                <Link href={`/projects/${project.slug?.current}`} className="relative h-48 overflow-hidden">
-                  <Image
-                    src={
-                      project.mainImage
-                        ? urlFor(project.mainImage).width(600).height(300).url()
-                        : `https://dummyimage.com/600X300/0d1117/00c8ff.png&text=${encodeURIComponent(project.title)}`
-                    }
-                    alt={project.mainImage?.alt || project.title}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-linear-to-t from-background/80 to-transparent" />
-                  {project.status && (
-                    <div className="absolute top-3 right-3">
-                      <span
-                        className={`text-[10px] font-medium px-2 py-0.5 rounded-full border ${statusColors[project.status] || ''}`}
-                      >
-                        {project.status}
-                      </span>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {projects.map((project, i) => (
+              <Reveal key={project._id} delay={i * 0.06}>
+                <SpotlightCard
+                  className="h-full !p-0"
+                  glowColor={i % 2 ? 'var(--aurora-cyan)' : 'var(--aurora-violet)'}
+                >
+                  <article className="group flex h-full flex-col">
+                    <Link
+                      href={`/projects/${project.slug?.current}`}
+                      className="relative block aspect-[16/10] overflow-hidden rounded-t-2xl"
+                    >
+                      <Image
+                        src={
+                          project.mainImage
+                            ? urlFor(project.mainImage).width(700).height(440).url()
+                            : projectPlaceholder(project.title)
+                        }
+                        alt={project.mainImage?.alt || `${project.title} preview`}
+                        fill
+                        sizes="(max-width: 640px) 100vw, 560px"
+                        className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-linear-to-t from-background/55 via-background/10 to-transparent" />
+                      {project.status && (
+                        <span className="absolute top-4 right-4 rounded-full border border-border bg-background/70 px-2.5 py-1 font-mono text-[0.625rem] tracking-wider text-foreground-muted uppercase backdrop-blur-sm">
+                          {project.status}
+                        </span>
+                      )}
+                    </Link>
+
+                    <div className="flex flex-1 flex-col p-6">
+                      <div className="flex items-baseline justify-between gap-4">
+                        <h2 className="font-display text-2xl">
+                          <Link
+                            href={`/projects/${project.slug?.current}`}
+                            className="transition-colors hover:text-primary"
+                          >
+                            {project.title}
+                          </Link>
+                        </h2>
+                        {project.featured && (
+                          <span className="shrink-0 font-mono text-[0.625rem] tracking-wider text-primary uppercase">
+                            featured
+                          </span>
+                        )}
+                      </div>
+
+                      {project.description && (
+                        <p className="mt-4 max-w-2xl text-[0.95rem] leading-relaxed text-foreground-muted">
+                          {project.description}
+                        </p>
+                      )}
+
+                      {project.technologies?.length ? (
+                        <ul className="mt-5 flex flex-wrap gap-1.5">
+                          {project.technologies.slice(0, 4).map(tech => (
+                            <li key={tech._id} className="tag-pill">
+                              {tech.name}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
+
+                      <div className="mt-auto flex flex-wrap items-center gap-x-6 gap-y-2 pt-6 text-sm">
+                        <Link
+                          href={`/projects/${project.slug?.current}`}
+                          className="group/link inline-flex items-center gap-1.5 text-foreground transition-colors hover:text-primary"
+                        >
+                          Read more
+                          <ArrowUpRight
+                            size={14}
+                            className="transition-transform group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5"
+                            aria-hidden
+                          />
+                        </Link>
+                        {project.githubUrl && (
+                          <a
+                            href={project.githubUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 text-foreground-muted transition-colors hover:text-foreground"
+                          >
+                            <Github size={14} aria-hidden />
+                            Source
+                          </a>
+                        )}
+                        {project.demoUrl && (
+                          <a
+                            href={project.demoUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 text-foreground-muted transition-colors hover:text-foreground"
+                          >
+                            <ArrowUpRight size={14} aria-hidden />
+                            Live demo
+                          </a>
+                        )}
+                        <span className="ml-auto font-mono text-xs text-foreground-subtle">
+                          {formatDate(project.publishedAt)}
+                        </span>
+                      </div>
                     </div>
-                  )}
-                  {project.featured && (
-                    <div className="absolute top-3 left-3">
-                      <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-primary/20 text-primary border border-primary/30">
-                        ⭐ Featured
-                      </span>
-                    </div>
-                  )}
-                </Link>
-
-                <div className="p-5 flex flex-col flex-1">
-                  <h3 className="font-bold text-foreground group-hover:text-primary transition-colors mb-1.5">
-                    <Link href={`/projects/${project.slug?.current}`}>{project.title}</Link>
-                  </h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed mb-3 flex-1 line-clamp-3">
-                    {project.description}
-                  </p>
-
-                  <div className="flex flex-wrap gap-1.5 mb-4">
-                    {project.technologies?.slice(0, 5).map(tech => (
-                      <span key={tech._id} className="tag-pill text-[11px]">
-                        {tech.name}
-                      </span>
-                    ))}
-                    {(project.technologies?.length || 0) > 5 && (
-                      <span className="tag-pill text-[11px]">+{(project.technologies?.length || 0) - 5}</span>
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-2 mt-auto">
-                    {project.githubUrl && (
-                      <Link href={project.githubUrl} target="_blank" className="flex-1">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="gap-2 text-xs w-full border-border/50 hover:border-primary/50"
-                        >
-                          <Github size={12} /> GitHub
-                        </Button>
-                      </Link>
-                    )}
-                    {project.demoUrl && (
-                      <Link href={project.demoUrl} target="_blank" className="flex-1">
-                        <Button
-                          size="sm"
-                          className="gap-2 text-xs w-full bg-primary/10 text-primary border border-primary/30 hover:bg-primary/20"
-                        >
-                          <ExternalLink size={12} /> Live Demo
-                        </Button>
-                      </Link>
-                    )}
-                    {project.slug?.current && (
-                      <Link href={`/projects/${project.slug.current}`}>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="text-xs px-2 text-muted-foreground hover:text-foreground"
-                        >
-                          <ArrowRight size={14} />
-                        </Button>
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              </div>
+                  </article>
+                </SpotlightCard>
+              </Reveal>
             ))}
           </div>
         )}
       </div>
-    </div>
+    </>
   )
 }

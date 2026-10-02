@@ -1,13 +1,15 @@
 'use client'
 
 import React, { useEffect, useRef } from 'react'
+import Image from 'next/image'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { Copy, Check } from 'lucide-react'
 import { useState } from 'react'
+import { isBadge } from '@/lib/utils'
 
 interface BlogMarkdownRendererProps {
   content: string
@@ -28,20 +30,23 @@ function CodeBlock({ language, children }: { language: string; children: string 
         mermaid = m.default
         mermaid.initialize({
           startOnLoad: false,
-          theme: 'dark',
+          // 'neutral' keeps diagrams legible against the paper background
+          // without importing the site's accent hue into every node.
+          theme: 'neutral',
           themeVariables: {
-            primaryColor: '#00c8ff',
-            primaryTextColor: '#f0f6fc',
-            primaryBorderColor: '#1e3a5f',
-            lineColor: '#00c8ff',
-            secondaryColor: '#161b22',
-            tertiaryColor: '#0d1117',
-            background: '#0d1117',
-            mainBkg: '#161b22',
-            nodeBorder: '#00c8ff',
-            clusterBkg: '#161b22',
-            titleColor: '#f0f6fc',
-            edgeLabelBackground: '#161b22',
+            primaryColor: '#f2efe9',
+            primaryTextColor: '#26221c',
+            primaryBorderColor: '#b9b0a3',
+            lineColor: '#8a8175',
+            secondaryColor: '#ece7de',
+            tertiaryColor: '#f7f4ee',
+            background: 'transparent',
+            mainBkg: '#f2efe9',
+            nodeBorder: '#b9b0a3',
+            clusterBkg: '#f7f4ee',
+            titleColor: '#26221c',
+            edgeLabelBackground: '#f7f4ee',
+            fontFamily: 'inherit',
           },
           flowchart: { useMaxWidth: true, htmlLabels: true },
         })
@@ -49,9 +54,9 @@ function CodeBlock({ language, children }: { language: string; children: string 
         if (containerRef.current) {
           containerRef.current.innerHTML = svg
         }
-      } catch (e) {
+      } catch {
         if (containerRef.current) {
-          containerRef.current.innerHTML = `<pre class="text-red-400 text-sm">Mermaid error: ${e}</pre>`
+          containerRef.current.innerHTML = `<p class="text-sm text-destructive">Could not render this diagram.</p>`
         }
       }
     }
@@ -62,7 +67,6 @@ function CodeBlock({ language, children }: { language: string; children: string 
   if (isMermaid) {
     return (
       <div className="mermaid-container">
-        <div className="text-xs text-muted-foreground mb-3 font-mono">{'\/\/ Diagram'}</div>
         <div ref={containerRef} className="flex justify-center overflow-x-auto" />
       </div>
     )
@@ -75,22 +79,28 @@ function CodeBlock({ language, children }: { language: string; children: string 
   }
 
   return (
-    <div className="relative group my-6 rounded-xl overflow-hidden border border-border/50">
-      <div className="flex items-center justify-between bg-card px-4 py-2 border-b border-border/30">
-        <span className="text-xs font-mono text-muted-foreground">{language || 'code'}</span>
+    <div className="group relative my-7 overflow-hidden rounded-md border border-border">
+      <div className="flex items-center justify-between border-b border-border bg-muted/50 px-4 py-2">
+        <span className="font-mono text-xs text-foreground-subtle">{language || 'code'}</span>
         <button
           onClick={copy}
-          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          className="flex items-center gap-1.5 text-xs text-foreground-subtle transition-colors hover:text-foreground"
         >
           {copied ? <Check size={12} className="text-accent" /> : <Copy size={12} />}
-          {copied ? 'Copied!' : 'Copy'}
+          {copied ? 'Copied' : 'Copy'}
         </button>
       </div>
       <SyntaxHighlighter
         language={language || 'text'}
-        style={oneDark}
-        customStyle={{ margin: 0, background: '#0d1117', borderRadius: 0, fontSize: '0.85rem' }}
-        codeTagProps={{ style: { fontFamily: 'var(--font-fira-code), JetBrains Mono, monospace' } }}
+        style={oneLight}
+        customStyle={{
+          margin: 0,
+          background: 'hsl(var(--background-card))',
+          padding: '1.1rem 1rem',
+          fontSize: '0.85rem',
+          lineHeight: 1.65,
+        }}
+        codeTagProps={{ style: { fontFamily: 'var(--font-code), ui-monospace, monospace' } }}
       >
         {children}
       </SyntaxHighlighter>
@@ -105,70 +115,52 @@ export function BlogMarkdownRenderer({ content }: BlogMarkdownRendererProps) {
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw]}
         components={{
+          /* Everything below inherits from `.prose-blog` in globals.css —
+             these overrides only cover the cases the utility can't express.
+             The previous version re-styled every element here, which meant a
+             palette change had to be made in two places. */
           code({ className, children, ...props }) {
             const match = /language-(\w+)/.exec(className || '')
             if (match && children) {
               return <CodeBlock language={match[1]}>{String(children).replace(/\n$/, '')}</CodeBlock>
             }
-            return (
-              <code className="font-mono text-sm bg-muted px-1.5 py-0.5 rounded text-primary" {...props}>
-                {children}
-              </code>
-            )
+            return <code {...props}>{children}</code>
           },
           table: ({ children }) => (
-            <div className="overflow-x-auto my-6">
-              <table className="w-full border-collapse">{children}</table>
+            <div className="my-7 overflow-x-auto">
+              <table>{children}</table>
             </div>
           ),
-          th: ({ children }) => (
-            <th className="border border-border bg-card px-4 py-2.5 text-left text-sm font-semibold">{children}</th>
-          ),
-          td: ({ children }) => (
-            <td className="border border-border px-4 py-2.5 text-sm text-foreground/85">{children}</td>
-          ),
           img: ({ src, alt }) => (
-            // renderer: images come from Sanity CDN with optimized srcset already;
-            // swapping to next/image here would break the renderer's generic contract.
-            // eslint-disable-next-line @next/next/no-img-element -- PortableText
-            <img
-              src={src}
-              alt={alt}
-              className="rounded-lg border border-border my-6 w-full max-w-full"
+            /* Markdown bodies embed a mix of sources: Sanity CDN for project
+               screenshots, and shields.io / badgen.net for status badges.
+               A plain <img> left those badges unoptimised and able to shift
+               layout as they loaded, so they now go through next/image with a
+               declared aspect box. `unoptimized` is set for badge hosts because
+               running a 200x20 SVG-ish badge through the AVIF/WebP pipeline
+               costs more than it saves.
+
+               The `isBadge` helper and the extra remotePatterns live in
+               next.config.ts / lib/utils respectively. */
+            <Image
+              src={String(src)}
+              alt={alt || ''}
+              // Badges are intrinsically small and vary in height, so give them
+              // their own generous box and let `h-auto` + `w-auto` preserve the
+              // real aspect ratio. Pinning one height for all of them made a
+              // short badge and a tall badge render at visibly different sizes.
+              width={isBadge(String(src)) ? 200 : 1200}
+              height={isBadge(String(src)) ? 24 : 675}
+              sizes={isBadge(String(src)) ? '200px' : '(max-width: 768px) 100vw, 672px'}
+              unoptimized={isBadge(String(src))}
               loading="lazy"
+              // `data-badge` opts out of `.prose-blog img { w-full }`, which
+              // would otherwise stretch a small badge to the full column.
+              data-badge={isBadge(String(src)) ? '' : undefined}
+              className={isBadge(String(src)) ? 'align-middle' : 'mx-auto h-auto w-full rounded-md'}
             />
           ),
-          a: ({ href, children }) => (
-            <a
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary underline underline-offset-4 hover:text-primary/80 transition-colors"
-            >
-              {children}
-            </a>
-          ),
-          blockquote: ({ children }) => (
-            <blockquote className="border-l-4 border-primary pl-4 italic text-muted-foreground my-6 bg-primary/3 py-2 rounded-r-lg">
-              {children}
-            </blockquote>
-          ),
-          h1: ({ children }) => <h1 className="text-3xl font-bold mb-6 mt-10 gradient-text">{children}</h1>,
-          h2: ({ children, id }) => (
-            <h2 id={id} className="text-2xl font-semibold mb-4 mt-8 text-foreground border-b border-border/30 pb-2">
-              {children}
-            </h2>
-          ),
-          h3: ({ children, id }) => (
-            <h3 id={id} className="text-xl font-semibold mb-3 mt-6 text-foreground">
-              {children}
-            </h3>
-          ),
-          p: ({ children }) => <p className="mb-4 leading-7 text-foreground/85">{children}</p>,
-          ul: ({ children }) => <ul className="mb-4 pl-6 space-y-1.5 list-disc marker:text-primary">{children}</ul>,
-          ol: ({ children }) => <ol className="mb-4 pl-6 space-y-1.5 list-decimal marker:text-primary">{children}</ol>,
-          li: ({ children }) => <li className="text-foreground/85 leading-relaxed">{children}</li>,
-          hr: () => <hr className="border-border my-8" />,
+          hr: () => <hr />,
         }}
       >
         {content}

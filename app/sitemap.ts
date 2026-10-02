@@ -1,75 +1,47 @@
 import type { MetadataRoute } from 'next'
-import { BlogPost, Project } from '@/sanity/lib/types'
+import { cacheLife, cacheTag } from 'next/cache'
 import { getBlogPosts, getProjects } from '@/sanity/lib/queries'
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.amankushwaha.dev'
+import { absoluteUrl } from '@/lib/site'
+import type { BlogPost, Project } from '@/sanity/lib/types'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  let allPosts: BlogPost[] = []
-  let allProjects: Project[] = []
+  // cacheComponents replaces route-segment `revalidate` with `use cache` +
+  // cacheLife; the underlying queries already carry their own lifetimes.
+  'use cache'
+  cacheLife('hours')
+  cacheTag('sanity', 'sitemap')
 
-  try {
-    const getBlogs = getBlogPosts().catch(() => [])
-    const getAllProjects = getProjects().catch(() => [])
+  const [allPosts, allProjects] = await Promise.all([
+    getBlogPosts().catch(() => [] as BlogPost[]),
+    getProjects().catch(() => [] as Project[]),
+  ])
 
-    const response = (await Promise.all([getAllProjects, getBlogs])) as [Project[], BlogPost[]]
-
-    ;[allProjects, allPosts] = response
-  } catch (error) {
-    console.error('failed to fetch posts for sitemap:', error)
-  }
-
-  const blogURLS = allPosts.map(post => ({
-    url: `${BASE_URL}/blog/${post.slug.current}`,
+  const blogURLs: MetadataRoute.Sitemap = allPosts.map(post => ({
+    url: absoluteUrl(`/blog/${post.slug.current}`),
     lastModified: post.publishedAt ? new Date(post.publishedAt) : new Date(),
-    changeFrequency: 'yearly' as const,
-    priority: 0.5,
+    // Content changes when edited, not on a fixed weekly schedule. Telling
+    // crawlers 'yearly' made fresh posts look stale; 'monthly' is the honest signal.
+    changeFrequency: 'monthly',
+    priority: post.featured ? 0.8 : 0.6,
   }))
 
-  const projectURLS = allProjects.map(project => ({
-    url: `${BASE_URL}/projects/${project.slug.current}`,
+  const projectURLs: MetadataRoute.Sitemap = allProjects.map(project => ({
+    url: absoluteUrl(`/projects/${project.slug.current}`),
     lastModified: project.publishedAt ? new Date(project.publishedAt) : new Date(),
-    changeFrequency: 'monthly' as const,
-    priority: 0.5,
+    changeFrequency: 'monthly',
+    priority: project.featured ? 0.8 : 0.6,
   }))
 
-  const staticURLS = [
-    {
-      url: BASE_URL,
-      lastModified: new Date(),
-      changeFrequency: 'yearly' as const,
-      priority: 1,
-    },
-    {
-      url: `${BASE_URL}/about`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.5,
-    },
-    {
-      url: `${BASE_URL}/blog`,
-      lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/skills`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.4,
-    },
-    {
-      url: `${BASE_URL}/projects`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
-    },
-    {
-      url: `${BASE_URL}/contact`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly' as const,
-      priority: 0.5,
-    },
+  // No lastModified on static routes: they have no CMS-backed content, and
+  // stamping `new Date()` on every request tells crawlers everything is new.
+  const staticURLs: MetadataRoute.Sitemap = [
+    { url: absoluteUrl('/'), changeFrequency: 'weekly', priority: 1 },
+    { url: absoluteUrl('/about'), changeFrequency: 'monthly', priority: 0.7 },
+    { url: absoluteUrl('/projects'), changeFrequency: 'weekly', priority: 0.9 },
+    { url: absoluteUrl('/blog'), changeFrequency: 'daily', priority: 0.9 },
+    { url: absoluteUrl('/skills'), changeFrequency: 'monthly', priority: 0.6 },
+    { url: absoluteUrl('/contact'), changeFrequency: 'yearly', priority: 0.5 },
   ]
-  return [...staticURLS, ...blogURLS, ...projectURLS]
+
+  return [...staticURLs, ...projectURLs, ...blogURLs]
 }

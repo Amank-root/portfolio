@@ -2,55 +2,156 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { FileCode2, X, CircleDot } from 'lucide-react'
+import { useState } from 'react'
+import { AnimatePresence, motion, useMotionValueEvent, useScroll } from 'motion/react'
+import { Menu, X } from 'lucide-react'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { cn } from '@/lib/utils'
+import { siteConfig } from '@/lib/site'
+import { isActivePath, navItems } from '@/lib/navigation'
+import Image from 'next/image'
 
 export function Header() {
   const pathname = usePathname()
+  const [open, setOpen] = useState(false)
+  // The header condenses once the page scrolls, so it occupies less of a
+  // small viewport when the reader is actually reading.
+  const [condensed, setCondensed] = useState(false)
+  const { scrollY } = useScroll()
 
-  const tabs = [
-    { name: 'index.tsx', path: '/' },
-    { name: 'about.tsx', path: '/about' },
-    { name: 'projects.tsx', path: '/projects' },
-    { name: 'skills.tsx', path: '/skills' },
-    { name: 'blog.md', path: '/blog' },
-    { name: 'contact.tsx', path: '/contact' },
-  ]
+  useMotionValueEvent(scrollY, 'change', latest => {
+    const next = latest > 24
+    // Guard against redundant sets: this fires on every scroll frame, and
+    // React bails out of identical state anyway, but the guard keeps the
+    // dependency array honest.
+    setCondensed(current => (current === next ? current : next))
+  })
+
+  // The menu overlays the page on small screens, so it must close on
+  // navigation. Links call `close()` directly rather than an effect watching
+  // `pathname` — that indirection costs an extra render pass on every route
+  // change and trips the set-state-in-effect lint rule.
+  const close = () => setOpen(false)
 
   return (
-    <header className="flex h-10 items-center border-b border-border/50 bg-background-elevated/80 backdrop-blur-xs sticky top-0 z-40">
-      {/* Brand */}
-      <div className="flex items-center gap-2 px-4 border-r border-border/30 h-full">
-        <FileCode2 size={14} className="text-primary" />
-        <span className="text-xs font-medium text-foreground/70">Portfolio</span>
+    <header
+      className={cn(
+        'sticky top-0 z-50 border-b transition-all duration-500',
+        open
+          ? 'border-border bg-background/80 backdrop-blur-xl'
+          : condensed
+            ? 'border-border/60 bg-background/60 backdrop-blur-xl'
+            : 'border-transparent bg-transparent'
+      )}
+    >
+      <div
+        className={cn(
+          'container flex items-center justify-between gap-6 transition-all duration-500',
+          condensed ? 'h-14' : 'h-18'
+        )}
+      >
+        {/* Wordmark: a gradient monogram plus the name. */}
+        <Link href="/" onClick={close} className="group flex items-center" aria-label={`${siteConfig.name} — home`}>
+          {/* <span
+            aria-hidden
+            className="flex h-8 w-8 items-center justify-center rounded-xl bg-[linear-gradient(135deg,hsl(var(--aurora-coral)),hsl(var(--aurora-violet)))] text-sm font-bold text-primary-foreground transition-transform duration-500 group-hover:rotate-[12deg]"
+          >
+            A
+          </span> */}
+          <Image className="invert dark:invert-0" src="/logo.png" alt={siteConfig.name} width={64} height={64} />
+          <span className="font-display text-lg leading-none tracking-tight">{siteConfig.name}</span>
+        </Link>
+
+        {/* Desktop nav. The active item carries a small gradient dot, which is
+            quieter than an underline or a filled pill. */}
+        <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
+          {navItems.map(item => {
+            const active = isActivePath(pathname, item.path)
+            return (
+              <Link
+                key={item.path}
+                href={item.path}
+                aria-current={active ? 'page' : undefined}
+                onClick={close}
+                className={cn(
+                  'relative rounded-full px-4 py-2 text-sm transition-colors duration-200',
+                  active ? 'text-foreground' : 'text-foreground-muted hover:text-foreground'
+                )}
+              >
+                {active && (
+                  <motion.span
+                    layoutId="nav-active"
+                    aria-hidden
+                    className="absolute inset-0 -z-10 rounded-full border border-primary/30 bg-primary/10"
+                    transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                  />
+                )}
+                {item.name}
+              </Link>
+            )
+          })}
+        </nav>
+
+        <div className="flex items-center gap-2">
+          <ThemeToggle className="p-2" />
+          <Link
+            href="/contact"
+            className="hidden rounded-full border border-border-strong px-4 py-2 text-sm font-medium transition-colors duration-200 hover:border-primary/50 hover:bg-card/60 sm:inline-flex"
+          >
+            Let&apos;s talk
+          </Link>
+          <button
+            type="button"
+            onClick={() => setOpen(o => !o)}
+            className="-mr-2 rounded-full p-2 text-foreground-muted transition-colors hover:bg-card/60 hover:text-foreground md:hidden"
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+            aria-label={open ? 'Close menu' : 'Open menu'}
+          >
+            {open ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex flex-1 overflow-x-auto scrollbar-none">
-        {tabs.map(tab => {
-          const isActive = pathname === tab.path || (tab.path !== '/' && pathname.startsWith(tab.path))
-          return (
-            <Link
-              key={tab.path}
-              href={tab.path}
-              className={cn(
-                'group relative flex h-10 items-center border-r border-border/30 px-4 text-xs transition-all duration-200 whitespace-nowrap',
-                isActive
-                  ? 'bg-background text-foreground'
-                  : 'bg-background-elevated/50 text-muted-foreground hover:bg-background/50 hover:text-foreground'
-              )}
-            >
-              {isActive && <span className="absolute top-0 left-0 right-0 h-[2px] bg-primary" />}
-              <span className="mr-2">{tab.name}</span>
-              {isActive ? (
-                <CircleDot size={10} className="text-primary" />
-              ) : (
-                <X size={10} className="opacity-0 group-hover:opacity-60 transition-opacity" />
-              )}
-            </Link>
-          )
-        })}
-      </div>
+      {/* Mobile menu */}
+      <AnimatePresence>
+        {open && (
+          <motion.nav
+            id="mobile-menu"
+            aria-label="Primary"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="overflow-hidden border-t border-border bg-background/95 backdrop-blur-xl md:hidden"
+          >
+            <ul className="container flex flex-col py-4">
+              {navItems.map((item, i) => {
+                const active = isActivePath(pathname, item.path)
+                return (
+                  <motion.li
+                    key={item.path}
+                    initial={{ opacity: 0, x: -12 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.04 * i, duration: 0.3 }}
+                    className="border-b border-border/50 last:border-0"
+                  >
+                    <Link
+                      href={item.path}
+                      aria-current={active ? 'page' : undefined}
+                      onClick={close}
+                      className="flex items-center justify-between py-4"
+                    >
+                      <span className={cn('font-display text-xl', active && 'text-primary')}>{item.name}</span>
+                      <span className="font-mono text-xs text-foreground-subtle">{item.description}</span>
+                    </Link>
+                  </motion.li>
+                )
+              })}
+            </ul>
+          </motion.nav>
+        )}
+      </AnimatePresence>
     </header>
   )
 }

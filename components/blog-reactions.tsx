@@ -98,9 +98,9 @@ export function BlogReactions({ blogSlug, initialReactions = [] }: BlogReactions
         ))}
       </AnimatePresence>
 
-      <div className="glass rounded-2xl p-6 border border-border/50">
-        <h3 className="text-sm font-semibold text-foreground mb-4 text-center">React to this post</h3>
-        <div className="flex items-center justify-center gap-3 flex-wrap">
+      <div className="border-y border-border py-10 text-center">
+        <h3 className="eyebrow">Did this land?</h3>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           {REACTIONS.map(({ type, emoji, label }) => {
             const count = reactions[type] || 0
             const hasReacted = userReactions.has(type)
@@ -108,24 +108,25 @@ export function BlogReactions({ blogSlug, initialReactions = [] }: BlogReactions
               <motion.button
                 key={type}
                 onClick={e => react(type, e)}
-                whileHover={{ scale: 1.1, y: -2 }}
-                whileTap={{ scale: 0.9 }}
+                whileHover={{ y: -2 }}
+                whileTap={{ scale: 0.94 }}
                 disabled={loading !== null}
-                className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-all duration-200 min-w-[64px] ${
+                className={`flex min-w-[4.5rem] flex-col items-center gap-1.5 rounded-lg border px-4 py-3 transition-colors duration-200 ${
                   hasReacted
-                    ? 'bg-primary/15 border border-primary/30 shadow-xs shadow-primary/10'
-                    : 'bg-muted/50 border border-border/30 hover:bg-muted hover:border-border'
+                    ? 'border-primary/40 bg-primary/5'
+                    : 'border-border hover:border-border-strong hover:bg-muted'
                 }`}
                 title={label}
+                aria-pressed={hasReacted}
               >
                 <motion.span
-                  className="text-2xl"
-                  animate={hasReacted ? { rotate: [0, -10, 10, 0], scale: [1, 1.2, 1] } : {}}
-                  transition={{ duration: 0.3 }}
+                  className="text-xl"
+                  animate={hasReacted ? { rotate: [0, -8, 8, 0] } : {}}
+                  transition={{ duration: 0.35 }}
                 >
                   {emoji}
                 </motion.span>
-                <span className={`text-xs font-medium ${hasReacted ? 'text-primary' : 'text-muted-foreground'}`}>
+                <span className={`font-mono text-xs ${hasReacted ? 'text-primary' : 'text-foreground-subtle'}`}>
                   {count > 0 ? count : label}
                 </span>
               </motion.button>

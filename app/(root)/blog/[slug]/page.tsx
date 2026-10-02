@@ -11,46 +11,61 @@ import { ClientOnly } from '@/components/client-only'
 import { BlogMarkdownRenderer } from '@/components/blog-markdown-renderer'
 import { BlogReactions } from '@/components/blog-reactions'
 import { BlogComments } from '@/components/blog-comments'
-import { CalendarDays, Clock, ArrowLeft, Tag, User, ArrowRight } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { ArrowLeft } from 'lucide-react'
 import { PageViewTracker } from '@/components/page-view-tracker'
+import { JsonLd } from '@/components/json-ld'
+import { blogPostingSchema, breadcrumbSchema, graph } from '@/lib/seo'
+import { absoluteUrl, siteConfig } from '@/lib/site'
 import type { BlogCategory, BlogPost } from '@/sanity/lib/types'
-
-// export const revalidate = 60
 
 type Props = { params: Promise<{ slug: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const post = (await getBlogPost(slug).catch(() => null)) as BlogPost | null
-  if (!post) return { title: 'Post Not Found' }
+  if (!post) return { title: 'Post Not Found', robots: { index: false, follow: false } }
 
   const title = post.seo?.metaTitle || post.title
-  const description = post.seo?.metaDescription || post.excerpt || `Read "${post.title}" on Aman Kushwaha's blog`
-  const ogImageUrl =
-    post.seo?.ogImage?.asset?.url || (post.mainImage ? urlFor(post.mainImage).width(1200).height(630).url() : undefined)
+  const description = post.seo?.metaDescription || post.excerpt || `Read "${post.title}" on ${siteConfig.name}'s blog`
+  const ogImageUrl = post.seo?.ogImage?.asset?.url
+    ? urlFor(post.seo.ogImage).width(1200).height(630).fit('crop').url()
+    : post.mainImage
+      ? urlFor(post.mainImage).width(1200).height(630).fit('crop').url()
+      : absoluteUrl('/opengraph-image')
+
+  const url = absoluteUrl(`/blog/${slug}`)
 
   return {
     title,
     description,
+    keywords: post.tags,
+    authors: [{ name: post.author?.name || siteConfig.name, url: siteConfig.url }],
+    creator: post.author?.name || siteConfig.name,
+    alternates: {
+      canonical: post.seo?.canonicalUrl || `/blog/${slug}`,
+    },
     openGraph: {
+      type: 'article',
+      url,
+      siteName: siteConfig.name,
+      locale: siteConfig.locale,
       title,
       description,
-      type: 'article',
       publishedTime: post.publishedAt,
-      authors: ['Aman Kushwaha'],
-      images: ogImageUrl ? [{ url: ogImageUrl, width: 1200, height: 630 }] : [],
+      modifiedTime: post.publishedAt,
+      authors: [post.author?.name || siteConfig.name],
+      section: post.categories?.[0]?.title,
+      tags: post.tags,
+      images: [{ url: ogImageUrl, width: 1200, height: 630, alt: title, type: 'image/png' }],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-      images: ogImageUrl ? [ogImageUrl] : [],
+      creator: siteConfig.author.twitter,
+      images: [{ url: ogImageUrl, width: 1200, height: 630, alt: title }],
     },
-    ...(post.seo?.noIndex ? { robots: { index: false, follow: false } } : { robots: { index: true, follow: true } }),
-    ...(post.seo?.canonicalUrl
-      ? { alternates: { canonical: post.seo.canonicalUrl } }
-      : { alternates: { canonical: `/blog/${slug}` } }),
+    robots: post.seo?.noIndex ? { index: false, follow: false } : { index: true, follow: true },
   }
 }
 
@@ -86,137 +101,99 @@ async function BlogPostContent({ params }: Props) {
   }
   const aggregatedReactions = Object.entries(reactionCounts).map(([type, count]) => ({ type, count }))
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
-    headline: post.title,
-    description: post.excerpt,
-    image: post.mainImage ? urlFor(post.mainImage).url() : undefined,
-    author: {
-      '@type': 'Person',
-      name: post.author?.name || 'Aman Kushwaha',
-    },
-    datePublished: post.publishedAt,
-    publisher: {
-      '@type': 'Person',
-      name: 'Aman Kushwaha',
-    },
-  }
+  const jsonLd = graph(
+    blogPostingSchema({
+      title: post.title,
+      description: post.excerpt,
+      slug,
+      publishedAt: post.publishedAt,
+      authorName: post.author?.name,
+      image: post.mainImage ? urlFor(post.mainImage).width(1200).height(630).fit('crop').url() : undefined,
+      categories: post.categories?.map(c => c.title),
+      keywords: post.tags,
+    }),
+    breadcrumbSchema([
+      { name: 'Home', path: '/' },
+      { name: 'Blog', path: '/blog' },
+      { name: post.title, path: `/blog/${slug}` },
+    ])
+  )
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <JsonLd data={jsonLd} />
       <PageViewTracker path={`/blog/${slug}`} blogSlug={slug} />
 
-      <article className="min-h-full">
-        {/* Hero */}
-        <div className="relative">
-          {post.mainImage ? (
-            <div className="relative h-72 sm:h-96 overflow-hidden">
-              <Image
-                src={urlFor(post.mainImage).width(1400).height(600).url()}
-                alt={post.mainImage.alt || post.title}
-                fill
-                className="object-cover"
-                priority
+      <article className="container">
+        {/* Header. No full-bleed cover image — the cover, when there is one,
+            sits inside the article column directly above the body, so the
+            title and the byline stay on paper instead of on a photo. */}
+        <header className="mx-auto max-w-2xl border-b border-border pb-12 pt-16 sm:pt-24">
+          <Link
+            href="/blog"
+            className="group inline-flex items-center gap-2 text-sm text-foreground-muted transition-colors hover:text-foreground"
+          >
+            <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-0.5" aria-hidden />
+            All writing
+          </Link>
+
+          {post.categories?.length ? (
+            <div className="mt-10 flex items-center gap-3">
+              <span
+                aria-hidden
+                className="h-px w-8 bg-[linear-gradient(90deg,hsl(var(--aurora-coral)),hsl(var(--aurora-violet)))]"
               />
-              <div className="absolute inset-0 bg-linear-to-b from-background/20 via-background/40 to-background" />
+              <span className="eyebrow font-mono text-primary">
+                {post.categories.map((cat: BlogCategory) => cat.title).join(' · ')}
+              </span>
             </div>
-          ) : (
-            <div className="h-32 bg-linear-to-br from-primary/5 via-background to-secondary/5" />
-          )}
+          ) : null}
 
-          <div className="relative px-4 sm:px-6 lg:px-8 -mt-24 sm:-mt-32">
-            <div className="mx-auto max-w-3xl">
-              <Link href="/blog">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="mb-6 gap-2 text-xs text-muted-foreground hover:text-foreground"
-                >
-                  <ArrowLeft size={12} /> Back to Blog
-                </Button>
-              </Link>
+          <h1 className="mt-5 max-w-3xl font-display text-page text-foreground">{post.title}</h1>
 
-              {/* Categories */}
-              <div className="flex flex-wrap gap-2 mb-4">
-                {post.categories?.map((cat: BlogCategory) => (
-                  <span
-                    key={cat._id}
-                    className="text-xs font-medium px-3 py-1 rounded-full bg-primary/15 text-primary border border-primary/25"
-                  >
-                    {cat.title}
-                  </span>
-                ))}
-              </div>
+          {post.excerpt && <p className="mt-6 text-lede text-foreground-muted">{post.excerpt}</p>}
 
-              {/* Title */}
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight text-foreground mb-6">
-                {post.title}
-              </h1>
-
-              {/* Meta */}
-              <div className="glass rounded-xl px-5 py-4 border border-border/30 mb-8">
-                <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-                  {post.author && (
-                    <div className="flex items-center gap-2">
-                      {post.author.image?.asset?.url ? (
-                        <Image
-                          src={post.author.image.asset.url}
-                          alt={post.author.name}
-                          width={28}
-                          height={28}
-                          className="rounded-full border border-border"
-                        />
-                      ) : (
-                        <div className="w-7 h-7 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
-                          <User size={12} className="text-primary" />
-                        </div>
-                      )}
-                      <span className="text-sm font-medium text-foreground">{post.author.name}</span>
-                    </div>
-                  )}
-                  {post.publishedAt && (
-                    <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                      <CalendarDays size={13} />
-                      {new Date(post.publishedAt).toLocaleDateString('en-US', {
-                        month: 'long',
-                        day: 'numeric',
-                        year: 'numeric',
-                      })}
-                    </span>
-                  )}
-                  {post.readTime && (
-                    <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                      <Clock size={13} />
-                      {post.readTime} min read
-                    </span>
-                  )}
-                </div>
-
-                {post.tags && post.tags.length > 0 && (
-                  <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-border/20">
-                    <Tag size={12} className="text-muted-foreground" />
-                    {post.tags.map((tag: string) => (
-                      <span key={tag} className="text-xs text-muted-foreground bg-muted/50 px-2 py-0.5 rounded-full">
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
+          {/* Byline as a plain meta line under a hairline. */}
+          <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-border pt-6 text-sm text-foreground-muted">
+            {post.author && <span className="text-foreground">{post.author.name}</span>}
+            {post.publishedAt && (
+              <span className="font-mono text-xs">
+                {new Date(post.publishedAt).toLocaleDateString('en-US', {
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric',
+                })}
+              </span>
+            )}
+            {post.readTime && <span className="font-mono text-xs">{post.readTime} min read</span>}
           </div>
-        </div>
+
+          {post.tags && post.tags.length > 0 && (
+            <ul className="mt-4 flex flex-wrap gap-2">
+              {post.tags.map((tag: string) => (
+                <li key={tag} className="tag-pill">
+                  {tag}
+                </li>
+              ))}
+            </ul>
+          )}
+        </header>
 
         {/* Content */}
-        <div className="px-4 sm:px-6 lg:px-8 pb-16">
-          <div className="mx-auto max-w-3xl">
-            {/* Excerpt */}
-            {post.excerpt && (
-              <p className="text-lg text-muted-foreground leading-relaxed mb-8 border-l-4 border-primary pl-4 italic">
-                {post.excerpt}
-              </p>
+        <div className="py-14 sm:py-20">
+          <div className="mx-auto max-w-2xl">
+            {/* Cover. Inside the measure, above the body. */}
+            {post.mainImage && (
+              <div className="relative mb-12 aspect-[16/9] overflow-hidden rounded-md border border-border bg-muted">
+                <Image
+                  src={urlFor(post.mainImage).width(1200).height(675).url()}
+                  alt={post.mainImage.alt || `${post.title} cover`}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 672px"
+                  className="object-cover"
+                  priority
+                />
+              </div>
             )}
 
             {/* Body */}
@@ -224,7 +201,7 @@ async function BlogPostContent({ params }: Props) {
               {post.contentType === 'markdown' && post.markdownBody ? (
                 <ClientOnly
                   fallback={
-                    <div className="prose-blog my-6 rounded-xl border border-border/30 bg-muted/20 p-6 text-sm text-muted-foreground">
+                    <div className="prose-blog rounded-md border border-border bg-muted/30 p-6 text-sm text-foreground-muted">
                       Loading article content...
                     </div>
                   }
@@ -236,51 +213,41 @@ async function BlogPostContent({ params }: Props) {
                   <PortableText value={post.body} components={portableTextComponents} />
                 </div>
               ) : (
-                <div className="text-center py-12 text-muted-foreground">
+                <div className="py-12 text-center text-foreground-muted">
                   <p>No content available for this post.</p>
                 </div>
               )}
             </div>
 
             {/* Reactions */}
-            <div className="mt-12">
+            <div className="mt-20">
               <BlogReactions blogSlug={slug} initialReactions={aggregatedReactions} />
             </div>
 
             {/* Comments */}
             <BlogComments blogSlug={slug} initialComments={commentsData} />
 
-            {/* Related posts */}
+            {/* Related posts — a list, like everywhere else on the site. */}
             {(relatedPosts as BlogPost[]).length > 0 && (
-              <div className="mt-16 pt-8 border-t border-border/30">
-                <h3 className="text-lg font-semibold mb-6 text-foreground">Related Posts</h3>
-                <div className="grid gap-4 sm:grid-cols-3">
+              <section className="mt-16 border-t border-border pt-10">
+                <h3 className="eyebrow">Keep reading</h3>
+                <ul className="mt-6">
                   {(relatedPosts as BlogPost[]).map(related => (
-                    <Link key={related._id} href={`/blog/${related.slug.current}`} className="group">
-                      <div className="glass rounded-xl overflow-hidden border-border/30 hover:border-primary/25 hover-card">
-                        {related.mainImage && (
-                          <div className="relative h-32 overflow-hidden">
-                            <Image
-                              src={urlFor(related.mainImage).width(300).height(150).url()}
-                              alt={related.mainImage.alt || related.title}
-                              fill
-                              className="object-cover transition-transform duration-300 group-hover:scale-105"
-                            />
-                          </div>
+                    <li key={related._id} className="border-b border-border last:border-0">
+                      <Link href={`/blog/${related.slug.current}`} className="row-lift group block py-5">
+                        <h4 className="font-display text-lg text-foreground transition-colors group-hover:text-primary">
+                          {related.title}
+                        </h4>
+                        {related.categories?.[0] && (
+                          <p className="mt-1.5 font-mono text-xs text-foreground-subtle">
+                            {related.categories[0].title}
+                          </p>
                         )}
-                        <div className="p-4">
-                          <h4 className="text-sm font-medium group-hover:text-primary transition-colors line-clamp-2 mb-2">
-                            {related.title}
-                          </h4>
-                          <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                            Read <ArrowRight size={10} />
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
+                      </Link>
+                    </li>
                   ))}
-                </div>
-              </div>
+                </ul>
+              </section>
             )}
           </div>
         </div>
@@ -291,25 +258,19 @@ async function BlogPostContent({ params }: Props) {
 
 function BlogPostSkeleton() {
   return (
-    <div className="min-h-full animate-pulse px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-3xl">
-        <div className="mb-6 h-9 w-32 rounded-full bg-muted/40" />
-        <div className="mb-8 h-72 w-full rounded-2xl bg-muted/40 sm:h-96" />
-        <div className="mb-8 space-y-3">
-          <div className="h-4 w-24 rounded-full bg-muted/30" />
-          <div className="h-10 w-3/4 rounded-lg bg-muted/40" />
-          <div className="h-4 w-full rounded-lg bg-muted/30" />
-          <div className="h-4 w-5/6 rounded-lg bg-muted/30" />
+    <div className="container animate-pulse">
+      <div className="mx-auto max-w-2xl">
+        <div className="border-b border-border pb-12 pt-16 sm:pt-24">
+          <div className="h-4 w-24 rounded bg-muted/60" />
+          <div className="mt-6 h-4 w-full rounded-lg bg-muted/40" />
+          <div className="mt-3 h-4 w-4/5 rounded-lg bg-muted/40" />
+          <div className="mt-7 h-4 w-full rounded bg-muted/50" />
+          <div className="mt-3 h-4 w-3/5 rounded bg-muted/50" />
+          <div className="mt-9 h-px w-full bg-border" />
+          <div className="mt-6 h-3 w-56 rounded bg-muted/60" />
         </div>
-        <div className="mb-8 rounded-xl border border-border/30 bg-muted/20 p-5">
-          <div className="flex flex-wrap gap-2">
-            {Array.from({ length: 5 }).map((_, index) => (
-              <div key={index} className="h-6 w-20 rounded-full bg-muted/40" />
-            ))}
-          </div>
-        </div>
-        <div className="space-y-4">
-          <div className="h-6 w-40 rounded-lg bg-muted/40" />
+        <div className="space-y-4 py-14 sm:py-20">
+          <div className="h-6 w-40 rounded bg-muted/40" />
           <div className="h-4 w-full rounded bg-muted/30" />
           <div className="h-4 w-5/6 rounded bg-muted/30" />
           <div className="h-4 w-2/3 rounded bg-muted/30" />

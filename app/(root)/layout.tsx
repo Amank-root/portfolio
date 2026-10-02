@@ -1,36 +1,29 @@
 import type React from 'react'
-import { Sidebar } from '@/components/sidebar'
 import { Header } from '@/components/header'
-import { MobileNav } from '@/components/mobile-nav'
+import { Footer } from '@/components/footer'
+import { Aurora } from '@/components/aurora'
+import { ScrollProgress } from '@/components/scroll-progress'
+import { JsonLd } from '@/components/json-ld'
+import { graph, personSchema, webSiteSchema } from '@/lib/seo'
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
+    <div className="relative flex min-h-screen flex-col">
+      {/* Site-level structured data: tells search engines who the site belongs
+          to, which feeds the knowledge panel and sitelinks. */}
+      <JsonLd data={graph(personSchema(), webSiteSchema())} />
+
+      <Aurora />
+      <ScrollProgress />
       <Header />
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar />
-        <main className="flex-1 overflow-auto pb-16 md:pb-0">{children}</main>
-      </div>
-      <footer className="hidden md:flex h-7 items-center justify-between border-t border-border/30 bg-background-elevated/50 px-4 text-[10px] text-muted-foreground font-mono">
-        <div className="flex items-center gap-4">
-          <span className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-            main
-          </span>
-          <span>UTF-8</span>
-          <span>TypeScript JSX</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <span>Next.js 16</span>
-          <span>Sanity CMS</span>
-          <span>Ln 1, Col 1</span>
-        </div>
-      </footer>
-      <MobileNav />
+
+      {/* Content sits above the grain overlay (z-index 1 on body::before); the
+          aurora is behind everything at -z-10. */}
+      <main id="main-content" className="relative z-10 flex-1" tabIndex={-1}>
+        {children}
+      </main>
+
+      <Footer />
     </div>
   )
 }

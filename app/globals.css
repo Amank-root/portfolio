@@ -6,17 +6,18 @@
 
 @utility container {
   margin-inline: auto;
-  padding-inline: 2rem;
+  padding-inline: 1.5rem;
   @media (width >= --theme(--breakpoint-sm)) {
-    max-width: none;
+    padding-inline: 2rem;
   }
-  @media (width >= 1400px) {
+  @media (width >= 1536px) {
     max-width: 1400px;
   }
 }
 
 @theme {
   --color-border: hsl(var(--border));
+  --color-border-strong: hsl(var(--border-strong));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
   --color-background: hsl(var(--background));
@@ -43,366 +44,160 @@
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
 
+  --color-background-elevated: hsl(var(--background-elevated));
+  --color-background-card: hsl(var(--background-card));
+  --color-background-overlay: hsl(var(--background-overlay));
+  --color-foreground-muted: hsl(var(--foreground-muted));
+  --color-foreground-subtle: hsl(var(--foreground-subtle));
+
+  /* Aurora hues, exposed as tokens so UI can tint against the exact palette
+     the canvas background paints with. */
+  --color-aurora-cyan: hsl(var(--aurora-cyan));
+  --color-aurora-violet: hsl(var(--aurora-violet));
+  --color-aurora-coral: hsl(var(--aurora-coral));
+
+  --radius-xl: calc(var(--radius) + 0.5rem);
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
 
-  --font-sans: var(--font-inter);
-  --font-mono: var(--font-fira-code);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display-family);
+  --font-mono: var(--font-mono-family);
+
+  --text-display: clamp(2.6rem, 1.2rem + 6vw, 6rem);
+  --text-display--line-height: 0.98;
+  --text-display--letter-spacing: -0.04em;
+
+  /* Page titles (index + detail pages). `--text-display` is the hero scale and
+     reads as too large once a heading is a project name rather than a short
+     statement, so inner pages get their own step. */
+  --text-page: clamp(2rem, 1.4rem + 2.6vw, 3.5rem);
+  --text-page--line-height: 1.06;
+  --text-page--letter-spacing: -0.03em;
+
+  --text-section: clamp(1.8rem, 1.3rem + 2.2vw, 2.75rem);
+  --text-section--line-height: 1.08;
+  --text-section--letter-spacing: -0.03em;
+
+  --text-lede: clamp(1.05rem, 1rem + 0.45vw, 1.325rem);
+  --text-lede--line-height: 1.62;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
+/* ===== DESIGN TOKENS — "deep field" =====
+   A near-black indigo canvas lit by an aurora. The accent hues are fixed and
+   shared with the canvas painter in components/aurora.tsx, so the background
+   and the UI can't drift apart.
 
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
+   Dark is the primary experience. Light is a "dawn" variant of the same hue
+   family: the accents are darkened hard, because the neon values that read on
+   black only reach ~2:1 on white. Every text pair clears WCAG AA. */
 @layer base {
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
+  :root,
+  .light {
+    color-scheme: light;
+
+    /* Champagne paper. Warm, low-chroma, never pure white — a pure #fff
+       page under this much motion reads as clinical. */
+    --background: 40 26% 95%;
+    --background-elevated: 40 30% 97%;
+    --background-card: 40 33% 98%;
+    --background-overlay: 40 24% 93%;
+
+    --foreground: 30 12% 14%;
+    --foreground-muted: 30 8% 38%;
+    --foreground-subtle: 30 7% 42%;
+
+    /* Clay — darkened for contrast on paper. */
+    --primary: 16 50% 40%;
+    --primary-foreground: 40 30% 97%;
+
+    --secondary: 158 12% 32%;
+    --secondary-foreground: 40 30% 97%;
+
+    --accent: 30 22% 42%;
+    --accent-foreground: 40 30% 97%;
+
+    --destructive: 4 56% 44%;
+    --destructive-foreground: 40 30% 97%;
+
+    --muted: 38 18% 91%;
+    --muted-foreground: 30 8% 40%;
+
+    --card: 40 33% 98%;
+    --card-foreground: 30 12% 14%;
+    --popover: 40 33% 98%;
+    --popover-foreground: 30 12% 14%;
+
+    --border: 34 16% 85%;
+    --border-strong: 32 14% 74%;
+    --input: 34 16% 82%;
+    --ring: 16 50% 40%;
+
+    --radius: 0.875rem;
+
+    /* Aurora: warm and desaturated. The earlier cyan/violet/coral trio was
+       electric enough to fight the paper, so this is the same three-hue
+       structure pulled down in chroma. */
+    --aurora-cyan: 190 26% 46%;
+    --aurora-violet: 258 26% 52%;
+    --aurora-coral: 16 52% 50%;
+  }
+
+  .dark {
+    color-scheme: dark;
+
+    /* Warm charcoal. Hue held near the light theme's warm neutrals, and
+       lifted off pure black — a true #000 canvas makes the aurora read as a
+       screen-glow artifact rather than as light in a room. */
+    --background: 30 8% 8%;
+    --background-elevated: 30 7% 11%;
+    --background-card: 30 7% 12%;
+    --background-overlay: 30 6% 16%;
+
+    --foreground: 40 16% 91%;
+    --foreground-muted: 38 9% 66%;
+    --foreground-subtle: 36 8% 62%;
+
+    /* Same clay hue as light mode, lifted for legibility on ink. */
+    --primary: 22 62% 66%;
+    --primary-foreground: 30 20% 10%;
+
+    --secondary: 150 16% 60%;
+    --secondary-foreground: 30 20% 10%;
+
+    --accent: 38 26% 70%;
+    --accent-foreground: 30 20% 10%;
+
+    --destructive: 4 62% 60%;
+    --destructive-foreground: 30 20% 10%;
+
+    --muted: 30 6% 16%;
+    --muted-foreground: 38 9% 62%;
+
+    /* `card` is meaningfully lighter than `background`. Anything that needs to
+       read as a raised surface must use card — a panel filled with
+       `background` on a `background` page is invisible. */
+    --card: 30 7% 12%;
+    --card-foreground: 40 16% 91%;
+    --popover: 30 7% 13%;
+    --popover-foreground: 40 16% 91%;
+
+    --border: 30 6% 20%;
+    --border-strong: 32 6% 30%;
+    --input: 30 6% 22%;
+    --ring: 22 62% 66%;
+
+    --radius: 0.875rem;
+
+    --aurora-cyan: 190 30% 52%;
+    --aurora-violet: 258 34% 60%;
+    --aurora-coral: 16 46% 58%;
   }
 }
 
-/* ===== COMPONENTS ===== */
-@utility glow-primary {
-  /* Glow effects */
-  box-shadow:
-    0 0 20px rgba(var(--glow-primary), 0.15),
-    0 0 60px rgba(var(--glow-primary), 0.05);
-}
-@utility glow-accent {
-  box-shadow:
-    0 0 20px rgba(var(--glow-accent), 0.15),
-    0 0 60px rgba(var(--glow-accent), 0.05);
-}
-@utility glow-text-primary {
-  text-shadow: 0 0 20px rgba(var(--glow-primary), 0.5);
-}
-@utility glow-text-accent {
-  text-shadow: 0 0 20px rgba(var(--glow-accent), 0.5);
-}
-@utility gradient-text {
-  /* Gradient text */
-  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-@utility gradient-text-accent {
-  background: linear-gradient(135deg, hsl(var(--accent)) 0%, hsl(var(--primary)) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-@utility glass {
-  /* Glass card */
-  background: hsl(var(--card) / 0.6);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid hsl(var(--border) / 0.8);
-}
-@utility glass-strong {
-  background: hsl(var(--background-elevated) / 0.8);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid hsl(var(--border));
-}
-@utility grid-pattern {
-  /* Grid pattern */
-  background-image:
-    linear-gradient(hsl(var(--border) / 0.15) 1px, transparent 1px),
-    linear-gradient(90deg, hsl(var(--border) / 0.15) 1px, transparent 1px);
-  background-size: 40px 40px;
-}
-@utility noise {
-  /* Noise texture */
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-    pointer-events: none;
-    opacity: 0.4;
-  }
-}
-@utility terminal {
-  /* Terminal styles */
-  font-family: var(--font-fira-code), 'JetBrains Mono', Consolas, monospace;
-}
-@utility terminal-prompt {
-  &::before {
-    content: '❯ ';
-    color: hsl(var(--accent));
-  }
-}
-@utility terminal-output {
-  color: hsl(var(--foreground-muted));
-  white-space: pre-wrap;
-  line-height: 1.7;
-}
-@utility syntax-string {
-  /* Code syntax colors */
-  color: #f59e0b;
-}
-@utility syntax-keyword {
-  color: hsl(var(--primary));
-}
-@utility syntax-function {
-  color: hsl(var(--accent));
-}
-@utility syntax-comment {
-  color: hsl(var(--foreground-subtle));
-  font-style: italic;
-}
-@utility syntax-variable {
-  color: #e879f9;
-}
-@utility syntax-type {
-  color: hsl(var(--secondary));
-}
-@utility syntax-number {
-  color: #fb923c;
-}
-@utility hover-card {
-  /* Hover card */
-  @apply transition-all duration-300;
-
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow:
-      0 20px 40px rgba(0, 0, 0, 0.3),
-      0 0 20px rgba(var(--glow-primary), 0.05);
-  }
-}
-@utility tag-pill {
-  /* Tag pill */
-  @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
-  background: hsl(var(--primary) / 0.1);
-  border: 1px solid hsl(var(--primary) / 0.25);
-  color: hsl(var(--primary));
-}
-@utility animated-underline {
-  /* Animated underline */
-  position: relative;
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent)));
-    transition: width 0.3s ease;
-  }
-
-  &:hover::after {
-    width: 100%;
-  }
-}
-@utility section-label {
-  /* Section heading */
-  @apply inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest;
-  color: hsl(var(--primary));
-}
-@utility dot-separator {
-  /* Dot separator */
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: hsl(var(--primary));
-  display: inline-block;
-}
-@utility prose-blog {
-  /* Blog prose */
-  @apply text-foreground;
-
-  & h1 {
-    @apply text-3xl font-bold mb-6 mt-8 gradient-text;
-  }
-
-  & h2 {
-    @apply text-2xl font-semibold mb-4 mt-8 text-foreground;
-  }
-
-  & h3 {
-    @apply text-xl font-semibold mb-3 mt-6 text-foreground;
-  }
-
-  & p {
-    @apply mb-4 leading-7 text-foreground/85;
-  }
-
-  & ul {
-    @apply mb-4 pl-6 space-y-1;
-  }
-
-  & ol {
-    @apply mb-4 pl-6 space-y-1;
-  }
-
-  & li {
-    @apply text-foreground/85;
-  }
-
-  & blockquote {
-    @apply border-l-4 border-primary pl-4 italic text-muted-foreground my-6;
-  }
-
-  & code {
-    @apply font-mono text-sm bg-muted px-1.5 py-0.5 rounded text-primary;
-  }
-
-  & pre {
-    @apply bg-card border border-border rounded-lg overflow-x-auto my-6;
-  }
-
-  & a {
-    @apply text-primary underline underline-offset-4 hover:text-primary/80;
-  }
-
-  & img {
-    @apply rounded-lg border border-border my-6 w-full;
-  }
-
-  & hr {
-    @apply border-border my-8;
-  }
-
-  & table {
-    @apply w-full border-collapse my-6;
-  }
-
-  & th {
-    @apply border border-border bg-muted px-4 py-2 text-left font-semibold;
-  }
-
-  & td {
-    @apply border border-border px-4 py-2;
-  }
-}
-@utility mermaid-container {
-  /* Mermaid diagrams */
-  @apply bg-card border border-border rounded-lg p-6 my-6 overflow-x-auto;
-}
-@utility animate-blink {
-  animation: blink 1s step-start infinite;
-}
-@utility animate-float {
-  animation: float 4s ease-in-out infinite;
-}
-@utility animate-pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
-}
-@utility animate-shimmer {
-  background: linear-gradient(90deg, transparent 25%, hsl(var(--primary) / 0.1) 50%, transparent 75%);
-  background-size: 200% 100%;
-  animation: shimmer 2s infinite;
-}
-@utility animate-gradient {
-  background-size: 200% 200%;
-  animation: gradient-shift 4s ease infinite;
-}
-@utility animate-rotate-slow {
-  animation: rotate-slow 20s linear infinite;
-}
-@utility animate-fade-up {
-  animation: fade-up 0.5s ease forwards;
-}
-@utility animate-slide-in-right {
-  animation: slide-in-right 0.4s ease forwards;
-}
-@utility stagger-children {
-  /* Stagger children */
-  & > *:nth-child(1) {
-    animation-delay: 0.1s;
-  }
-
-  & > *:nth-child(2) {
-    animation-delay: 0.2s;
-  }
-
-  & > *:nth-child(3) {
-    animation-delay: 0.3s;
-  }
-
-  & > *:nth-child(4) {
-    animation-delay: 0.4s;
-  }
-
-  & > *:nth-child(5) {
-    animation-delay: 0.5s;
-  }
-
-  & > *:nth-child(6) {
-    animation-delay: 0.6s;
-  }
-}
-
-@layer utilities {
-  /* ===== DESIGN TOKENS ===== */
-  :root {
-    /* Background scale */
-    --background: 220 16% 8%;
-    --background-elevated: 220 14% 11%;
-    --background-card: 220 13% 13%;
-    --background-overlay: 220 12% 16%;
-
-    /* Foreground */
-    --foreground: 210 30% 96%;
-    --foreground-muted: 215 20% 65%;
-    --foreground-subtle: 215 15% 45%;
-
-    /* Brand - Electric Cyan/Blue */
-    --primary: 198 100% 55%;
-    --primary-foreground: 220 16% 8%;
-    --primary-glow: 198 100% 55%;
-
-    /* Accent - Neon Green */
-    --accent: 152 80% 50%;
-    --accent-foreground: 220 16% 8%;
-
-    /* Secondary - Warm Purple */
-    --secondary: 260 60% 60%;
-    --secondary-foreground: 210 30% 96%;
-
-    /* Destructive */
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 30% 96%;
-
-    /* Muted */
-    --muted: 220 14% 16%;
-    --muted-foreground: 215 20% 55%;
-
-    /* Card */
-    --card: 220 13% 13%;
-    --card-foreground: 210 30% 96%;
-
-    /* Popover */
-    --popover: 220 14% 11%;
-    --popover-foreground: 210 30% 96%;
-
-    /* Border & Input */
-    --border: 220 12% 20%;
-    --input: 220 12% 18%;
-    --ring: 198 100% 55%;
-
-    --radius: 0.6rem;
-
-    /* Custom glow colors */
-    --glow-primary: 0 200 255;
-    --glow-accent: 40 230 120;
-    --glow-secondary: 150 120 255;
-  }
-
-  /* ===== BASE STYLES ===== */
-}
 @layer base {
   * {
     @apply border-border;
@@ -410,44 +205,73 @@
 
   html {
     scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
   }
 
   body {
     @apply bg-background text-foreground antialiased;
+    /* The aurora is painted by a fixed <canvas> (components/aurora.tsx). These
+       two static washes anchor colour to the top and bottom edges so the
+       canvas doesn't read as a blob floating in a void. */
     background-image:
-      radial-gradient(ellipse at 20% 50%, rgba(0, 200, 255, 0.03) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 20%, rgba(150, 120, 255, 0.03) 0%, transparent 50%),
-      radial-gradient(ellipse at 50% 80%, rgba(40, 230, 120, 0.02) 0%, transparent 50%);
-    background-attachment: fixed;
+      radial-gradient(ellipse 70% 50% at 50% -10%, hsl(var(--primary) / 0.07) 0%, transparent 65%),
+      radial-gradient(ellipse 60% 40% at 50% 110%, hsl(var(--accent) / 0.05) 0%, transparent 65%);
   }
 
-  /* Custom scrollbar */
+  /* Film grain. Fixed, non-interactive, and deliberately below the z-index of
+     the aurora canvas's siblings so it sits over the artwork, not over the
+     text. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 10px;
+    height: 10px;
   }
 
   ::-webkit-scrollbar-track {
-    background: hsl(var(--background));
+    background: transparent;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: hsl(var(--border));
+    background: hsl(var(--border-strong) / 0.7);
+    border: 3px solid transparent;
+    background-clip: content-box;
     border-radius: 999px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--primary) / 0.5);
+    background: hsl(var(--primary) / 0.55);
+    background-clip: content-box;
   }
 
-  /* Selection */
   ::selection {
-    background: hsl(var(--primary) / 0.25);
+    background: hsl(var(--primary) / 0.3);
     color: hsl(var(--foreground));
+  }
+
+  /* Motion is the point of this design, so the reduced-motion path has to be
+     thorough. Components additionally check the media query in JS so they skip
+     work entirely rather than run a 0.01ms loop forever. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
-/* ===== TYPOGRAPHY ===== */
 @layer base {
   h1,
   h2,
@@ -455,21 +279,231 @@
   h4,
   h5,
   h6 {
-    font-family: var(--font-clash), var(--font-inter), sans-serif;
-    letter-spacing: -0.02em;
+    font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* A single, consistent focus ring. Several components here are custom
+     (canvas, magnetic, spotlight) and suppress outlines, so this is the one
+     place keyboard focus is guaranteed to be visible. */
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 3px;
+    border-radius: 4px;
   }
 }
 
-/* ===== ANIMATIONS ===== */
+/* ===== COMPONENTS ===== */
+
+/* Frosted panel. Used sparingly — the site leans on open space and the aurora
+   rather than on a grid of boxes. */
+@utility glass {
+  background: hsl(var(--card) / 0.72);
+  backdrop-filter: blur(16px) saturate(120%);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+  border: 1px solid hsl(var(--border));
+}
+
+@utility eyebrow {
+  @apply font-mono text-[0.6875rem] uppercase tracking-[0.24em];
+  color: hsl(var(--foreground-subtle));
+}
+
+/* Conic-gradient type, clipped to the glyphs. The signature treatment — used
+   on one or two words per page, never on a whole heading. */
+@utility text-gradient {
+  background-image: linear-gradient(
+    100deg,
+    hsl(var(--aurora-coral)) 0%,
+    hsl(var(--aurora-violet)) 50%,
+    hsl(var(--aurora-cyan)) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility tag-pill {
+  @apply inline-flex items-center rounded-full px-2.5 py-1 font-mono text-[0.6875rem] tracking-wide;
+  color: hsl(var(--foreground-muted));
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--muted) / 0.5);
+}
+
+/* Card hover. Animates only border-color and transform, so nothing reflows. */
+@utility hover-glow {
+  transition:
+    border-color 0.4s var(--ease-out-expo),
+    transform 0.4s var(--ease-out-expo);
+
+  &:hover {
+    border-color: hsl(var(--primary) / 0.55);
+  }
+}
+
+@utility prose-blog {
+  @apply text-foreground;
+
+  & > * + * {
+    margin-top: 1.15em;
+  }
+
+  & h2 {
+    @apply mt-12 mb-4 text-[1.6rem] leading-tight;
+  }
+
+  & h3 {
+    @apply mt-9 mb-3 text-[1.25rem] leading-snug;
+  }
+
+  & p,
+  & li {
+    @apply text-[1.0625rem] leading-[1.75];
+    color: hsl(var(--foreground-muted));
+  }
+
+  & strong {
+    color: hsl(var(--foreground));
+    font-weight: 600;
+  }
+
+  & ul {
+    @apply list-disc space-y-1.5 pl-5;
+  }
+
+  & ol {
+    @apply list-decimal space-y-1.5 pl-5;
+  }
+
+  & li::marker {
+    color: hsl(var(--primary));
+  }
+
+  & blockquote {
+    @apply my-8 border-l-2 pl-5 italic;
+    border-color: hsl(var(--primary) / 0.6);
+    color: hsl(var(--foreground-muted));
+  }
+
+  & code {
+    @apply rounded-md px-1.5 py-0.5 font-mono text-[0.85em];
+    background: hsl(var(--muted));
+    color: hsl(var(--foreground));
+  }
+
+  & pre {
+    @apply my-7 overflow-x-auto;
+  }
+
+  /* Reset the inline-code treatment inside fences, where the whole block is
+     already monospace and tinted. */
+  & pre code {
+    @apply bg-transparent p-0 text-[0.85rem];
+    color: inherit;
+  }
+
+  & a {
+    @apply underline decoration-primary/50 underline-offset-4 transition-colors;
+    color: hsl(var(--primary));
+  }
+
+  & a:hover {
+    text-decoration-color: hsl(var(--primary));
+  }
+
+  & img {
+    @apply my-8 w-full;
+    border-radius: var(--radius);
+  }
+
+  /* Badges are intrinsically small and must keep their own size — the `w-full`
+     above is a descendant selector, so a component-level `w-auto` loses to it
+     regardless of order. The attribute selector also outranks it, which is why
+     the renderer marks badges rather than fighting the cascade. */
+  & img[data-badge] {
+    @apply my-2 h-auto w-auto;
+    border-radius: 0;
+  }
+
+  & hr {
+    @apply my-10;
+    border-color: hsl(var(--border));
+  }
+
+  & table {
+    @apply my-7 w-full border-collapse text-[0.95rem];
+  }
+
+  & th {
+    @apply border-b px-3 py-2 text-left font-medium;
+    border-color: hsl(var(--border));
+  }
+
+  & td {
+    @apply border-b px-3 py-2;
+    border-color: hsl(var(--border) / 0.6);
+    color: hsl(var(--foreground-muted));
+  }
+}
+
+@utility mermaid-container {
+  @apply my-7 overflow-x-auto rounded-lg border p-5;
+  background: hsl(var(--card));
+  border-color: hsl(var(--border));
+}
+
+/* ===== ANIMATION UTILITIES ===== */
+@utility animate-marquee {
+  animation: marquee var(--marquee-duration, 40s) linear infinite;
+}
+
+@utility animate-shimmer {
+  animation: shimmer 2.5s ease-in-out infinite;
+}
+
+@utility animate-float {
+  animation: float 7s ease-in-out infinite;
+}
+
+@utility animate-breathe {
+  animation: breathe 3.2s ease-in-out infinite;
+}
+
+@utility animate-spin-slow {
+  animation: spin 14s linear infinite;
+}
+
+@utility animate-border {
+  animation: border-spin 6s linear infinite;
+}
+
 @layer utilities {
-  @keyframes blink {
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+
+    to {
+      /* -50% because the track is rendered twice for a seamless loop. */
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes shimmer {
     0%,
     100% {
-      opacity: 1;
+      opacity: 0.4;
     }
 
     50% {
-      opacity: 0;
+      opacity: 1;
     }
   }
 
@@ -480,85 +514,41 @@
     }
 
     50% {
-      transform: translateY(-8px);
+      transform: translateY(-10px);
     }
   }
 
-  @keyframes pulse-glow {
+  @keyframes breathe {
     0%,
     100% {
-      box-shadow: 0 0 10px rgba(var(--glow-primary), 0.2);
+      opacity: 1;
+      transform: scale(1);
     }
 
     50% {
-      box-shadow:
-        0 0 25px rgba(var(--glow-primary), 0.4),
-        0 0 50px rgba(var(--glow-primary), 0.1);
+      opacity: 0.4;
+      transform: scale(0.8);
     }
   }
 
-  @keyframes shimmer {
-    0% {
-      background-position: -200% 0;
-    }
-
-    100% {
-      background-position: 200% 0;
-    }
-  }
-
-  @keyframes scan {
-    0% {
-      transform: translateY(-100%);
-    }
-
-    100% {
-      transform: translateY(100vh);
-    }
-  }
-
-  @keyframes gradient-shift {
-    0%,
-    100% {
-      background-position: 0% 50%;
-    }
-
-    50% {
-      background-position: 100% 50%;
-    }
-  }
-
-  @keyframes rotate-slow {
-    from {
-      transform: rotate(0deg);
-    }
-
+  @keyframes spin {
     to {
       transform: rotate(360deg);
     }
   }
 
-  @keyframes fade-up {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  /* Registered so the conic angle can be interpolated. Animating the angle
+     (rather than rotating a pseudo-element) keeps border thickness constant,
+     so nothing reflows while it spins. */
+  @property --angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
   }
 
-  @keyframes slide-in-right {
-    from {
-      opacity: 0;
-      transform: translateX(20px);
-    }
-
+  @keyframes border-spin {
     to {
-      opacity: 1;
-      transform: translateX(0);
+      --angle: 360deg;
     }
   }
 }
