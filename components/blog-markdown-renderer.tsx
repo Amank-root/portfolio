@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useRef } from 'react'
+import Image from 'next/image'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
@@ -8,6 +9,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { Copy, Check } from 'lucide-react'
 import { useState } from 'react'
+import { isBadge } from '@/lib/utils'
 
 interface BlogMarkdownRendererProps {
   content: string
@@ -130,10 +132,33 @@ export function BlogMarkdownRenderer({ content }: BlogMarkdownRendererProps) {
             </div>
           ),
           img: ({ src, alt }) => (
-            // renderer: images come from Sanity CDN with optimized srcset already;
-            // swapping to next/image here would break the renderer's generic contract.
-            // eslint-disable-next-line @next/next/no-img-element -- PortableText
-            <img src={src} alt={alt} loading="lazy" />
+            /* Markdown bodies embed a mix of sources: Sanity CDN for project
+               screenshots, and shields.io / badgen.net for status badges.
+               A plain <img> left those badges unoptimised and able to shift
+               layout as they loaded, so they now go through next/image with a
+               declared aspect box. `unoptimized` is set for badge hosts because
+               running a 200x20 SVG-ish badge through the AVIF/WebP pipeline
+               costs more than it saves.
+
+               The `isBadge` helper and the extra remotePatterns live in
+               next.config.ts / lib/utils respectively. */
+            <Image
+              src={String(src)}
+              alt={alt || ''}
+              // Badges are intrinsically small and vary in height, so give them
+              // their own generous box and let `h-auto` + `w-auto` preserve the
+              // real aspect ratio. Pinning one height for all of them made a
+              // short badge and a tall badge render at visibly different sizes.
+              width={isBadge(String(src)) ? 200 : 1200}
+              height={isBadge(String(src)) ? 24 : 675}
+              sizes={isBadge(String(src)) ? '200px' : '(max-width: 768px) 100vw, 672px'}
+              unoptimized={isBadge(String(src))}
+              loading="lazy"
+              // `data-badge` opts out of `.prose-blog img { w-full }`, which
+              // would otherwise stretch a small badge to the full column.
+              data-badge={isBadge(String(src)) ? '' : undefined}
+              className={isBadge(String(src)) ? 'align-middle' : 'mx-auto h-auto w-full rounded-md'}
+            />
           ),
           hr: () => <hr />,
         }}

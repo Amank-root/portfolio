@@ -42,8 +42,9 @@ export const featuredProjectsQuery = groq`
 export const projectQuery = groq`
   *[_type == "project" && slug.current == $slug][0] {
     _id, title, slug, description, longDescription,
-    mainImage { asset->{ _id, url }, alt },
-    gallery[] { asset->{ _id, url }, alt },
+    mainImage { asset->{ _id, url, metadata { dimensions } }, alt },
+    // dimensions let the renderer reserve the exact aspect box before decode
+    gallery[] { asset->{ _id, url, metadata { dimensions } }, alt },
     technologies[]->{ _id, name, color, category },
     githubUrl, demoUrl, featured, status, publishedAt
   }
@@ -102,7 +103,7 @@ export const blogPostQuery = groq`
   *[_type == "post" && slug.current == $slug][0] {
     _id, title, slug, excerpt, publishedAt, readTime, featured, contentType,
     body, markdownBody,
-    mainImage { asset->{ _id, url }, alt },
+    mainImage { asset->{ _id, url, metadata { dimensions } }, alt },
     categories[]->{ _id, title, slug },
     tags,
     author->{ _id, name, bio, image { asset->{ url } } },

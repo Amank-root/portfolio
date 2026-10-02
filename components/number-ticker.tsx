@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { useInView, useReducedMotion } from 'motion/react'
+import { useInView } from 'motion/react'
+import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion'
 import { cn } from '@/lib/utils'
 
 /**
@@ -32,7 +33,7 @@ export function NumberTicker({
 }) {
   const ref = useRef<HTMLSpanElement>(null)
   const inView = useInView(ref, { once: true, margin: '-10% 0px' })
-  const reduced = useReducedMotion()
+  const reduced = usePrefersReducedMotion()
   // Under reduced motion the final value is derived during render rather than
   // set from an effect: there is nothing to animate, so the effect would exist
   // only to trigger a second render pass.

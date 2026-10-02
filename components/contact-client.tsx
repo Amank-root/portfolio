@@ -19,7 +19,7 @@ interface ContactClientProps {
 }
 
 export function ContactClient({ contact }: ContactClientProps) {
-  const email = contact?.email || 'contact@amank-root.slmail.me'
+  const email = contact?.email || 'query@amankushwaha.dev'
   const location = contact?.location || 'New Delhi, Delhi, India'
   const title = contact?.title || 'Get in touch'
   const description =

@@ -9,6 +9,7 @@ import { ThemeToggle } from '@/components/theme-toggle'
 import { cn } from '@/lib/utils'
 import { siteConfig } from '@/lib/site'
 import { isActivePath, navItems } from '@/lib/navigation'
+import Image from 'next/image'
 
 export function Header() {
   const pathname = usePathname()
@@ -50,18 +51,14 @@ export function Header() {
         )}
       >
         {/* Wordmark: a gradient monogram plus the name. */}
-        <Link
-          href="/"
-          onClick={close}
-          className="group flex items-center gap-3"
-          aria-label={`${siteConfig.name} — home`}
-        >
-          <span
+        <Link href="/" onClick={close} className="group flex items-center" aria-label={`${siteConfig.name} — home`}>
+          {/* <span
             aria-hidden
             className="flex h-8 w-8 items-center justify-center rounded-xl bg-[linear-gradient(135deg,hsl(var(--aurora-coral)),hsl(var(--aurora-violet)))] text-sm font-bold text-primary-foreground transition-transform duration-500 group-hover:rotate-[12deg]"
           >
             A
-          </span>
+          </span> */}
+          <Image className="invert dark:invert-0" src="/logo.png" alt={siteConfig.name} width={64} height={64} />
           <span className="font-display text-lg leading-none tracking-tight">{siteConfig.name}</span>
         </Link>
 

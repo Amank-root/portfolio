@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { useReducedMotion } from 'motion/react'
 import { cn } from '@/lib/utils'
+import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion'
 
 /**
  * Infinite horizontal marquee.
@@ -35,7 +35,7 @@ export function Marquee({
   minDuration?: number
   className?: string
 }) {
-  const reduced = useReducedMotion()
+  const reduced = usePrefersReducedMotion()
   const trackRef = useRef<HTMLDivElement>(null)
   const [duration, setDuration] = useState<number | null>(null)
 

@@ -12,12 +12,17 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.sanity.io",
+      // reCAPTCHA injects these; without them the widget silently fails to
+      // load, so the form looked like it had no captcha at all.
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.sanity.io https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' blob: data: https://cdn.sanity.io https://dummyimage.com",
+      // Markdown bodies commonly embed shields.io / badgen.net badges. These
+      // were absent from img-src, so the images were blocked outright and
+      // rendered as broken-image icons in project write-ups.
+      "img-src 'self' blob: data: https://cdn.sanity.io https://dummyimage.com https://img.shields.io https://badgen.net",
       "font-src 'self' data:",
-      "connect-src 'self' https://*.api.sanity.io https://*.apicdn.sanity.io",
-      "frame-src 'self' https://*.sanity.io",
+      "connect-src 'self' https://*.api.sanity.io https://*.apicdn.sanity.io https://www.google.com/recaptcha/",
+      "frame-src 'self' https://*.sanity.io https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/",
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self' https://formspree.io",
@@ -49,6 +54,9 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: 'dummyimage.com' },
       { protocol: 'https', hostname: 'cdn.sanity.io' },
+      // Status badges embedded in markdown bodies (see lib/utils.ts isBadge).
+      { protocol: 'https', hostname: 'img.shields.io' },
+      { protocol: 'https', hostname: 'badgen.net' },
     ],
     // AVIF first, WebP fallback: meaningfully smaller than JPEG at equal quality.
     formats: ['image/avif', 'image/webp'],

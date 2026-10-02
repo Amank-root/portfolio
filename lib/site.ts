@@ -19,7 +19,7 @@ export const siteConfig = {
     'Full stack developer and AI/ML engineer building fast, accessible web products with Next.js, TypeScript and Python.',
   locale: 'en_US',
   url: rawBaseUrl ? rawBaseUrl.replace(/\/$/, '') : 'https://www.amankushwaha.dev',
-  email: 'contact@amank-root.slmail.me',
+  email: 'query@amankushwaha.dev',
   location: {
     city: 'New Delhi',
     region: 'Delhi',

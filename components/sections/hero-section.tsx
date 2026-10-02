@@ -2,7 +2,8 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { motion, useReducedMotion } from 'motion/react'
+import { motion } from 'motion/react'
+import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion'
 import { ArrowRight, Download } from 'lucide-react'
 import { Magnetic } from '@/components/magnetic'
 import { TextGenerate } from '@/components/text-generate'
@@ -24,7 +25,7 @@ interface HeroSectionProps {
  * paragraph beneath it.
  */
 function RoleSwap() {
-  const reduced = useReducedMotion()
+  const reduced = usePrefersReducedMotion()
 
   if (reduced) return <span>{ROLES[0]}</span>
 
@@ -56,7 +57,7 @@ function RoleSwap() {
 }
 
 export function HeroSection({ about }: HeroSectionProps) {
-  const reduced = useReducedMotion()
+  const reduced = usePrefersReducedMotion()
   const resumeUrl = about?.resumeFile?.asset?.url
 
   return (
@@ -92,7 +93,11 @@ export function HeroSection({ about }: HeroSectionProps) {
 
             <h1 className="mt-8 font-display text-display">
               <TextGenerate words="Building for the" className="block" stagger={0.07} delay={0.1} />
-              <TextGenerate words="modern web." className="text-gradient block" stagger={0.07} delay={0.34} />
+              {/* `gradient` moves text-gradient onto each word span — see the
+                  note in TextGenerate. Passing it via className left the
+                  wrapper holding the gradient while the glyphs sat in child
+                  spans, so the text painted as fully transparent. */}
+              <TextGenerate words="modern web." className="block" gradient stagger={0.07} delay={0.34} />
             </h1>
 
             <div className="mt-7 flex items-center gap-3 font-mono text-sm tracking-wide text-foreground-muted">

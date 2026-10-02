@@ -149,7 +149,7 @@ async function BlogPostContent({ params }: Props) {
             </div>
           ) : null}
 
-          <h1 className="mt-5 font-display text-display text-foreground">{post.title}</h1>
+          <h1 className="mt-5 max-w-3xl font-display text-page text-foreground">{post.title}</h1>
 
           {post.excerpt && <p className="mt-6 text-lede text-foreground-muted">{post.excerpt}</p>}
 

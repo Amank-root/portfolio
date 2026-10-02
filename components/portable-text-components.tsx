@@ -11,13 +11,16 @@ export const portableTextComponents: PortableTextComponents = {
       return (
         <figure className="my-8">
           <div className="relative w-full overflow-hidden rounded-md border border-border bg-muted">
+            {/* Height comes from the asset's real aspect ratio rather than a
+                fixed 800px box, so the reserved space matches the image and
+                nothing shifts as it decodes. */}
             <Image
               src={urlFor(value).width(1200).quality(90).url()}
               alt={value.alt || 'Image'}
-              width={1200}
-              height={800}
-              className="w-full h-auto object-contain"
-              style={{ maxHeight: '500px' }}
+              width={value.asset?.metadata?.dimensions?.width || 1200}
+              height={value.asset?.metadata?.dimensions?.height || 800}
+              sizes="(max-width: 768px) 100vw, 768px"
+              className="h-auto w-full object-contain"
             />
           </div>
           {value.alt && (

@@ -1,7 +1,8 @@
 'use client'
 
 import type React from 'react'
-import { motion, useReducedMotion } from 'motion/react'
+import { motion } from 'motion/react'
+import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion'
 import { cn } from '@/lib/utils'
 
 /**
@@ -26,7 +27,7 @@ export function Reveal({
   y?: number
   as?: 'div' | 'section' | 'li' | 'article' | 'ul' | 'header'
 }) {
-  const reduced = useReducedMotion()
+  const reduced = usePrefersReducedMotion()
   const MotionTag = motion[as] as typeof motion.div
 
   if (reduced) {
@@ -122,7 +123,7 @@ export function PageHeader({
       </Reveal>
 
       <Reveal delay={0.08}>
-        <h1 className="max-w-4xl font-display text-display">{title}</h1>
+        <h1 className="max-w-3xl font-display text-page">{title}</h1>
       </Reveal>
 
       {lede && (

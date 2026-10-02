@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -8,9 +9,15 @@ import { Textarea } from '@/components/ui/textarea'
 import { Send, CheckCircle2, AlertCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import { useForm, ValidationError } from '@formspree/react'
-import dynamic from 'next/dynamic'
 
-// Dynamically import ReCAPTCHA with SSR disabled to prevent "window is not defined" errors
+/**
+ * reCAPTCHA v2 checkbox.
+ *
+ * The widget injects `window.grecaptcha` during script load, so it cannot be
+ * rendered on the server — a plain import throws "window is not defined" at
+ * build time. `ssr: false` is the fix; it is also why the component itself
+ * stays a separate client file rather than being inlined into a server page.
+ */
 const ReCAPTCHAComponent = dynamic(() => import('react-google-recaptcha'), { ssr: false })
 
 interface ContactFormProps {
@@ -33,25 +40,19 @@ export function ContactForm({ formspreeEndpoint, recaptchaSiteKey }: ContactForm
     message: '',
   })
 
-  // Show toast and handle success transition
+  // Toast + success transition once Formspree confirms the send.
   useEffect(() => {
-    if (state.succeeded) {
-      toast.success('Message sent successfully!', {
-        description: "Thank you for your message. I'll get back to you soon.",
-      })
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- form submission success
-      setShowSuccess(true)
-      // Reset form data and recaptcha token
-      setFormData({ name: '', email: '', subject: '', message: '' })
-      setRecaptchaToken(null)
+    if (!state.succeeded) return
 
-      // Hide success message after 3 seconds
-      const timer = setTimeout(() => {
-        setShowSuccess(false)
-      }, 3000)
+    toast.success('Message sent', { description: "Thanks — I'll get back to you soon." })
 
-      return () => clearTimeout(timer)
-    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- resets an event-driven success panel, not derived state
+    setShowSuccess(true)
+    setFormData({ name: '', email: '', subject: '', message: '' })
+    setRecaptchaToken(null)
+
+    const timer = setTimeout(() => setShowSuccess(false), 4000)
+    return () => clearTimeout(timer)
   }, [state.succeeded])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -62,6 +63,8 @@ export function ContactForm({ formspreeEndpoint, recaptchaSiteKey }: ContactForm
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
+    // v2 renders a real checkbox, so an empty token means the user simply has
+    // not ticked it yet — asking them to complete the verification is accurate.
     if (siteKey && !recaptchaToken) {
       toast.error('reCAPTCHA Required', {
         description: 'Please complete the reCAPTCHA verification.',
@@ -93,7 +96,7 @@ export function ContactForm({ formspreeEndpoint, recaptchaSiteKey }: ContactForm
         </motion.div>
       ) : (
         <form onSubmit={handleFormSubmit} className="space-y-4">
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label htmlFor="name" className="eyebrow mb-2 block">
                 Name
@@ -153,13 +156,14 @@ export function ContactForm({ formspreeEndpoint, recaptchaSiteKey }: ContactForm
               placeholder="Tell me about your project, idea, or just say hi..."
               required
               rows={6}
-              className="bg-background/60 resize-none text-sm"
+              className="resize-none bg-background/60 text-sm"
             />
           </div>
 
-          {/* ReCAPTCHA — token is captured via onChange, avoiding ref forwarding issues */}
+          {/* reCAPTCHA v2 — token is captured via onChange rather than a ref, so
+              there is no ref-forwarding problem through the dynamic import. */}
           {siteKey && (
-            <div className="mb-4 flex justify-center">
+            <div className="flex justify-center py-1">
               <ReCAPTCHAComponent
                 sitekey={siteKey}
                 theme="dark"

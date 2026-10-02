@@ -119,7 +119,7 @@ async function ProjectPageContent({ params }: Props) {
               {[project.status, project.featured ? 'featured' : null].filter(Boolean).join(' · ')}
             </p>
 
-            <h1 className="mt-5 font-display text-display text-foreground">{project.title}</h1>
+            <h1 className="mt-5 font-display text-page text-foreground">{project.title}</h1>
             {project.description && <p className="mt-6 text-lede text-foreground-muted">{project.description}</p>}
 
             {(project.githubUrl || project.demoUrl) && (

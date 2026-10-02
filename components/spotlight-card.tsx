@@ -1,7 +1,8 @@
 'use client'
 
 import { useRef, useState, type ReactNode } from 'react'
-import { motion, useMotionTemplate, useMotionValue, useReducedMotion } from 'motion/react'
+import { motion, useMotionTemplate, useMotionValue } from 'motion/react'
+import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion'
 import { cn } from '@/lib/utils'
 
 /**
@@ -28,7 +29,7 @@ export function SpotlightCard({
   glowColor?: string
 }) {
   const ref = useRef<HTMLDivElement>(null)
-  const reduced = useReducedMotion()
+  const reduced = usePrefersReducedMotion()
 
   // x/y are -1..1, centred on the element. Mouse-normalised rather than pixel
   // offsets so the gradient maths is resolution-independent.

@@ -2,7 +2,14 @@ import { PortableTextBlock } from '@portabletext/types'
 import { SanityImageAssetDocument } from 'next-sanity'
 
 export interface SanityImage {
-  asset: SanityImageAssetDocument & { url?: string }
+  asset: SanityImageAssetDocument & {
+    url?: string
+    /** Present when the projection requests `asset->{metadata{dimensions}}`.
+        Used to reserve the right aspect box before an image decodes. */
+    metadata?: {
+      dimensions?: { width?: number; height?: number; aspectRatio?: number }
+    }
+  }
   alt?: string
 }
 

@@ -69,6 +69,13 @@
   --text-display--line-height: 0.98;
   --text-display--letter-spacing: -0.04em;
 
+  /* Page titles (index + detail pages). `--text-display` is the hero scale and
+     reads as too large once a heading is a project name rather than a short
+     statement, so inner pages get their own step. */
+  --text-page: clamp(2rem, 1.4rem + 2.6vw, 3.5rem);
+  --text-page--line-height: 1.06;
+  --text-page--letter-spacing: -0.03em;
+
   --text-section: clamp(1.8rem, 1.3rem + 2.2vw, 2.75rem);
   --text-section--line-height: 1.08;
   --text-section--letter-spacing: -0.03em;
@@ -414,6 +421,15 @@
   & img {
     @apply my-8 w-full;
     border-radius: var(--radius);
+  }
+
+  /* Badges are intrinsically small and must keep their own size — the `w-full`
+     above is a descendant selector, so a component-level `w-auto` loses to it
+     regardless of order. The attribute selector also outranks it, which is why
+     the renderer marks badges rather than fighting the cascade. */
+  & img[data-badge] {
+    @apply my-2 h-auto w-auto;
+    border-radius: 0;
   }
 
   & hr {

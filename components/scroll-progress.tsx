@@ -1,6 +1,7 @@
 'use client'
 
-import { motion, useScroll, useSpring, useReducedMotion } from 'motion/react'
+import { motion, useScroll, useSpring } from 'motion/react'
+import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion'
 
 /**
  * Scroll progress bar.
@@ -12,7 +13,7 @@ import { motion, useScroll, useSpring, useReducedMotion } from 'motion/react'
  */
 export function ScrollProgress() {
   const { scrollYProgress } = useScroll()
-  const reduced = useReducedMotion()
+  const reduced = usePrefersReducedMotion()
   const scaleX = useSpring(scrollYProgress, { stiffness: 140, damping: 30, restDelta: 0.001 })
 
   if (reduced) return null
