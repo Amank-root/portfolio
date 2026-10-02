@@ -1,24 +1,43 @@
 import type React from 'react'
 import type { Metadata, Viewport } from 'next'
-import { Fira_Code, Inter } from 'next/font/google'
+import { Syne, Instrument_Sans, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from 'sonner'
 import { siteConfig } from '@/lib/site'
 
-const inter = Inter({
+/**
+ * Three voices:
+ *  - Syne (display) — a wide, characterful grotesk. It does the work a
+ *    gradient can't: at display sizes it's immediately not-a-template.
+ *  - Instrument Sans (body) — a neutral grotesque for running text.
+ *  - Geist Mono (code + micro-labels) — tags, small caps labels and code only.
+ */
+const syne = Syne({
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-display-family',
   display: 'swap',
-  // Only ship the weights actually used — trims ~40KB from the critical CSS.
-  weight: ['400', '500', '600', '700'],
+  // Variable weight: the opsz axis can only be requested alongside a variable
+  // range, so weight must not be pinned to discrete values.
+  weight: 'variable',
+  // axes: ['opsz'],
+  style: ['normal'],
 })
 
-const firaCode = Fira_Code({
+const instrumentSans = Instrument_Sans({
   subsets: ['latin'],
-  variable: '--font-fira-code',
+  variable: '--font-body',
   display: 'swap',
   weight: ['400', '500', '600'],
+  style: ['normal', 'italic'],
+})
+
+const geistMono = Geist_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono-family',
+  display: 'swap',
+  weight: ['400', '500'],
+  style: ['normal', 'italic'],
 })
 
 export const metadata: Metadata = {
@@ -83,20 +102,29 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: 'cover',
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#0b0e14' },
+    { media: '(prefers-color-scheme: light)', color: '#f2efe9' },
+    { media: '(prefers-color-scheme: dark)', color: '#141311' },
   ],
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${firaCode.variable} font-sans`} suppressHydrationWarning>
+    /* The font variables must live on <html>, not <body>. Tailwind emits
+       `--font-sans: var(--font-body)` into its `:root` theme block, and a
+       variable declared on a descendant is not visible to `:root` — the
+       reference resolves to nothing and every heading and paragraph silently
+       falls back to the system UI font. */
+    <html
+      lang="en"
+      className={`${syne.variable} ${instrumentSans.variable} ${geistMono.variable}`}
+      suppressHydrationWarning
+    >
+      <body className="font-sans" suppressHydrationWarning>
         {/* Skip link: keyboard users currently have to tab through the whole
             header + sidebar nav on every page. */}
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-6 focus:top-6 focus:z-[100] focus:rounded-full focus:bg-primary focus:px-5 focus:py-2.5 focus:text-sm focus:font-medium focus:text-primary-foreground"
         >
           Skip to content
         </a>

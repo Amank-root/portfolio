@@ -1,11 +1,8 @@
-'use client'
-
 import type React from 'react'
-import { motion } from 'framer-motion'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Terminal } from '@/components/terminal'
 import { Mail, MapPin, Github, Linkedin, Twitter, Globe, Phone } from 'lucide-react'
 import { ContactForm } from '@/components/contact-form'
+import { PageHeader, Reveal } from '@/components/section'
+import { SpotlightCard } from '@/components/spotlight-card'
 import type { Contact } from '@/sanity/lib/types'
 
 const ICON_MAP: Record<string, React.ElementType> = {
@@ -24,177 +21,85 @@ interface ContactClientProps {
 export function ContactClient({ contact }: ContactClientProps) {
   const email = contact?.email || 'contact@amank-root.slmail.me'
   const location = contact?.location || 'New Delhi, Delhi, India'
-  const title = contact?.title || 'Get In Touch'
+  const title = contact?.title || 'Get in touch'
   const description =
     contact?.description ||
-    'Have a project in mind or want to discuss potential opportunities? Feel free to reach out through the form below or via my contact information.'
-
-  // Animation variants
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.3,
-      },
-    },
-  }
-
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  }
+    'Have a project in mind, or want to talk through an idea? Send a note using the form, or email me directly — either works.'
 
   // Parse social links or use defaults
   const socialLinks = contact?.socialLinks || [
-    { platform: 'GitHub', url: 'https://github.com/amank-root' },
-    { platform: 'LinkedIn', url: 'https://linkedin.com/in/amank-root' },
-    { platform: 'Twitter', url: 'https://twitter.com/AmanKushwaha_28' },
+    { platform: 'GitHub', url: 'https://github.com/amank-root', icon: 'github' },
+    { platform: 'LinkedIn', url: 'https://linkedin.com/in/amank-root', icon: 'linkedin' },
+    { platform: 'Twitter', url: 'https://twitter.com/AmanKushwaha_28', icon: 'twitter' },
   ]
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto">
-      {/* Hero Section */}
-      <section className="px-4 py-12 sm:px-6 lg:px-8 border-b border-border/10 bg-card/20">
-        <div className="mx-auto max-w-6xl">
-          <motion.h1
-            className="mb-4 text-3xl font-bold gradient-text sm:text-4xl md:text-5xl"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            {title}
-          </motion.h1>
-          <motion.p
-            className="max-w-3xl text-base text-muted-foreground sm:text-lg leading-relaxed"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            {description}
-          </motion.p>
-        </div>
-      </section>
+    <div className="container">
+      <PageHeader eyebrow="Contact" title={title} lede={description} />
 
-      {/* Contact Section */}
-      <section className="px-4 py-12 sm:px-6 lg:px-8">
-        <motion.div
-          className="mx-auto grid max-w-6xl gap-6 md:grid-cols-2 lg:gap-8"
-          variants={container}
-          initial="hidden"
-          animate="show"
-        >
-          {/* Contact Form */}
-          <motion.div variants={item}>
-            <ContactForm formspreeEndpoint={contact?.formspreeEndpoint} recaptchaSiteKey={contact?.recaptchaSiteKey} />
-          </motion.div>
+      <div className="grid gap-10 pb-20 lg:grid-cols-[1fr_20rem] lg:gap-12 sm:pb-28">
+        {/* Form — the primary column, so it gets the width. */}
+        <Reveal>
+          <ContactForm formspreeEndpoint={contact?.formspreeEndpoint} recaptchaSiteKey={contact?.recaptchaSiteKey} />
+        </Reveal>
 
-          {/* Contact Info */}
-          <div className="flex flex-col gap-4 sm:gap-6">
-            <motion.div variants={item}>
-              <Card className="glass border-border/50">
-                <CardHeader>
-                  <CardTitle className="text-lg sm:text-xl font-semibold text-foreground">
-                    Contact Information
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <ContactItem icon={Mail} title="Email" value={email} href={`mailto:${email}`} />
-                  <ContactItem icon={MapPin} title="Location" value={location} />
-                </CardContent>
-              </Card>
-            </motion.div>
+        {/* Details, as one spotlight panel rather than four stacked cards. */}
+        <Reveal delay={0.12}>
+          <SpotlightCard className="h-full" glowColor="var(--aurora-cyan)">
+            <p className="eyebrow">Details</p>
 
-            <motion.div variants={item}>
-              <Card className="glass border-border/50">
-                <CardHeader>
-                  <CardTitle className="text-lg sm:text-xl font-semibold text-foreground">Social Media</CardTitle>
-                </CardHeader>
-                <CardContent className="flex flex-wrap gap-3">
+            <dl className="mt-6 space-y-6">
+              <div>
+                <dt className="eyebrow">Email</dt>
+                <dd className="mt-2">
+                  <a
+                    href={`mailto:${email}`}
+                    className="break-all text-[0.95rem] text-foreground transition-colors hover:text-primary"
+                  >
+                    {email}
+                  </a>
+                </dd>
+              </div>
+
+              <div className="border-t border-border/60 pt-5">
+                <dt className="eyebrow">Based in</dt>
+                <dd className="mt-2 flex items-start gap-2 text-[0.95rem] text-foreground-muted">
+                  <MapPin size={14} className="mt-1 shrink-0 text-primary" aria-hidden />
+                  {location}
+                </dd>
+              </div>
+
+              <div className="border-t border-border/60 pt-5">
+                <dt className="eyebrow">Elsewhere</dt>
+                <dd className="mt-3 flex flex-col gap-2.5">
                   {socialLinks.map((link, idx) => {
-                    const iconName = link.platform.toLowerCase()
-                    const Icon = ICON_MAP[iconName] || Globe
-                    return <SocialButton key={idx} icon={Icon} label={link.platform} href={link.url} />
+                    const Icon = ICON_MAP[link.platform.toLowerCase()] || Globe
+                    return (
+                      <a
+                        key={idx}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group inline-flex items-center gap-2.5 text-[0.95rem] text-foreground-muted transition-colors hover:text-foreground"
+                      >
+                        <Icon size={14} className="text-foreground-subtle" aria-hidden />
+                        {link.platform}
+                      </a>
+                    )
                   })}
-                </CardContent>
-              </Card>
-            </motion.div>
+                </dd>
+              </div>
 
-            <motion.div variants={item}>
-              <Card className="glass border-border/50">
-                <CardHeader>
-                  <CardTitle className="text-lg sm:text-xl font-semibold text-foreground">Terminal</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Terminal>
-                    <div className="terminal-prompt">cat contact_info.txt</div>
-                    <div className="terminal-output mb-4">
-                      Email: {email}
-                      {'\n'}
-                      Location: {location}
-                    </div>
-
-                    <div className="terminal-prompt">
-                      echo &quot;I&apos;m looking forward to hearing from you!&quot;
-                    </div>
-                    <div className="terminal-output">I&apos;m looking forward to hearing from you!</div>
-                  </Terminal>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </div>
-        </motion.div>
-      </section>
+              <div className="border-t border-border/60 pt-5">
+                <dt className="eyebrow">Response time</dt>
+                <dd className="mt-2 text-[0.95rem] leading-relaxed text-foreground-muted">
+                  Usually within a day or two. If it&apos;s urgent, email beats the form.
+                </dd>
+              </div>
+            </dl>
+          </SpotlightCard>
+        </Reveal>
+      </div>
     </div>
-  )
-}
-
-interface ContactItemProps {
-  icon: React.ElementType
-  title: string
-  value: string
-  href?: string
-}
-
-function ContactItem({ icon: Icon, title, value, href }: ContactItemProps) {
-  return (
-    <motion.div className="flex items-start gap-3" whileHover={{ x: 5, transition: { duration: 0.2 } }}>
-      <div className="rounded-lg bg-primary/10 p-2 border border-primary/20">
-        <Icon className="h-4 w-4 text-primary sm:h-5 sm:w-5" />
-      </div>
-      <div>
-        <h3 className="text-sm font-semibold sm:text-base">{title}</h3>
-        {href ? (
-          <a href={href} className="text-xs text-muted-foreground hover:text-primary hover:underline sm:text-sm">
-            {value}
-          </a>
-        ) : (
-          <p className="text-xs text-muted-foreground sm:text-sm">{value}</p>
-        )}
-      </div>
-    </motion.div>
-  )
-}
-
-interface SocialButtonProps {
-  icon: React.ElementType
-  label: string
-  href: string
-}
-
-function SocialButton({ icon: Icon, label, href }: SocialButtonProps) {
-  return (
-    <motion.a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium transition-colors hover:bg-accent hover:text-accent-foreground sm:gap-2 sm:px-4 sm:py-2 sm:text-sm"
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-    >
-      <Icon className="h-3 w-3 sm:h-4 sm:w-4" />
-      {label}
-    </motion.a>
   )
 }

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { RotateCcw, TriangleAlert } from 'lucide-react'
+import { RotateCcw } from 'lucide-react'
 
 export default function GlobalError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   useEffect(() => {
@@ -9,18 +9,25 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
   }, [error])
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-4 text-center">
-      <TriangleAlert size={44} className="mb-6 text-destructive" />
-      <h1 className="text-3xl font-bold tracking-tight">Something broke</h1>
-      <p className="mt-3 max-w-md text-muted-foreground">
+    <div className="container flex min-h-screen flex-col justify-center py-24">
+      <div className="flex items-center gap-3">
+        <span
+          aria-hidden
+          className="h-px w-8 bg-[linear-gradient(90deg,hsl(var(--aurora-coral)),hsl(var(--aurora-violet)))]"
+        />
+        <span className="eyebrow font-mono text-destructive">Error</span>
+      </div>
+      <h1 className="mt-6 max-w-xl font-display text-section">Something broke.</h1>
+      <p className="mt-5 max-w-md leading-relaxed text-foreground-muted">
         An unexpected error occurred while rendering this page. Reloading usually clears it.
       </p>
-      {error.digest && <p className="mt-3 font-mono text-xs text-muted-foreground/70">digest: {error.digest}</p>}
+      {error.digest && <p className="mt-3 font-mono text-xs text-foreground-subtle">digest: {error.digest}</p>}
       <button
         onClick={reset}
-        className="mt-8 inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+        className="mt-10 inline-flex h-11 w-fit items-center gap-2 rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground transition-transform duration-300 active:scale-95"
       >
-        <RotateCcw size={14} /> Try again
+        <RotateCcw size={14} aria-hidden />
+        Try again
       </button>
     </div>
   )

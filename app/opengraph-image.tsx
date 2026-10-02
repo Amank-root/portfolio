@@ -8,6 +8,10 @@ export const contentType = 'image/png'
 /**
  * Site-wide OG card. Generated rather than a static asset so it stays in sync
  * with siteConfig and costs ~0 bytes of repo/CDN until requested.
+ *
+ * Mirrors the live site's palette — warm charcoal with the same muted aurora
+ * blooms the canvas paints — so a shared link looks like a page from the site
+ * rather than a different product.
  */
 export default async function OpengraphImage() {
   return new ImageResponse(
@@ -18,52 +22,54 @@ export default async function OpengraphImage() {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        background: '#0b0e14',
+        background: '#141311',
         backgroundImage:
-          'radial-gradient(circle at 15% 20%, #10344a 0%, transparent 45%), radial-gradient(circle at 85% 80%, #1c2b52 0%, transparent 45%)',
+          'radial-gradient(circle at 18% 12%, rgba(196,120,80,0.24) 0%, transparent 48%), radial-gradient(circle at 88% 88%, rgba(130,140,120,0.18) 0%, transparent 45%), radial-gradient(circle at 62% 40%, rgba(150,120,180,0.14) 0%, transparent 45%)',
         padding: '72px 80px',
         fontFamily: 'sans-serif',
       }}
     >
-      {/* Brand mark */}
+      {/* Wordmark */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
         <div
           style={{
             width: '52px',
             height: '52px',
-            borderRadius: '14px',
-            background: 'linear-gradient(135deg, #22d3ee 0%, #6366f1 100%)',
+            borderRadius: '999px',
+            background: 'linear-gradient(135deg, #c47850 0%, #8b7fb8 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '30px',
+            fontSize: '26px',
             fontWeight: 700,
-            color: '#0b0e14',
+            color: '#141311',
+            letterSpacing: '-0.02em',
           }}
         >
-          AK
+          A
         </div>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <div style={{ fontSize: '30px', fontWeight: 700, color: '#e6edf3', lineHeight: 1.2 }}>{siteConfig.name}</div>
-          <div style={{ fontSize: '22px', color: '#7d8590', lineHeight: 1.3 }}>{siteConfig.role}</div>
+          <div style={{ fontSize: '30px', fontWeight: 600, color: '#26221c', lineHeight: 1.2 }}>{siteConfig.name}</div>
+          <div style={{ fontSize: '20px', color: '#a9a196', lineHeight: 1.4 }}>{siteConfig.role}</div>
         </div>
       </div>
 
-      {/* Headline */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      {/* Headline — the serif voice, approximated with a light weight and
+          generous tracking at this size. */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
         <div
           style={{
-            fontSize: '62px',
-            fontWeight: 800,
-            color: '#e6edf3',
-            lineHeight: 1.12,
-            letterSpacing: '-0.02em',
-            maxWidth: '900px',
+            fontSize: '64px',
+            fontWeight: 700,
+            color: '#ece8e0',
+            lineHeight: 1.14,
+            letterSpacing: '-0.03em',
+            maxWidth: '920px',
           }}
         >
           I build fast, accessible web products — and the AI systems behind them.
         </div>
-        <div style={{ fontSize: '28px', color: '#8b949e', lineHeight: 1.4, maxWidth: '880px' }}>
+        <div style={{ fontSize: '26px', color: '#a9a196', lineHeight: 1.45, maxWidth: '880px' }}>
           Next.js, TypeScript, React, Python, machine learning, and open-source tooling.
         </div>
       </div>
@@ -74,15 +80,15 @@ export default async function OpengraphImage() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          borderTop: '1px solid #21262d',
+          borderTop: '1px solid #332f2a',
           paddingTop: '28px',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '24px', color: '#34d399' }}>
-          <div style={{ width: '12px', height: '12px', borderRadius: '999px', background: '#34d399' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '23px', color: '#8fae8b' }}>
+          <div style={{ width: '12px', height: '12px', borderRadius: '999px', background: '#8fae8b' }} />
           Available for opportunities
         </div>
-        <div style={{ fontSize: '24px', color: '#7d8590' }}>amankushwaha.dev</div>
+        <div style={{ fontSize: '23px', color: '#8d867a' }}>amankushwaha.dev</div>
       </div>
     </div>,
     size

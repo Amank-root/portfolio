@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Home, ArrowLeft, FileQuestion } from 'lucide-react'
+import { ArrowLeft, Home } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Page Not Found',
@@ -10,34 +10,30 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   return (
-    <div className="flex min-h-full flex-col items-center justify-center px-4 py-24 text-center">
-      <div className="relative mb-8">
-        <div className="absolute inset-0 -z-10 blur-3xl" aria-hidden>
-          <div className="mx-auto h-40 w-40 rounded-full bg-primary/20" />
-        </div>
-        <FileQuestion size={56} className="mx-auto text-primary/60" />
-      </div>
+    <div className="container flex min-h-[70vh] flex-col justify-center py-24">
+      {/* Oversized gradient numeral, so the 404 reads as a page of the same
+          site rather than a system error screen. */}
+      <p className="text-gradient font-display text-[7rem] leading-none tracking-tight sm:text-[9rem]">404</p>
 
-      <p className="font-mono text-sm text-primary">404</p>
-      <h1 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
-        This page <span className="gradient-text">doesn&apos;t exist</span>
-      </h1>
-      <p className="mt-4 max-w-md text-muted-foreground">
-        The link may be broken, or the page may have been moved. Try the explorer on the left, or head back home.
+      <h1 className="mt-6 max-w-xl font-display text-section">This page doesn&apos;t exist.</h1>
+      <p className="mt-5 max-w-md leading-relaxed text-foreground-muted">
+        The link may be broken, or the page may have moved. Everything else is still where you left it.
       </p>
 
-      <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+      <div className="mt-10 flex flex-wrap items-center gap-4">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          className="inline-flex h-11 items-center gap-2 rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground transition-transform duration-300 active:scale-95"
         >
-          <Home size={14} /> Back home
+          <Home size={15} aria-hidden />
+          Back home
         </Link>
         <Link
           href="/blog"
-          className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm font-medium transition-colors hover:border-primary/50 hover:text-primary"
+          className="inline-flex h-11 items-center gap-2 rounded-full border border-border-strong bg-card/40 px-6 text-sm backdrop-blur-sm transition-colors hover:border-primary/50"
         >
-          <ArrowLeft size={14} /> Read the blog
+          <ArrowLeft size={15} aria-hidden />
+          Read the writing
         </Link>
       </div>
     </div>

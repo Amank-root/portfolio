@@ -54,80 +54,31 @@ async function ContactPageContent() {
 
 function ContactPageSkeleton() {
   return (
-    <div className="flex h-full flex-col animate-pulse">
-      {/* Hero Skeleton */}
-      <section className="px-4 py-12 sm:px-6 lg:px-8 border-b border-border/10 bg-card/20">
-        <div className="mx-auto max-w-6xl space-y-3">
-          <div className="h-10 w-64 rounded bg-muted/60" />
-          <div className="h-5 w-full max-w-xl rounded bg-muted/60" />
+    <div className="container animate-pulse">
+      <div className="border-b border-border pb-14 pt-16 sm:pt-24">
+        <div className="h-3 w-28 rounded bg-muted" />
+        <div className="mt-6 h-12 w-2/3 max-w-lg rounded bg-muted" />
+        <div className="mt-7 h-4 w-full max-w-xl rounded bg-muted/60" />
+      </div>
+
+      <div className="grid gap-16 py-20 lg:grid-cols-[1fr_18rem] lg:gap-20 sm:py-28">
+        <div className="max-w-xl space-y-6">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <div key={index} className="space-y-2">
+              <div className="h-3 w-20 rounded bg-muted/60" />
+              <div className="h-11 w-full rounded-md bg-muted/50" />
+            </div>
+          ))}
         </div>
-      </section>
-
-      {/* Grid Skeleton */}
-      <section className="px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-2 lg:gap-8">
-          {/* Left Column (Form) */}
-          <div className="glass rounded-xl p-6 border border-border/50 space-y-6">
-            <div className="h-6 w-36 rounded bg-muted/60" />
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <div className="h-3 w-12 rounded bg-muted/60" />
-                <div className="h-10 rounded bg-muted/40" />
-              </div>
-              <div className="space-y-2">
-                <div className="h-3 w-12 rounded bg-muted/60" />
-                <div className="h-10 rounded bg-muted/40" />
-              </div>
-            </div>
-            <div className="space-y-2">
+        <div className="space-y-10">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <div key={index} className="space-y-3 border-t border-border pt-5">
               <div className="h-3 w-16 rounded bg-muted/60" />
-              <div className="h-10 rounded bg-muted/40" />
+              <div className="h-4 w-40 rounded bg-muted/50" />
             </div>
-            <div className="space-y-2">
-              <div className="h-3 w-16 rounded bg-muted/60" />
-              <div className="h-32 rounded bg-muted/40" />
-            </div>
-            <div className="h-10 rounded bg-muted/60" />
-          </div>
-
-          {/* Right Column (Info / Cards) */}
-          <div className="flex flex-col gap-4 sm:gap-6">
-            <div className="glass rounded-xl p-6 border border-border/50 space-y-4">
-              <div className="h-6 w-40 rounded bg-muted/60" />
-              <div className="space-y-3">
-                <div className="flex gap-3">
-                  <div className="h-10 w-10 rounded-lg bg-muted/40" />
-                  <div className="space-y-2">
-                    <div className="h-4 w-20 rounded bg-muted/60" />
-                    <div className="h-3 w-32 rounded bg-muted/40" />
-                  </div>
-                </div>
-                <div className="flex gap-3">
-                  <div className="h-10 w-10 rounded-lg bg-muted/40" />
-                  <div className="space-y-2">
-                    <div className="h-4 w-20 rounded bg-muted/60" />
-                    <div className="h-3 w-32 rounded bg-muted/40" />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="glass rounded-xl p-6 border border-border/50 space-y-4">
-              <div className="h-6 w-32 rounded bg-muted/60" />
-              <div className="flex gap-3">
-                <div className="h-8 w-20 rounded bg-muted/40" />
-                <div className="h-8 w-20 rounded bg-muted/40" />
-                <div className="h-8 w-20 rounded bg-muted/40" />
-              </div>
-            </div>
-
-            <div className="glass rounded-xl p-6 border border-border/50 space-y-4">
-              <div className="h-6 w-24 rounded bg-muted/60" />
-              <div className="h-24 rounded bg-muted/40" />
-            </div>
-          </div>
+          ))}
         </div>
-      </section>
+      </div>
     </div>
   )
 }

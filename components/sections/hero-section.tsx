@@ -1,14 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { motion, useReducedMotion } from 'framer-motion'
-import { ArrowRight, Download, Github, Linkedin, ExternalLink, Sparkles } from 'lucide-react'
+import { motion, useReducedMotion } from 'motion/react'
+import { ArrowRight, Download } from 'lucide-react'
+import { Magnetic } from '@/components/magnetic'
+import { TextGenerate } from '@/components/text-generate'
 import { siteConfig } from '@/lib/site'
 
-const TYPING_TEXTS = ['Full Stack Developer', 'AI/ML Engineer', 'Next.js Specialist', 'Open Source Builder']
+const ROLES = ['Full Stack Developer', 'AI/ML Engineer', 'Interface Craftsman']
 
 interface HeroSectionProps {
   about: {
@@ -17,257 +17,232 @@ interface HeroSectionProps {
   } | null
 }
 
-export function HeroSection({ about }: HeroSectionProps) {
-  // Seeded with the first role so the server-rendered HTML already contains
-  // real text for crawlers and for users with JS disabled — an empty string
-  // here would leave the hero's <h2> blank in the initial paint.
-  const [text, setText] = useState(TYPING_TEXTS[0])
-  const [textIndex, setTextIndex] = useState(0)
-  const [charIndex, setCharIndex] = useState(0)
-  const [isDeleting, setIsDeleting] = useState(false)
-  const prefersReducedMotion = useReducedMotion()
+/**
+ * Rotating role line. Each word runs its own 9s opacity/blur cycle offset by
+ * 3s, so exactly one is legible at a time and the sequence never restarts from
+ * a blank line. Fixed height + overflow-hidden means the swap can't reflow the
+ * paragraph beneath it.
+ */
+function RoleSwap() {
+  const reduced = useReducedMotion()
 
-  useEffect(() => {
-    // Respect prefers-reduced-motion: render the first role statically instead
-    // of animating a typewriter effect forever.
-    if (prefersReducedMotion) return
-
-    const currentText = TYPING_TEXTS[textIndex]
-    const speed = isDeleting ? 40 : 90
-
-    const timeout = setTimeout(() => {
-      if (!isDeleting) {
-        if (charIndex < currentText.length) {
-          setText(currentText.slice(0, charIndex + 1))
-          setCharIndex(c => c + 1)
-        } else {
-          setTimeout(() => setIsDeleting(true), 2000)
-        }
-      } else {
-        if (charIndex > 0) {
-          setText(currentText.slice(0, charIndex - 1))
-          setCharIndex(c => c - 1)
-        } else {
-          setIsDeleting(false)
-          setTextIndex(i => (i + 1) % TYPING_TEXTS.length)
-        }
-      }
-    }, speed)
-
-    return () => clearTimeout(timeout)
-  }, [charIndex, textIndex, isDeleting, prefersReducedMotion])
-
-  const resumeUrl = about?.resumeFile?.asset?.url
-  const roleText = prefersReducedMotion ? TYPING_TEXTS[0] : text || TYPING_TEXTS[0]
+  if (reduced) return <span>{ROLES[0]}</span>
 
   return (
-    <section className="relative flex min-h-[calc(100svh-2.5rem)] items-center overflow-hidden px-4 py-16 sm:px-6 lg:px-8">
-      {/* Background effects */}
-      <div className="absolute inset-0 grid-pattern opacity-30" aria-hidden />
-      <div className="absolute left-1/4 top-1/4 h-96 w-96 rounded-full bg-primary/5 blur-3xl" aria-hidden />
-      <div className="absolute bottom-1/4 right-1/4 h-80 w-80 rounded-full bg-secondary/5 blur-3xl" aria-hidden />
-      <div
-        className="absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/3 blur-3xl"
-        aria-hidden
-      />
+    <span className="relative inline-flex h-7 items-center overflow-hidden align-bottom">
+      {ROLES.map((role, i) => (
+        <motion.span
+          key={role}
+          className="absolute left-0 whitespace-nowrap"
+          initial={false}
+          animate={{
+            opacity: [0, 1, 1, 0],
+            y: [12, 0, 0, -12],
+            filter: ['blur(5px)', 'blur(0px)', 'blur(0px)', 'blur(5px)'],
+          }}
+          transition={{
+            duration: 9,
+            times: [0, 0.12, 0.78, 1],
+            delay: i * 3,
+            ease: 'easeInOut',
+            repeat: Infinity,
+          }}
+        >
+          {role}
+        </motion.span>
+      ))}
+    </span>
+  )
+}
 
-      <div className="relative mx-auto w-full max-w-5xl">
-        <div className="flex flex-col-reverse items-center gap-12 md:flex-row">
-          {/* Text content */}
-          <motion.div
-            className="flex-1 text-center md:text-left"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: 'easeOut' }}
-          >
-            {/* Badge */}
+export function HeroSection({ about }: HeroSectionProps) {
+  const reduced = useReducedMotion()
+  const resumeUrl = about?.resumeFile?.asset?.url
+
+  return (
+    <section className="relative overflow-hidden pt-16 pb-24 sm:pt-24 sm:pb-32">
+      {/* Perspective grid, masked to a soft ellipse so it fades out before it
+          reaches the edges. Decorative, never interactive. */}
+      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden>
+        <div
+          className="absolute inset-x-[-25%] top-[-15%] h-[130%] opacity-[0.10] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_30%,#000,transparent_78%)]"
+          style={{
+            backgroundImage:
+              'linear-gradient(to right, hsl(var(--primary) / 0.55) 1px, transparent 1px), linear-gradient(to bottom, hsl(var(--primary) / 0.55) 1px, transparent 1px)',
+            backgroundSize: '64px 64px',
+            transform: 'perspective(1000px) rotateX(58deg)',
+            transformOrigin: 'top center',
+          }}
+        />
+      </div>
+
+      <div className="container">
+        <div className="grid items-center gap-16 lg:grid-cols-[1.15fr_0.85fr] lg:gap-20">
+          {/* Copy */}
+          <div>
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.1 }}
-              className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-4 py-1.5 text-xs text-primary"
-            >
-              <Sparkles size={12} className="animate-pulse" aria-hidden />
-              Available for opportunities
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent" aria-hidden />
-            </motion.div>
-
-            {/* Name */}
-            <motion.h1
-              className="mb-4 text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl"
-              initial={{ opacity: 0, y: 20 }}
+              className="inline-flex items-center gap-2.5 rounded-full border border-border bg-card/40 py-1.5 pr-4 pl-2.5 backdrop-blur-sm"
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             >
-              Hey, I&apos;m <span className="gradient-text glow-text-primary">{siteConfig.name}</span>
-            </motion.h1>
-
-            {/* Typing text. aria-live is off so screen readers aren't spammed by
-                every keystroke; the static role is exposed once below. */}
-            <motion.div
-              className="mb-6 h-8 font-mono text-xl font-semibold text-muted-foreground sm:text-2xl"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              aria-hidden
-            >
-              <span className="text-accent">{roleText}</span>
-              {!prefersReducedMotion && <span className="ml-0.5 animate-blink text-primary">█</span>}
-            </motion.div>
-            {/* Screen-reader / crawler equivalent of the animated line. */}
-            <p className="sr-only">{TYPING_TEXTS.join(', ')}</p>
-
-            {/* Description */}
-            <motion.p
-              className="mx-auto mb-8 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg md:mx-0"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              I build fast, accessible web products and the AI systems behind them — from machine learning pipelines to
-              production interfaces in Next.js and TypeScript.
-            </motion.p>
-
-            {/* CTA Buttons */}
-            <motion.div
-              className="mb-8 flex flex-wrap justify-center gap-3 md:justify-start"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-            >
-              <Link href="/contact">
-                <Button className="gap-2 bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90">
-                  Contact Me <ArrowRight size={16} />
-                </Button>
-              </Link>
-              <Link href="/projects">
-                <Button variant="outline" className="gap-2 border-border/60 hover:border-primary/50 hover:text-primary">
-                  View Projects <ExternalLink size={14} />
-                </Button>
-              </Link>
-              {resumeUrl && (
-                <Link href={resumeUrl} target="_blank" rel="noopener noreferrer">
-                  <Button
-                    variant="ghost"
-                    className="gap-2 text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                  >
-                    <Download size={14} /> Resume
-                  </Button>
-                </Link>
-              )}
+              <span className="animate-breathe h-1.5 w-1.5 rounded-full bg-accent" aria-hidden />
+              <span className="font-mono text-xs tracking-wide text-foreground-muted">Available for work</span>
             </motion.div>
 
-            {/* Social links */}
-            <motion.div
-              className="flex items-center justify-center gap-4 md:justify-start"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
-            >
-              <span className="text-xs text-muted-foreground">Find me on</span>
-              <div className="flex gap-3">
-                <Link
-                  href={siteConfig.social.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="GitHub"
-                  className="text-muted-foreground transition-all hover:scale-110 hover:text-foreground active:scale-95"
-                >
-                  <Github size={18} />
-                </Link>
-                <Link
-                  href={siteConfig.social.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="LinkedIn"
-                  className="text-muted-foreground transition-all hover:scale-110 hover:text-primary active:scale-95"
-                >
-                  <Linkedin size={18} />
-                </Link>
-                <Link
-                  href={siteConfig.social.twitter}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="X (Twitter)"
-                  className="text-muted-foreground transition-all hover:scale-110 hover:text-foreground active:scale-95"
-                >
-                  <svg viewBox="0 0 24 24" width={17} height={17} fill="currentColor" aria-hidden>
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                  </svg>
-                </Link>
-              </div>
-            </motion.div>
-          </motion.div>
+            <h1 className="mt-8 font-display text-display">
+              <TextGenerate words="Building for the" className="block" stagger={0.07} delay={0.1} />
+              <TextGenerate words="modern web." className="text-gradient block" stagger={0.07} delay={0.34} />
+            </h1>
 
-          {/* Profile image */}
-          <motion.div
-            className="relative"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, ease: 'easeOut', delay: 0.1 }}
-          >
-            <div className="absolute inset-0 flex items-center justify-center" aria-hidden>
-              <div className="h-72 w-72 animate-rotate-slow rounded-full border border-primary/10 sm:h-80 sm:w-80" />
-              <div
-                className="absolute h-64 w-64 rounded-full border border-accent/10 sm:h-72 sm:w-72"
-                style={{ animationDirection: 'reverse' }}
-              />
+            <div className="mt-7 flex items-center gap-3 font-mono text-sm tracking-wide text-foreground-muted">
+              <span className="text-primary" aria-hidden>
+                ▸
+              </span>
+              <RoleSwap />
+              {/* One announcement for screen readers, rather than a new one
+                  every time the visible word changes. */}
+              <span className="sr-only">{ROLES.join(', ')}</span>
             </div>
 
-            <motion.div
-              className="glow-primary relative h-56 w-56 animate-float overflow-hidden rounded-full border-2 border-primary/30 sm:h-64 sm:w-64 lg:h-72 lg:w-72"
-              whileHover={{ scale: 1.03 }}
-              transition={{ type: 'spring', stiffness: 200 }}
+            <motion.p
+              className="mt-7 max-w-xl text-lede text-foreground-muted"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
             >
-              <Image
-                src="/aman-pic.jpg"
-                alt={`${siteConfig.name}, ${siteConfig.role}`}
-                fill
-                sizes="(max-width: 640px) 224px, (max-width: 1024px) 256px, 288px"
-                className="object-cover"
-                priority
-              />
-              <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-primary/10" />
+              I&apos;m {siteConfig.name}. I design and build fast, accessible web products — and the machine learning
+              systems that power them.
+            </motion.p>
+
+            <motion.div
+              className="mt-10 flex flex-wrap items-center gap-4"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.72, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <Magnetic>
+                <Link
+                  href="/projects"
+                  className="group relative inline-flex h-12 items-center gap-2.5 overflow-hidden rounded-full bg-primary px-7 text-[0.95rem] font-semibold text-primary-foreground transition-transform duration-300 active:scale-95"
+                >
+                  {/* Sheen sweeping across on hover. */}
+                  <span
+                    aria-hidden
+                    className="absolute inset-0 -translate-x-full bg-[linear-gradient(90deg,transparent,hsl(var(--primary-foreground)/0.3),transparent)] transition-transform duration-700 group-hover:translate-x-full"
+                  />
+                  <span className="relative">See the work</span>
+                  <ArrowRight
+                    size={17}
+                    className="relative transition-transform duration-300 group-hover:translate-x-1"
+                    aria-hidden
+                  />
+                </Link>
+              </Magnetic>
+
+              <Magnetic strength={0.2}>
+                <Link
+                  href="/contact"
+                  className="group inline-flex h-12 items-center gap-2.5 rounded-full border border-border-strong bg-card/40 px-7 text-[0.95rem] font-medium backdrop-blur-sm transition-colors duration-300 hover:border-primary/50 hover:bg-card/70"
+                >
+                  Let&apos;s talk
+                  <span className="text-primary transition-transform duration-300 group-hover:translate-x-0.5">↗</span>
+                </Link>
+              </Magnetic>
+
+              {resumeUrl && (
+                <a
+                  href={resumeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-2 text-sm text-foreground-subtle transition-colors hover:text-foreground"
+                >
+                  <Download size={15} aria-hidden />
+                  Résumé
+                </a>
+              )}
+            </motion.div>
+          </div>
+
+          {/* Portrait in a floating glass frame, with an orbiting dashed ring
+              and two stat chips. */}
+          <motion.div
+            className="relative mx-auto w-full max-w-sm"
+            initial={{ opacity: 0, scale: 0.94, y: 24 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <div className="pointer-events-none absolute -inset-5" aria-hidden>
+              <svg className="animate-spin-slow h-full w-full" viewBox="0 0 100 100" fill="none">
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="49"
+                  stroke="hsl(var(--primary) / 0.4)"
+                  strokeWidth="0.35"
+                  strokeDasharray="2 5"
+                />
+              </svg>
+            </div>
+
+            <div className={reduced ? 'relative' : 'animate-float relative'}>
+              <div className="relative aspect-[4/5] overflow-hidden rounded-3xl border border-border bg-card">
+                <Image
+                  src="/aman-pic.jpg"
+                  alt={`${siteConfig.name}, ${siteConfig.role}`}
+                  fill
+                  sizes="(max-width: 1024px) 384px, 30vw"
+                  className="object-cover"
+                  priority
+                />
+                {/* Scrim so the caption stays legible over any photo. */}
+                <div className="absolute inset-x-0 bottom-0 h-28 bg-linear-to-t from-background/80 via-background/30 to-transparent" />
+
+                <div className="absolute inset-x-0 bottom-0 flex items-center justify-between p-5">
+                  <div>
+                    <p className="font-display text-sm">{siteConfig.name}</p>
+                    <p className="font-mono text-[0.6875rem] text-foreground-subtle">{siteConfig.location.city}</p>
+                  </div>
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/70 px-2.5 py-1 font-mono text-[0.625rem] tracking-wider text-foreground-muted backdrop-blur-sm">
+                    <span className="animate-breathe h-1.5 w-1.5 rounded-full bg-accent" aria-hidden />
+                    OPEN
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* The chips overlap the portrait by design, but on a 390px
+                viewport the second one would hang off the right edge — so
+                they're desktop/tablet only. */}
+            <motion.div
+              className="glass absolute -top-3 -left-3 hidden rounded-2xl px-4 py-3 sm:block"
+              initial={{ opacity: 0, x: -20, y: 10 }}
+              animate={{ opacity: 1, x: 0, y: 0 }}
+              transition={{ delay: 0.9, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <p className="font-mono text-[0.625rem] tracking-wider text-foreground-subtle uppercase">
+                Projects shipped
+              </p>
+              <p className="font-display text-2xl">
+                10<span className="text-primary">+</span>
+              </p>
             </motion.div>
 
             <motion.div
-              className="glass absolute -bottom-2 -left-4 rounded-lg border border-accent/20 px-3 py-1.5 text-xs font-medium text-accent"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.8 }}
+              className="glass absolute -right-3 bottom-20 hidden rounded-2xl px-4 py-3 sm:block"
+              initial={{ opacity: 0, x: 20, y: 10 }}
+              animate={{ opacity: 1, x: 0, y: 0 }}
+              transition={{ delay: 1.05, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             >
-              ⚡ Next.js 16
-            </motion.div>
-            <motion.div
-              className="glass absolute -right-6 top-4 rounded-lg border border-primary/20 px-3 py-1.5 text-xs font-medium text-primary"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.9 }}
-            >
-              🤖 AI/ML
+              <p className="font-mono text-[0.625rem] tracking-wider text-foreground-subtle uppercase">
+                Commits this year
+              </p>
+              <p className="font-display text-2xl">
+                200<span className="text-primary">+</span>
+              </p>
             </motion.div>
           </motion.div>
         </div>
-
-        {/* Stats row */}
-        <motion.dl
-          className="mt-16 grid grid-cols-2 gap-4 sm:grid-cols-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-        >
-          {[
-            { label: 'Projects Built', value: '10+' },
-            { label: 'Technologies', value: '20+' },
-            { label: 'GitHub Stars', value: '50+' },
-            { label: 'Contributions', value: '200+' },
-          ].map(stat => (
-            <div key={stat.label} className="glass rounded-xl border-border/30 p-4 text-center">
-              <dd className="gradient-text text-2xl font-bold">{stat.value}</dd>
-              <dt className="mt-1 text-xs text-muted-foreground">{stat.label}</dt>
-            </div>
-          ))}
-        </motion.dl>
       </div>
     </section>
   )

@@ -7,8 +7,7 @@ import { getProject, getProjects } from '@/sanity/lib/queries'
 import { urlFor } from '@/sanity/lib/image'
 import { PortableText } from '@portabletext/react'
 import { portableTextComponents } from '@/components/portable-text-components'
-import { Button } from '@/components/ui/button'
-import { Github, ExternalLink, ArrowLeft, Calendar, Tag } from 'lucide-react'
+import { Github, ExternalLink, ArrowLeft } from 'lucide-react'
 import { JsonLd } from '@/components/json-ld'
 import { breadcrumbSchema, graph } from '@/lib/seo'
 import { absoluteUrl, siteConfig } from '@/lib/site'
@@ -105,91 +104,77 @@ async function ProjectPageContent({ params }: Props) {
   return (
     <>
       <JsonLd data={projectJsonLd} />
-      <div className="min-h-full px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-4xl">
-          <Link href="/projects">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="mb-6 gap-2 text-xs text-muted-foreground hover:text-foreground"
+      <div className="container">
+        <div className="mx-auto max-w-3xl">
+          <header className="border-b border-border pb-12 pt-16 sm:pt-24">
+            <Link
+              href="/projects"
+              className="group inline-flex items-center gap-2 text-sm text-foreground-muted transition-colors hover:text-foreground"
             >
-              <ArrowLeft size={12} /> Back to Projects
-            </Button>
-          </Link>
+              <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-0.5" aria-hidden />
+              All work
+            </Link>
 
-          {/* Hero image */}
+            <p className="eyebrow mt-10 font-mono text-primary">
+              {[project.status, project.featured ? 'featured' : null].filter(Boolean).join(' · ')}
+            </p>
+
+            <h1 className="mt-5 font-display text-display text-foreground">{project.title}</h1>
+            {project.description && <p className="mt-6 text-lede text-foreground-muted">{project.description}</p>}
+
+            {(project.githubUrl || project.demoUrl) && (
+              <div className="mt-9 flex flex-wrap items-center gap-x-8 gap-y-3 border-t border-border pt-6 text-sm">
+                {project.githubUrl && (
+                  <a
+                    href={project.githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group inline-flex items-center gap-2 text-foreground transition-colors hover:text-primary"
+                  >
+                    <Github size={15} aria-hidden />
+                    Source on GitHub
+                  </a>
+                )}
+                {project.demoUrl && (
+                  <a
+                    href={project.demoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group inline-flex items-center gap-2 text-foreground transition-colors hover:text-primary"
+                  >
+                    <ExternalLink size={15} aria-hidden />
+                    Live demo
+                  </a>
+                )}
+              </div>
+            )}
+          </header>
+
+          {/* Cover image, inside the measure. */}
           {project.mainImage && (
-            <div className="relative h-72 sm:h-96 w-full overflow-hidden rounded-2xl border border-border/50 mb-8">
+            <div className="relative my-12 aspect-[16/9] w-full overflow-hidden rounded-md border border-border bg-muted">
               <Image
-                src={urlFor(project.mainImage).width(1200).height(600).url()}
+                src={urlFor(project.mainImage).width(1200).height(675).url()}
                 alt={project.mainImage.alt || `${project.title} preview`}
                 fill
-                sizes="(max-width: 1024px) 100vw, 896px"
+                sizes="(max-width: 768px) 100vw, 768px"
                 className="object-cover"
                 priority
               />
-              <div className="absolute inset-0 bg-linear-to-t from-background/60 to-transparent" />
             </div>
           )}
 
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                {project.status && (
-                  <span
-                    className={`text-xs px-2 py-0.5 rounded-full border ${
-                      project.status === 'completed'
-                        ? 'bg-accent/15 text-accent border-accent/30'
-                        : project.status === 'development'
-                          ? 'bg-yellow-500/15 text-yellow-400 border-yellow-500/30'
-                          : 'bg-secondary/15 text-secondary border-secondary/30'
-                    }`}
-                  >
-                    {project.status}
-                  </span>
-                )}
-                {project.featured && (
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/30">
-                    ⭐ Featured
-                  </span>
-                )}
-              </div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-foreground">{project.title}</h1>
-              <p className="mt-2 text-muted-foreground leading-relaxed">{project.description}</p>
-            </div>
-
-            <div className="flex gap-2 shrink-0">
-              {project.githubUrl && (
-                <Link href={project.githubUrl} target="_blank">
-                  <Button variant="outline" className="gap-2 border-border/50 hover:border-primary/50">
-                    <Github size={14} /> GitHub
-                  </Button>
-                </Link>
-              )}
-              {project.demoUrl && (
-                <Link href={project.demoUrl} target="_blank">
-                  <Button className="gap-2 bg-primary/10 text-primary border border-primary/30 hover:bg-primary/20">
-                    <ExternalLink size={14} /> Live Demo
-                  </Button>
-                </Link>
-              )}
-            </div>
-          </div>
-
-          {/* Technologies */}
+          {/* Stack as running text under a hairline. */}
           {project.technologies && project.technologies.length > 0 && (
-            <div className="glass rounded-xl p-5 border border-border/50 mb-8">
-              <h2 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
-                <Tag size={13} /> Tech Stack
-              </h2>
-              <div className="flex flex-wrap gap-2">
+            <div className="mb-12 border-y border-border py-6">
+              <h2 className="eyebrow">Built with</h2>
+              <ul className="mt-4 flex flex-wrap gap-2">
                 {project.technologies.map(tech => (
-                  <span key={tech._id} className="tag-pill">
+                  <li key={tech._id} className="tag-pill">
                     {tech.name}
-                  </span>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
           )}
 
@@ -209,43 +194,35 @@ async function ProjectPageContent({ params }: Props) {
             }
             return (
               <div className="prose-blog">
-                {text.split('\n').map(
-                  (line, i) =>
-                    line.trim() && (
-                      <p key={i} className="mb-4 text-foreground/85 leading-7">
-                        {line}
-                      </p>
-                    )
-                )}
+                {text.split('\n').map((line, i) => line.trim() && <p key={i}>{line}</p>)}
               </div>
             )
           })()}
 
           {/* Gallery */}
           {project.gallery && project.gallery.length > 0 && (
-            <div className="mt-8">
-              <h2 className="text-lg font-semibold mb-4">Gallery</h2>
-              <div className="grid gap-4 sm:grid-cols-2">
+            <section className="mt-14">
+              <h2 className="eyebrow">Gallery</h2>
+              <div className="mt-6 grid gap-6 sm:grid-cols-2">
                 {project.gallery.map((img, i) => (
-                  <div key={i} className="relative h-48 overflow-hidden rounded-xl border border-border/50">
+                  <div key={i} className="relative aspect-[3/2] overflow-hidden rounded-md border border-border">
                     <Image
                       src={urlFor(img).width(600).height(400).url()}
                       alt={img.alt || `${project.title} screenshot ${i + 1}`}
                       fill
-                      sizes="(max-width: 1024px) 100vw, 440px"
+                      sizes="(max-width: 640px) 100vw, 360px"
                       className="object-cover"
                     />
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
           )}
 
           {project.publishedAt && (
-            <div className="mt-8 flex items-center gap-2 text-xs text-muted-foreground">
-              <Calendar size={12} />
+            <p className="mt-14 border-t border-border pt-6 font-mono text-xs text-foreground-subtle">
               {new Date(project.publishedAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-            </div>
+            </p>
           )}
         </div>
       </div>
@@ -255,30 +232,20 @@ async function ProjectPageContent({ params }: Props) {
 
 function ProjectPageSkeleton() {
   return (
-    <div className="min-h-full px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-4xl animate-pulse">
-        <div className="mb-6 h-9 w-32 rounded-full bg-muted/40" />
-        <div className="mb-8 h-72 w-full rounded-2xl bg-muted/40 sm:h-96" />
-        <div className="mb-8 space-y-3">
-          <div className="h-4 w-24 rounded-full bg-muted/30" />
-          <div className="h-10 w-3/4 rounded-lg bg-muted/40" />
-          <div className="h-4 w-full rounded-lg bg-muted/30" />
-          <div className="h-4 w-5/6 rounded-lg bg-muted/30" />
+    <div className="container animate-pulse">
+      <div className="mx-auto max-w-3xl">
+        <div className="border-b border-border pb-12 pt-16 sm:pt-24">
+          <div className="h-4 w-20 rounded bg-muted/60" />
+          <div className="mt-8 h-3 w-24 rounded bg-muted/60" />
+          <div className="mt-5 h-11 w-3/4 rounded-lg bg-muted/40" />
+          <div className="mt-7 h-4 w-full rounded bg-muted/50" />
         </div>
-        <div className="mb-8 rounded-xl border border-border/50 bg-muted/20 p-5">
-          <div className="mb-3 h-4 w-24 rounded-full bg-muted/30" />
-          <div className="flex flex-wrap gap-2">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <div key={index} className="h-7 w-20 rounded-full bg-muted/40" />
-            ))}
-          </div>
-        </div>
+        <div className="my-12 aspect-[16/9] rounded-md bg-muted/50" />
         <div className="space-y-4">
-          <div className="h-6 w-40 rounded-lg bg-muted/40" />
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="h-48 rounded-xl bg-muted/40" />
-            <div className="h-48 rounded-xl bg-muted/40" />
-          </div>
+          <div className="h-6 w-40 rounded bg-muted/40" />
+          <div className="h-4 w-full rounded bg-muted/30" />
+          <div className="h-4 w-5/6 rounded bg-muted/30" />
+          <div className="h-4 w-2/3 rounded bg-muted/30" />
         </div>
       </div>
     </div>

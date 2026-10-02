@@ -76,19 +76,19 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-sm">
-          <div className="glass rounded-2xl p-8 border border-border/50 text-center">
-            <div className="w-16 h-16 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-6">
+          <div className="text-center">
+            <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full border border-border">
               <Lock size={24} className="text-primary" />
             </div>
-            <h1 className="text-2xl font-bold gradient-text mb-2">Dashboard</h1>
-            <p className="text-muted-foreground text-sm mb-8">Enter your dashboard key to access analytics</p>
+            <h1 className="font-display text-2xl mb-2">Dashboard</h1>
+            <p className="text-foreground-muted text-sm mb-8">Enter your dashboard key to access analytics</p>
             <form onSubmit={login} className="space-y-4">
               <Input
                 type="password"
                 value={key}
                 onChange={e => setKey(e.target.value)}
                 placeholder="Dashboard secret key"
-                className="bg-background border-border/50 text-center font-mono"
+                className="h-11 text-center font-mono"
                 required
               />
               {error && (
@@ -115,8 +115,8 @@ export default function DashboardPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold gradient-text">Analytics Dashboard</h1>
-            <p className="text-muted-foreground text-sm mt-1">
+            <h1 className="font-display text-3xl">Analytics</h1>
+            <p className="text-foreground-muted text-sm mt-1">
               Portfolio & Blog Analytics
               {lastUpdated && <span className="ml-2">· Updated {lastUpdated.toLocaleTimeString()}</span>}
             </p>
@@ -139,7 +139,7 @@ export default function DashboardPage() {
                 setAuthenticated(false)
                 sessionStorage.removeItem('dashboard-key')
               }}
-              className="text-muted-foreground text-xs"
+              className="text-foreground-muted text-xs"
             >
               Logout
             </Button>
@@ -165,7 +165,7 @@ export default function DashboardPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className="glass rounded-xl p-5 border border-border/50"
+              className="panel p-5"
             >
               <div className="flex items-start justify-between mb-3">
                 <div
@@ -182,26 +182,26 @@ export default function DashboardPage() {
                     }
                   />
                 </div>
-                <span className="text-xs text-accent flex items-center gap-0.5">
+                <span className="flex items-center gap-0.5 text-xs text-accent">
                   <ArrowUpRight size={10} />
                   {stat.change}
                 </span>
               </div>
               <div className="text-2xl font-bold text-foreground">{stat.value.toLocaleString()}</div>
-              <div className="text-xs text-muted-foreground mt-1">{stat.label}</div>
+              <div className="text-xs text-foreground-muted mt-1">{stat.label}</div>
             </motion.div>
           ))}
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6 mb-6">
           {/* Views chart */}
-          <div className="lg:col-span-2 glass rounded-xl p-5 border border-border/50">
+          <div className="panel p-5 lg:col-span-2">
             <div className="flex items-center justify-between mb-6">
               <h2 className="font-semibold text-foreground flex items-center gap-2">
                 <TrendingUp size={16} className="text-primary" />
                 Views (Last 30 Days)
               </h2>
-              <span className="text-xs text-muted-foreground">{data?.viewsByDay?.length || 0} days</span>
+              <span className="text-xs text-foreground-muted">{data?.viewsByDay?.length || 0} days</span>
             </div>
             {data?.viewsByDay && data.viewsByDay.length > 0 ? (
               <div className="flex items-end gap-1 h-40">
@@ -214,11 +214,11 @@ export default function DashboardPage() {
                       <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-card border border-border rounded px-1.5 py-0.5 text-xs text-foreground opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
                         {day.count} views
                         <br />
-                        <span className="text-muted-foreground">{day.date}</span>
+                        <span className="text-foreground-muted">{day.date}</span>
                       </div>
                     </div>
                     {i % 6 === 0 && (
-                      <span className="text-[8px] text-muted-foreground rotate-45 origin-left absolute -bottom-5">
+                      <span className="text-[8px] text-foreground-muted rotate-45 origin-left absolute -bottom-5">
                         {day.date.slice(5)}
                       </span>
                     )}
@@ -226,14 +226,14 @@ export default function DashboardPage() {
                 ))}
               </div>
             ) : (
-              <div className="h-40 flex items-center justify-center text-muted-foreground text-sm">
+              <div className="h-40 flex items-center justify-center text-foreground-muted text-sm">
                 No view data yet
               </div>
             )}
           </div>
 
           {/* Top Posts */}
-          <div className="glass rounded-xl p-5 border border-border/50">
+          <div className="panel p-5">
             <h2 className="font-semibold text-foreground flex items-center gap-2 mb-5">
               <BarChart3 size={16} className="text-accent" />
               Top Blog Posts
@@ -252,7 +252,7 @@ export default function DashboardPage() {
                       </div>
                       <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-linear-to-r from-primary to-accent rounded-full"
+                          className="h-full rounded-full bg-primary"
                           style={{ width: `${(post.count / maxCount) * 100}%` }}
                         />
                       </div>
@@ -261,7 +261,7 @@ export default function DashboardPage() {
                 })}
               </div>
             ) : (
-              <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm">
+              <div className="flex-1 flex items-center justify-center text-foreground-muted text-sm">
                 No blog data yet
               </div>
             )}
@@ -269,7 +269,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Quick Links */}
-        <div className="glass rounded-xl p-5 border border-border/50">
+        <div className="panel p-5">
           <h2 className="font-semibold text-foreground mb-4">Quick Actions</h2>
           <div className="flex flex-wrap gap-3">
             <a href="/studio" target="_blank" rel="noopener noreferrer">
@@ -285,7 +285,7 @@ export default function DashboardPage() {
             <Button
               variant="ghost"
               size="sm"
-              className="gap-2 text-xs text-muted-foreground"
+              className="gap-2 text-xs text-foreground-muted"
               onClick={() => {
                 const info = `POST /api/blog/ingest\nHeader: x-api-key: BLOG_INGEST_API_KEY\nBody: { title, slug, content (markdown), excerpt?, tags?, readTime?, published?, featured? }`
                 alert(info)

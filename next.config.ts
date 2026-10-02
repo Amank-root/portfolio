@@ -29,9 +29,15 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
+  // Inlined at build time. The footer needs a copyright year, but calling
+  // `new Date()` during render makes the page dynamic and blocks static
+  // prerendering — the value only changes when a deploy happens anyway.
+  env: {
+    NEXT_PUBLIC_BUILD_YEAR: String(new Date().getFullYear()),
+  },
   // Prefetch one reusable App Shell per route instead of a full route payload
   // per visible link. Every route here is now fully cacheable, so the shell is
-  // shared by all links pointing at it (header tabs, sidebar, card grids).
+  // shared by all links pointing at it (header nav, footer, card grids).
   partialPrefetching: true,
   // Blog/CMS content is republished a few times a day and purged precisely by
   // the /api/revalidate webhook. `days` keeps it prerendered and in the shell;
@@ -56,12 +62,12 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }]
   },
-  // logging: {
-  //   fetches: {
-  //     // Full URLs in build logs include Sanity project IDs and query params.
-  //     fullUrl: false,
-  //   },
-  // },
+  logging: {
+    fetches: {
+      // Full URLs in build logs include Sanity project IDs and query params.
+      fullUrl: false,
+    },
+  },
   // reactCompiler is available and its babel plugin is installed; enabling it
   // removes the need for most manual memoization. Left off until the
   // `set-state-in-effect` lint warnings are resolved.

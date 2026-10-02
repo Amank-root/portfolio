@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { MessageSquare, Send, User, Clock } from 'lucide-react'
+import { Send } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -57,18 +57,10 @@ export function BlogComments({ blogSlug, initialComments = [] }: BlogCommentsPro
   }
 
   return (
-    <div className="mt-12">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
-          <MessageSquare size={18} className="text-primary" />
-          Discussion ({comments.length})
-        </h3>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => setShowForm(f => !f)}
-          className="border-border/50 hover:border-primary/50 text-xs"
-        >
+    <section className="mt-16 border-t border-border pt-10">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <h3 className="eyebrow">Discussion ({comments.length})</h3>
+        <Button size="sm" variant="outline" onClick={() => setShowForm(f => !f)}>
           {showForm ? 'Cancel' : 'Leave a comment'}
         </Button>
       </div>
@@ -82,43 +74,43 @@ export function BlogComments({ blogSlug, initialComments = [] }: BlogCommentsPro
             exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden"
           >
-            <form onSubmit={submit} className="glass rounded-xl p-5 border border-border/50 mb-8">
-              <h4 className="text-sm font-semibold mb-4">Share your thoughts</h4>
+            <form onSubmit={submit} className="my-8 border-y border-border py-8">
+              <h4 className="font-display text-lg mb-6">Share your thoughts</h4>
               <div className="grid gap-3 sm:grid-cols-2 mb-3">
                 <div>
-                  <label className="text-xs text-muted-foreground mb-1 block">Name *</label>
+                  <label className="eyebrow mb-2 block">Name</label>
                   <Input
                     value={name}
                     onChange={e => setName(e.target.value)}
                     placeholder="Your name"
                     required
-                    className="h-9 text-sm bg-background border-border/50"
+                    className="text-sm"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-muted-foreground mb-1 block">Email (optional)</label>
+                  <label className="eyebrow mb-2 block">Email (optional)</label>
                   <Input
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     placeholder="your@email.com"
                     type="email"
-                    className="h-9 text-sm bg-background border-border/50"
+                    className="text-sm"
                   />
                 </div>
               </div>
               <div className="mb-3">
-                <label className="text-xs text-muted-foreground mb-1 block">Comment *</label>
+                <label className="eyebrow mb-2 block">Comment</label>
                 <Textarea
                   value={content}
                   onChange={e => setContent(e.target.value)}
                   placeholder="Write your comment here..."
                   required
                   rows={4}
-                  className="text-sm bg-background border-border/50 resize-none"
+                  className="text-sm"
                 />
               </div>
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-muted-foreground">Comments are moderated before appearing.</p>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="text-xs text-foreground-subtle">Comments are moderated before appearing.</p>
                 <Button type="submit" size="sm" disabled={submitting} className="gap-2">
                   {submitting ? (
                     'Submitting...'
@@ -136,45 +128,34 @@ export function BlogComments({ blogSlug, initialComments = [] }: BlogCommentsPro
 
       {/* Comments list */}
       {comments.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">
-          <MessageSquare size={32} className="mx-auto mb-3 opacity-30" />
-          <p className="text-sm">No comments yet. Be the first to share your thoughts!</p>
-        </div>
+        <p className="py-12 text-sm text-foreground-subtle">No comments yet — be the first to share your thoughts.</p>
       ) : (
-        <div className="space-y-4">
+        <ul className="mt-4">
           {comments.map((comment, i) => (
-            <motion.div
+            <motion.li
               key={comment._id}
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
-              className="glass rounded-xl p-5 border border-border/30"
+              className="border-b border-border py-6 last:border-0"
             >
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
-                  <User size={14} className="text-primary" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="font-medium text-sm text-foreground">{comment.name}</span>
-                    {comment.createdAt && (
-                      <span className="text-xs text-muted-foreground flex items-center gap-1">
-                        <Clock size={10} />
-                        {new Date(comment.createdAt).toLocaleDateString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                          year: 'numeric',
-                        })}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-sm text-foreground/80 leading-relaxed">{comment.content}</p>
-                </div>
+              <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                <span className="font-medium text-foreground">{comment.name}</span>
+                {comment.createdAt && (
+                  <span className="font-mono text-xs text-foreground-subtle">
+                    {new Date(comment.createdAt).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })}
+                  </span>
+                )}
               </div>
-            </motion.div>
+              <p className="mt-2.5 text-[0.95rem] leading-relaxed text-foreground-muted">{comment.content}</p>
+            </motion.li>
           ))}
-        </div>
+        </ul>
       )}
-    </div>
+    </section>
   )
 }

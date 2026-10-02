@@ -73,27 +73,30 @@ export function ContactForm({ formspreeEndpoint, recaptchaSiteKey }: ContactForm
   }
 
   return (
-    <div className="glass rounded-xl p-6 border border-border/50">
-      <h2 className="font-semibold text-foreground mb-6">Send a Message</h2>
+    <div className="glass rounded-2xl p-6 sm:p-8">
+      <h2 className="font-display text-2xl">Send a message</h2>
+      <p className="mt-2 text-sm text-foreground-muted">
+        Fill this in and it goes straight to my inbox. No tracking, no newsletter.
+      </p>
 
       {showSuccess ? (
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="text-center py-12"
+          className="py-16 text-center"
         >
-          <div className="w-16 h-16 rounded-full bg-accent/10 border border-accent/30 flex items-center justify-center mx-auto mb-4">
-            <CheckCircle2 size={28} className="text-accent" />
+          <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full border border-border">
+            <CheckCircle2 size={22} className="text-accent" />
           </div>
-          <h3 className="text-xl font-semibold text-foreground mb-2">Message Sent!</h3>
-          <p className="text-muted-foreground text-sm">I&apos;ll get back to you within 24 hours.</p>
+          <h3 className="font-display text-2xl text-foreground">Message sent</h3>
+          <p className="mt-3 text-sm text-foreground-muted">I&apos;ll get back to you within a day or two.</p>
         </motion.div>
       ) : (
         <form onSubmit={handleFormSubmit} className="space-y-4">
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="name" className="text-xs text-muted-foreground mb-1.5 block">
-                Name *
+              <label htmlFor="name" className="eyebrow mb-2 block">
+                Name
               </label>
               <Input
                 id="name"
@@ -102,12 +105,12 @@ export function ContactForm({ formspreeEndpoint, recaptchaSiteKey }: ContactForm
                 onChange={handleChange}
                 placeholder="Your name"
                 required
-                className="bg-background border-border/50 focus:border-primary/50 text-sm"
+                className="h-11 bg-background/60 text-sm"
               />
             </div>
             <div>
-              <label htmlFor="email" className="text-xs text-muted-foreground mb-1.5 block">
-                Email *
+              <label htmlFor="email" className="eyebrow mb-2 block">
+                Email
               </label>
               <Input
                 id="email"
@@ -117,15 +120,15 @@ export function ContactForm({ formspreeEndpoint, recaptchaSiteKey }: ContactForm
                 onChange={handleChange}
                 placeholder="your@email.com"
                 required
-                className="bg-background border-border/50 focus:border-primary/50 text-sm"
+                className="h-11 bg-background/60 text-sm"
               />
               <ValidationError field="email" prefix="Email" errors={state.errors} />
             </div>
           </div>
 
           <div>
-            <label htmlFor="subject" className="text-xs text-muted-foreground mb-1.5 block">
-              Subject *
+            <label htmlFor="subject" className="eyebrow mb-2 block">
+              Subject
             </label>
             <Input
               id="subject"
@@ -134,13 +137,13 @@ export function ContactForm({ formspreeEndpoint, recaptchaSiteKey }: ContactForm
               onChange={handleChange}
               placeholder="What's this about?"
               required
-              className="bg-background border-border/50 focus:border-primary/50 text-sm"
+              className="h-11 bg-background/60 text-sm"
             />
           </div>
 
           <div>
-            <label htmlFor="message" className="text-xs text-muted-foreground mb-1.5 block">
-              Message *
+            <label htmlFor="message" className="eyebrow mb-2 block">
+              Message
             </label>
             <Textarea
               id="message"
@@ -150,7 +153,7 @@ export function ContactForm({ formspreeEndpoint, recaptchaSiteKey }: ContactForm
               placeholder="Tell me about your project, idea, or just say hi..."
               required
               rows={6}
-              className="bg-background border-border/50 focus:border-primary/50 resize-none text-sm"
+              className="bg-background/60 resize-none text-sm"
             />
           </div>
 
@@ -168,26 +171,22 @@ export function ContactForm({ formspreeEndpoint, recaptchaSiteKey }: ContactForm
 
           {/* General form errors */}
           {state.errors && (
-            <div className="flex items-center gap-2 text-sm text-red-400">
+            <div className="flex items-center gap-2 text-sm text-destructive">
               <AlertCircle size={14} />
               <ValidationError errors={state.errors} />
             </div>
           )}
 
-          <Button
-            type="submit"
-            disabled={state.submitting}
-            className="w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
-          >
+          <Button type="submit" disabled={state.submitting} size="lg" className="w-full gap-2">
             {state.submitting ? (
               <>
-                <span className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                Sending...
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" />
+                Sending…
               </>
             ) : (
               <>
-                <Send size={14} />
-                Send Message
+                <Send size={15} />
+                Send message
               </>
             )}
           </Button>

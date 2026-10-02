@@ -1,7 +1,11 @@
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { getSkills } from '@/sanity/lib/queries'
-import { Code2, Globe, Server, Wrench, Cpu } from 'lucide-react'
+import { PageHeader, Reveal } from '@/components/section'
+import { SpotlightCard } from '@/components/spotlight-card'
+
+/** Rotate the spotlight hue per tile so the grid doesn't read as one colour. */
+const GLOWS = ['var(--aurora-violet)', 'var(--aurora-cyan)', 'var(--aurora-coral)', 'var(--aurora-violet)']
 import { JsonLd } from '@/components/json-ld'
 import { breadcrumbSchema, collectionSchema, graph } from '@/lib/seo'
 import { absoluteUrl, siteConfig } from '@/lib/site'
@@ -29,11 +33,19 @@ export const metadata: Metadata = {
   },
 }
 
-const categoryConfig: Record<string, { label: string; icon: typeof Code2; color: string }> = {
-  frontend: { label: 'Frontend', icon: Globe, color: 'text-primary' },
-  backend: { label: 'Backend', icon: Server, color: 'text-accent' },
-  tools: { label: 'Tools & DevOps', icon: Wrench, color: 'text-secondary' },
-  other: { label: 'Other', icon: Cpu, color: 'text-muted-foreground' },
+/** Display order and labels for the CMS categories. */
+const CATEGORY_LABELS: Record<string, string> = {
+  frontend: 'Frontend',
+  backend: 'Backend',
+  tools: 'Data & Infrastructure',
+  other: 'Tools & Practice',
+}
+
+const CATEGORY_NOTES: Record<string, string> = {
+  frontend: 'Interfaces I build and the tooling around them.',
+  backend: 'Services, APIs and the machine learning work behind them.',
+  tools: 'Where data lives and how it gets deployed.',
+  other: 'The rest of the toolkit, and how I work.',
 }
 
 const FALLBACK_SKILLS: Skill[] = [
@@ -97,54 +109,50 @@ async function SkillsPageContent() {
     return acc
   }, {})
 
+  // Render categories in a fixed editorial order rather than CMS insertion
+  // order, so the page reads the same way on every visit.
+  const order = ['frontend', 'backend', 'tools', 'other']
+  const categories = order.filter(key => grouped[key]?.length)
+
   return (
-    <div className="min-h-full px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-4xl">
-        <div className="mb-12">
-          <span className="section-label mb-3 flex items-center gap-2">
-            <Code2 size={12} />
-            Expertise
-          </span>
-          <h1 className="text-display font-bold gradient-text">Skills</h1>
-          <p className="mt-3 text-muted-foreground max-w-lg">
-            My technical toolkit — continuously growing and evolving.
-          </p>
-        </div>
+    <div className="container">
+      <PageHeader
+        eyebrow="Toolkit"
+        title="What I work with."
+        lede="The tools I reach for, grouped by what they're actually for. This is a working list, not a certification wall — anything here has shipped something."
+      />
 
-        <div className="space-y-8">
-          {Object.entries(grouped).map(([category, categorySkills]) => {
-            const config = categoryConfig[category] || categoryConfig.other
-            return (
-              <div key={category} className="glass rounded-xl p-6 border border-border/50">
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="p-2 rounded-lg bg-muted/50">
-                    <config.icon size={16} className={config.color} />
-                  </div>
-                  <h2 className="font-semibold text-foreground">{config.label}</h2>
-                </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {categories.map((category, i) => {
+          const label = CATEGORY_LABELS[category] ?? category
+          return (
+            <Reveal key={category} delay={i * 0.08}>
+              <SpotlightCard className="h-full" glowColor={GLOWS[i % GLOWS.length]}>
+                <p className="eyebrow font-mono text-primary">{String(i + 1).padStart(2, '0')}</p>
+                <h2 className="mt-4 font-display text-2xl">{label}</h2>
+                {CATEGORY_NOTES[category] && (
+                  <p className="mt-3 text-sm leading-relaxed text-foreground-subtle">{CATEGORY_NOTES[category]}</p>
+                )}
 
-                {categorySkills.map(group => (
-                  <div key={group._id} className="mb-5 last:mb-0">
-                    {group.title && group.title !== config.label && (
-                      <h3 className="text-sm font-medium text-muted-foreground mb-3">{group.title}</h3>
+                {grouped[category].map(group => (
+                  <div key={group._id} className="mt-6 border-t border-border/60 pt-5">
+                    {group.title && group.title !== label && <p className="eyebrow mb-3">{group.title}</p>}
+                    {group.description && (
+                      <p className="mb-4 text-[0.9rem] leading-relaxed text-foreground-muted">{group.description}</p>
                     )}
-                    <div className="flex flex-wrap gap-2">
+                    <ul className="flex flex-wrap gap-2">
                       {group.skills?.map(skill => (
-                        <div
-                          key={skill}
-                          className="group flex items-center gap-1.5 rounded-lg border border-border/50 bg-muted/30 px-3 py-1.5 text-sm text-foreground/80 hover:border-primary/30 hover:text-primary hover:bg-primary/5 transition-all duration-200 cursor-default"
-                        >
-                          <span className="w-1.5 h-1.5 rounded-full bg-primary/40 group-hover:bg-primary transition-colors" />
+                        <li key={skill} className="tag-pill">
                           {skill}
-                        </div>
+                        </li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
                 ))}
-              </div>
-            )
-          })}
-        </div>
+              </SpotlightCard>
+            </Reveal>
+          )
+        })}
       </div>
     </div>
   )
@@ -152,29 +160,25 @@ async function SkillsPageContent() {
 
 function SkillsPageSkeleton() {
   return (
-    <div className="min-h-full px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-4xl animate-pulse">
-        <div className="mb-12 space-y-3">
-          <div className="h-4 w-24 rounded-full bg-muted/40" />
-          <div className="h-10 w-40 rounded-lg bg-muted/40" />
-          <div className="h-4 w-full max-w-lg rounded-lg bg-muted/30" />
-        </div>
-
-        <div className="space-y-8">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <div key={index} className="rounded-xl border border-border/50 bg-muted/20 p-6">
-              <div className="mb-5 flex items-center gap-3">
-                <div className="h-8 w-8 rounded-lg bg-muted/40" />
-                <div className="h-5 w-32 rounded-lg bg-muted/40" />
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {Array.from({ length: 7 }).map((_, skillIndex) => (
-                  <div key={skillIndex} className="h-8 w-24 rounded-lg bg-muted/30" />
-                ))}
-              </div>
+    <div className="container animate-pulse">
+      <div className="pt-16 pb-14 sm:pt-24">
+        <div className="h-3 w-24 rounded bg-muted" />
+        <div className="mt-6 h-12 w-2/3 max-w-xl rounded bg-muted" />
+        <div className="mt-7 h-4 w-full max-w-lg rounded bg-muted/70" />
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div key={index} className="space-y-3 rounded-2xl border border-border bg-card/40 p-6">
+            <div className="h-3 w-8 rounded bg-muted" />
+            <div className="h-6 w-40 rounded bg-muted" />
+            <div className="h-3 w-56 rounded bg-muted/60" />
+            <div className="flex flex-wrap gap-2 pt-4">
+              {Array.from({ length: 8 }).map((__, j) => (
+                <div key={j} className="h-6 w-20 rounded-full bg-muted/60" />
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     </div>
   )
