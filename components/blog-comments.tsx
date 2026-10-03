@@ -59,7 +59,10 @@ export function BlogComments({ blogSlug, initialComments = [] }: BlogCommentsPro
   return (
     <section className="mt-16 border-t border-border pt-10">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h3 className="eyebrow">Discussion ({comments.length})</h3>
+        {/* "Discussion (0)" on every post read as a dead widget to visitors and
+            as an empty string to crawlers. With no comments there is nothing to
+            show but the invitation to leave the first one. */}
+        <h3 className="eyebrow">{comments.length > 0 ? `Discussion (${comments.length})` : 'Discussion'}</h3>
         <Button size="sm" variant="outline" onClick={() => setShowForm(f => !f)}>
           {showForm ? 'Cancel' : 'Leave a comment'}
         </Button>

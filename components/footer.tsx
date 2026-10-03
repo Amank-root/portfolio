@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowUpRight, Mail } from 'lucide-react'
 import { Magnetic } from '@/components/magnetic'
 import { Reveal } from '@/components/section'
@@ -60,13 +61,14 @@ export function Footer() {
 
         <div className="grid gap-10 border-t border-border/60 pt-12 sm:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-2">
-            <Link href="/" className="group inline-flex items-center gap-3">
-              <span
+            <Link href="/" className="group inline-flex items-center">
+              <Image className="invert dark:invert-0" src="/logo.png" alt={siteConfig.name} width={64} height={64} />
+              {/* <span
                 aria-hidden
                 className="flex h-9 w-9 items-center justify-center rounded-xl bg-[linear-gradient(135deg,hsl(var(--aurora-coral)),hsl(var(--aurora-violet)))] text-sm font-bold text-primary-foreground transition-transform duration-500 group-hover:rotate-[12deg]"
               >
                 A
-              </span>
+              </span> */}
               <span className="font-display text-xl">{siteConfig.name}</span>
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-foreground-muted">

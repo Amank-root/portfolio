@@ -14,28 +14,50 @@ import { NumberTicker } from '@/components/number-ticker'
 import { Marquee } from '@/components/marquee'
 import { TextReveal } from '@/components/text-generate'
 import { projectPlaceholder } from '@/lib/placeholder'
+import { absoluteUrl, siteConfig } from '@/lib/site'
 import type { Project, BlogPost, Skill } from '@/sanity/lib/types'
 
 export const metadata: Metadata = {
-  title: 'Home',
+  title: {
+    // Absolute, so the template doesn't append "| Aman Kushwaha" to a title
+    // that already carries the name. "Home | Aman Kushwaha" told a crawler
+    // nothing about the page.
+    absolute: siteConfig.title,
+  },
+  description: siteConfig.description,
   alternates: {
-    canonical: `/`,
+    canonical: '/',
+  },
+  openGraph: {
+    title: siteConfig.title,
+    description: siteConfig.shortDescription,
+    url: absoluteUrl('/'),
+    type: 'website',
+    images: [{ url: absoluteUrl('/og.png'), width: 1200, height: 630, alt: siteConfig.title, type: 'image/png' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: siteConfig.title,
+    description: siteConfig.shortDescription,
+    site: siteConfig.author.twitter,
+    creator: siteConfig.author.twitter,
+    images: [absoluteUrl('/og.png')],
   },
 }
 
 /** Bento tiles. Each pairs an icon with a title and one tight sentence. */
 const CAPABILITIES = [
   {
-    icon: Layers,
-    title: 'Product engineering',
-    body: 'Full-stack Next.js and TypeScript — design systems, data layers, and the unglamorous parts that keep things fast and accessible.',
-    glow: 'var(--aurora-violet)',
-  },
-  {
     icon: Cpu,
     title: 'Applied machine learning',
     body: 'Retrieval pipelines, fine-tuning and evaluation, wired into real products instead of left in notebooks.',
     glow: 'var(--aurora-cyan)',
+  },
+  {
+    icon: Layers,
+    title: 'Product engineering',
+    body: 'Full-stack Next.js and TypeScript — design systems, data layers, and the unglamorous parts that keep things fast and accessible.',
+    glow: 'var(--aurora-violet)',
   },
   {
     icon: Sparkles,

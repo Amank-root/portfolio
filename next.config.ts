@@ -19,7 +19,7 @@ const securityHeaders = [
       // Markdown bodies commonly embed shields.io / badgen.net badges. These
       // were absent from img-src, so the images were blocked outright and
       // rendered as broken-image icons in project write-ups.
-      "img-src 'self' blob: data: https://cdn.sanity.io https://dummyimage.com https://img.shields.io https://badgen.net",
+      "img-src 'self' blob: data: https://cdn.sanity.io https://dummyimage.com https://img.shields.io https://badgen.net https://raw.githubusercontent.com",
       "font-src 'self' data:",
       // Formspree must be here, not just in form-action: `useForm` submits with
       // fetch(), and connect-src is what governs fetch/XHR. With only form-action
@@ -60,6 +60,7 @@ const nextConfig: NextConfig = {
       // Status badges embedded in markdown bodies (see lib/utils.ts isBadge).
       { protocol: 'https', hostname: 'img.shields.io' },
       { protocol: 'https', hostname: 'badgen.net' },
+      { protocol: 'https', hostname: 'raw.githubusercontent.com' },
     ],
     // AVIF first, WebP fallback: meaningfully smaller than JPEG at equal quality.
     formats: ['image/avif', 'image/webp'],
@@ -72,6 +73,26 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }]
+  },
+  async redirects() {
+    return [
+      // The apex is canonical. www was being served alongside it, which split
+      // the site's authority across two hosts and let canonical/og:url point at
+      // a host the visitor never requested. 308 keeps the method and the path.
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.amankushwaha.dev' }],
+        destination: 'https://amankushwaha.dev/:path*',
+        permanent: true,
+      },
+      // Google had this exact PDF indexed from the old site. Without a redirect
+      // it 404s, which actively hurts the pages that link to it.
+      {
+        source: '/AmanKushwaha_Resume.pdf',
+        destination: '/resume',
+        permanent: true,
+      },
+    ]
   },
   logging: {
     fetches: {

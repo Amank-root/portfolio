@@ -57,6 +57,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: 'summary_large_image',
       title,
       description,
+      site: siteConfig.author.twitter,
       creator: siteConfig.author.twitter,
       images: [{ url: ogImageUrl, width: 1200, height: 630, alt: title }],
     },

@@ -9,7 +9,7 @@ import { Magnetic } from '@/components/magnetic'
 import { TextGenerate } from '@/components/text-generate'
 import { siteConfig } from '@/lib/site'
 
-const ROLES = ['Full Stack Developer', 'AI/ML Engineer', 'Interface Craftsman']
+const ROLES = ['AI/ML Engineer', 'Full Stack Developer', 'Interface Craftsman']
 
 interface HeroSectionProps {
   about: {
@@ -58,7 +58,10 @@ function RoleSwap() {
 
 export function HeroSection({ about }: HeroSectionProps) {
   const reduced = usePrefersReducedMotion()
-  const resumeUrl = about?.resumeFile?.asset?.url
+  // Prefer the CMS portrait so replacing the photo in Sanity updates the hero
+  // too; the bundled file stays as the fallback for when the query fails.
+  const portraitSrc = about?.profileImage?.asset?.url
+  const portraitAlt = about?.profileImage?.alt || `${siteConfig.name}, ${siteConfig.role}`
 
   return (
     <section className="relative overflow-hidden pt-16 pb-24 sm:pt-24 sm:pb-32">
@@ -88,16 +91,19 @@ export function HeroSection({ about }: HeroSectionProps) {
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             >
               <span className="animate-breathe h-1.5 w-1.5 rounded-full bg-accent" aria-hidden />
-              <span className="font-mono text-xs tracking-wide text-foreground-muted">Available for work</span>
+              <span className="font-mono text-xs tracking-wide text-foreground-muted">{siteConfig.availability}</span>
             </motion.div>
 
+            {/* ML leads the H1. "Building for the modern web" was a slogan
+                that described every full stack dev on the internet and gave
+                search engines nothing to index. */}
             <h1 className="mt-8 font-display text-display">
-              <TextGenerate words="Building for the" className="block" stagger={0.07} delay={0.1} />
+              <TextGenerate words="I build AI/ML systems" className="block" stagger={0.07} delay={0.1} />
               {/* `gradient` moves text-gradient onto each word span — see the
                   note in TextGenerate. Passing it via className left the
                   wrapper holding the gradient while the glyphs sat in child
                   spans, so the text painted as fully transparent. */}
-              <TextGenerate words="modern web." className="block" gradient stagger={0.07} delay={0.34} />
+              <TextGenerate words="that reach production." className="block" gradient stagger={0.07} delay={0.34} />
             </h1>
 
             <div className="mt-7 flex items-center gap-3 font-mono text-sm tracking-wide text-foreground-muted">
@@ -116,8 +122,10 @@ export function HeroSection({ about }: HeroSectionProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
             >
-              I&apos;m {siteConfig.name}. I design and build fast, accessible web products — and the machine learning
-              systems that power them.
+              {/* `role` is inserted verbatim — lowercasing it here would render
+                  "an ai/ml engineer" and lose the acronym. */}
+              I&apos;m {siteConfig.name}, an {siteConfig.role} building retrieval and fine-tuning pipelines — and the
+              fast, accessible web products that ship them.
             </motion.p>
 
             <motion.div
@@ -155,17 +163,17 @@ export function HeroSection({ about }: HeroSectionProps) {
                 </Link>
               </Magnetic>
 
-              {resumeUrl && (
-                <a
-                  href={resumeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-2 text-sm text-foreground-subtle transition-colors hover:text-foreground"
-                >
-                  <Download size={15} aria-hidden />
-                  Résumé
-                </a>
-              )}
+              {/* Always rendered: /resume handles the "no PDF uploaded yet"
+                  case itself, and a link that vanishes with CMS state is a
+                  worse default than one that leads somewhere useful. */}
+              <Link
+                href={about?.resumeFile?.asset?.url || '/resume'}
+                // href="/resume"
+                className="inline-flex items-center gap-2 px-2 text-sm text-foreground-subtle transition-colors hover:text-foreground"
+              >
+                <Download size={15} aria-hidden />
+                Résumé
+              </Link>
             </motion.div>
           </div>
 
@@ -193,8 +201,8 @@ export function HeroSection({ about }: HeroSectionProps) {
             <div className={reduced ? 'relative' : 'animate-float relative'}>
               <div className="relative aspect-[4/5] overflow-hidden rounded-3xl border border-border bg-card">
                 <Image
-                  src="/aman-pic.jpg"
-                  alt={`${siteConfig.name}, ${siteConfig.role}`}
+                  src={portraitSrc || '/aman-pic.jpg'}
+                  alt={portraitAlt}
                   fill
                   sizes="(max-width: 1024px) 384px, 30vw"
                   className="object-cover"

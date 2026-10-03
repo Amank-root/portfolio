@@ -18,9 +18,16 @@ export function personSchema(): Json {
     name: siteConfig.name,
     url: siteConfig.url,
     image: absoluteUrl('/aman-pic.jpg'),
-    jobTitle: 'Full Stack Developer',
+    // ML first, matching the title, H1 and hero alt. "Full Stack Developer"
+    // was the only jobTitle Google had to match against, and it is the most
+    // crowded label on the web.
+    jobTitle: siteConfig.role,
     description: siteConfig.shortDescription,
     email: `mailto:${siteConfig.email}`,
+    // schema.org has no "remote" flag, but jobLocationType accepts
+    // TELEMPLOY / MIXED, which is what "open to remote roles" means and what
+    // job boards read.
+    jobLocationType: 'TELEMPLOY',
     address: {
       '@type': 'PostalAddress',
       addressLocality: siteConfig.location.city,
@@ -30,12 +37,16 @@ export function personSchema(): Json {
     knowsAbout: [
       'Machine Learning',
       'Artificial Intelligence',
+      'Retrieval-Augmented Generation',
+      'Model Fine-Tuning',
+      'Model Evaluation',
+      'Python',
+      'PyTorch',
       'TypeScript',
       'React',
       'Next.js',
-      'Python',
-      'Data Science',
     ],
+    knowsLanguage: ['en'],
     sameAs: [siteConfig.social.github, siteConfig.social.linkedin, siteConfig.social.twitter],
   }
 }

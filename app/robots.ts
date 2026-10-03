@@ -27,6 +27,22 @@ export default function robots(): MetadataRoute.Robots {
       // Ad crawlers need the OG image endpoint to fetch it.
       { userAgent: 'Twitterbot', allow: '/' },
       { userAgent: 'facebookexternalhit', allow: '/' },
+      // AI crawlers are explicitly welcome — the whole point of /llms.txt is
+      // that they can read a clean summary instead of scraping rendered HTML.
+      // Listed by name because a wildcard rule alone doesn't signal intent.
+      { userAgent: 'GPTBot', allow: '/' },
+      { userAgent: 'OAI-SearchBot', allow: '/' },
+      { userAgent: 'ChatGPT-User', allow: '/' },
+      { userAgent: 'ClaudeBot', allow: '/' },
+      { userAgent: 'Claude-User', allow: '/' },
+      { userAgent: 'anthropic-ai', allow: '/' },
+      { userAgent: 'PerplexityBot', allow: '/' },
+      { userAgent: 'Google-Extended', allow: '/' },
+      { userAgent: 'Applebot-Extended', allow: '/' },
+      { userAgent: 'CCBot', allow: '/' },
+      { userAgent: 'Bingbot', allow: '/' },
+      // /llms.txt points crawlers at the machine-readable summary.
+      { userAgent: 'llms.txt', allow: '/' },
     ],
     sitemap: absoluteUrl('/sitemap.xml'),
     host: siteConfig.url,

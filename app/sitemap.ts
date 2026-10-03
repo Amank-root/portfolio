@@ -41,6 +41,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: absoluteUrl('/blog'), changeFrequency: 'daily', priority: 0.9 },
     { url: absoluteUrl('/skills'), changeFrequency: 'monthly', priority: 0.6 },
     { url: absoluteUrl('/contact'), changeFrequency: 'yearly', priority: 0.5 },
+    // The canonical résumé target of the old /AmanKushwaha_Resume.pdf 301.
+    { url: absoluteUrl('/resume'), changeFrequency: 'monthly', priority: 0.6 },
   ]
 
   return [...staticURLs, ...projectURLs, ...blogURLs]
