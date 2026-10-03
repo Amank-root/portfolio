@@ -7,7 +7,7 @@ import { absoluteUrl, siteConfig } from '@/lib/site'
 import type { Contact } from '@/sanity/lib/types'
 import { Suspense } from 'react'
 
-const CONTACT_DESCRIPTION = `Get in touch with ${siteConfig.name} — available for full stack development, AI/ML and data science collaborations, freelance work and full-time roles.`
+const CONTACT_DESCRIPTION = `Get in touch with ${siteConfig.name} — ${siteConfig.availability}. Also available for freelance projects and collaborations.`
 
 export const metadata: Metadata = {
   title: 'Contact',
@@ -20,11 +20,15 @@ export const metadata: Metadata = {
     description: CONTACT_DESCRIPTION,
     url: absoluteUrl('/contact'),
     type: 'website',
+    images: [{ url: absoluteUrl('/og.png'), width: 1200, height: 630, alt: siteConfig.title, type: 'image/png' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: `Contact | ${siteConfig.name}`,
     description: CONTACT_DESCRIPTION,
+    site: siteConfig.author.twitter,
+    creator: siteConfig.author.twitter,
+    images: [absoluteUrl('/og.png')],
   },
 }
 

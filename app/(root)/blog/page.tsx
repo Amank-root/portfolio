@@ -26,11 +26,17 @@ export const metadata: Metadata = {
     description: BLOG_DESCRIPTION,
     url: absoluteUrl('/blog'),
     type: 'website',
+    // Declaring openGraph here means the layout's images are NOT inherited
+    // (Next merges per-key), so they have to be repeated.
+    images: [{ url: absoluteUrl('/og.png'), width: 1200, height: 630, alt: siteConfig.title, type: 'image/png' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: `Blog | ${siteConfig.name}`,
     description: BLOG_DESCRIPTION,
+    site: siteConfig.author.twitter,
+    creator: siteConfig.author.twitter,
+    images: [absoluteUrl('/og.png')],
   },
 }
 

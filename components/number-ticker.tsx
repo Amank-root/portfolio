@@ -8,12 +8,19 @@ import { cn } from '@/lib/utils'
 /**
  * Count-up number.
  *
- * Counts from 0 to `value` once the element scrolls into view, using
- * requestAnimationFrame with an ease-out curve so it decelerates rather than
- * ticking linearly. The final value is what lands in the DOM, so a crawler
- * that ignores JS still sees the real number.
+ * The final value is what SSRs into the HTML, so a crawler (or a visitor with
+ * JS disabled) reads "200+", not "0+". Previously state started at 0, which
+ * meant the prerendered document shipped zeros and only client hydration
+ * filled them in — Google indexed the zeros.
  *
- * Respects prefers-reduced-motion by rendering the final value immediately.
+ * The animation therefore only arms for counters that start *below* the fold:
+ * if the element is already on screen at mount, rendering 0 and counting up
+ * would be a visible flash from the correct number back to zero. Reduced
+ * motion skips it entirely.
+ *
+ * Counts 0 → `value` once the element scrolls into view, using
+ * requestAnimationFrame with an ease-out curve so it decelerates rather than
+ * ticking linearly.
  */
 export function NumberTicker({
   value,
@@ -34,10 +41,12 @@ export function NumberTicker({
   const ref = useRef<HTMLSpanElement>(null)
   const inView = useInView(ref, { once: true, margin: '-10% 0px' })
   const reduced = usePrefersReducedMotion()
-  // Under reduced motion the final value is derived during render rather than
-  // set from an effect: there is nothing to animate, so the effect would exist
-  // only to trigger a second render pass.
-  const [display, setDisplay] = useState(0)
+  // Tracks whether this counter has already run its count-up, so the effect is
+  // idempotent across re-renders.
+  const animatedRef = useRef(false)
+  // Server-rendered and initial client render both show the real number; the
+  // effect below swaps in the count-up only when it can do so unseen.
+  const [display, setDisplay] = useState(value)
 
   useEffect(() => {
     if (reduced || !inView) return
@@ -53,7 +62,15 @@ export function NumberTicker({
       if (t < 1) raf = requestAnimationFrame(tick)
     }
 
-    raf = requestAnimationFrame(tick)
+    // Only animate if this element was still below the fold on first paint;
+    // otherwise the jump back to zero is visible. `animatedRef` is untouched by
+    // later renders, so scrolling back up never re-triggers it either.
+    if (!animatedRef.current) {
+      animatedRef.current = true
+      setDisplay(0)
+      raf = requestAnimationFrame(tick)
+    }
+
     return () => cancelAnimationFrame(raf)
   }, [inView, value, duration, reduced])
 

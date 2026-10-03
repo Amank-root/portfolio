@@ -67,10 +67,10 @@ export default async function OpengraphImage() {
             maxWidth: '920px',
           }}
         >
-          I build fast, accessible web products — and the AI systems behind them.
+          I build AI/ML systems that reach production — and the web products that ship them.
         </div>
         <div style={{ fontSize: '26px', color: '#a9a196', lineHeight: 1.45, maxWidth: '880px' }}>
-          Next.js, TypeScript, React, Python, machine learning, and open-source tooling.
+          Retrieval, fine-tuning and evaluation pipelines in Python and PyTorch. Next.js, TypeScript and React on top.
         </div>
       </div>
 
@@ -86,7 +86,7 @@ export default async function OpengraphImage() {
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '23px', color: '#8fae8b' }}>
           <div style={{ width: '12px', height: '12px', borderRadius: '999px', background: '#8fae8b' }} />
-          Available for opportunities
+          {siteConfig.availability}
         </div>
         <div style={{ fontSize: '23px', color: '#8d867a' }}>amankushwaha.dev</div>
       </div>

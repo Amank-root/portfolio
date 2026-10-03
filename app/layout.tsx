@@ -68,12 +68,23 @@ export const metadata: Metadata = {
     siteName: siteConfig.name,
     title: siteConfig.title,
     description: siteConfig.shortDescription,
-    images: [{ url: `${siteConfig.url}/og.png`, width: 1200, height: 630, alt: siteConfig.title }],
+    images: [
+      {
+        url: `${siteConfig.url}/og.png`,
+        width: 1200,
+        height: 630,
+        alt: `${siteConfig.name} — ${siteConfig.role}`,
+        type: 'image/png',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: siteConfig.title,
     description: siteConfig.shortDescription,
+    // `site` attributes the card to the account; `creator` attributes the
+    // post. Both were missing `site`, so nothing linked back to the profile.
+    site: siteConfig.author.twitter,
     creator: siteConfig.author.twitter,
     images: [`${siteConfig.url}/og.png`],
   },
@@ -117,6 +128,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html
       lang="en"
       className={`${syne.variable} ${instrumentSans.variable} ${geistMono.variable}`}
+      data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
       <body className="font-sans" suppressHydrationWarning>

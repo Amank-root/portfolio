@@ -131,6 +131,10 @@ export function BlogMarkdownRenderer({ content }: BlogMarkdownRendererProps) {
               <table>{children}</table>
             </div>
           ),
+          /* Markdown bodies that open with `# Title` were rendering a second
+             <h1> directly beneath the page's own <h1>, so every post and
+             project had two. Only the first level is demoted — ## stays ##. */
+          h1: ({ children }) => <h2>{children}</h2>,
           img: ({ src, alt }) => (
             /* Markdown bodies embed a mix of sources: Sanity CDN for project
                screenshots, and shields.io / badgen.net for status badges.

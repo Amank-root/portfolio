@@ -16,7 +16,7 @@ import { absoluteUrl, siteConfig } from '@/lib/site'
 import type { About } from '@/sanity/lib/types'
 
 const ABOUT_DESCRIPTION =
-  'About Aman Kushwaha — full stack developer and AI/ML engineer based in India, building production web systems and machine learning tooling. Experience, education and interests.'
+  'About Aman Kushwaha — AI/ML engineer and full stack developer in India, open to remote work. Builds retrieval and fine-tuning pipelines and the web systems that ship them.'
 
 export const metadata: Metadata = {
   title: 'About',
@@ -29,11 +29,18 @@ export const metadata: Metadata = {
     description: ABOUT_DESCRIPTION,
     url: absoluteUrl('/about'),
     type: 'profile',
+    // The root layout's images are inherited by nested routes only when the
+    // route doesn't declare its own openGraph object at all — this one does,
+    // so og:image has to be repeated here or the card renders imageless.
+    images: [{ url: absoluteUrl('/og.png'), width: 1200, height: 630, alt: siteConfig.title, type: 'image/png' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: `About | ${siteConfig.name}`,
     description: ABOUT_DESCRIPTION,
+    site: siteConfig.author.twitter,
+    creator: siteConfig.author.twitter,
+    images: [absoluteUrl('/og.png')],
   },
 }
 
@@ -51,11 +58,6 @@ export default async function AboutPage() {
 
   const about = (await getAbout().catch(() => null)) as About | null
 
-  // Resume lives in Sanity. The old hardcoded '/AmanKushwaha_Resume.pdf' fallback
-  // pointed at a file deleted from /public, so the button 404'd for every visitor
-  // whose CMS document had no resume uploaded.
-  const resumeUrl = about?.resumeFile?.asset?.url
-
   return (
     <>
       <JsonLd
@@ -71,7 +73,7 @@ export default async function AboutPage() {
         <PageHeader
           eyebrow="Background"
           title={about?.title || 'A short version of the story.'}
-          lede="Full stack developer and AI/ML engineer, currently finishing a B.Tech in Computer Science. I care about software that is fast, legible, and kind to the person maintaining it."
+          lede="AI/ML engineer and full stack developer, currently finishing a B.Tech in Computer Science. I build retrieval and fine-tuning pipelines, and the accessible web products that ship them."
         >
           <div className="flex flex-wrap items-center gap-x-8 gap-y-3 text-sm text-foreground-muted">
             <span className="inline-flex items-center gap-2">
@@ -84,20 +86,17 @@ export default async function AboutPage() {
             </span>
             <span className="inline-flex items-center gap-2">
               <span className="animate-breathe h-1.5 w-1.5 rounded-full bg-accent" aria-hidden />
-              Available for hire
+              {siteConfig.availability}
             </span>
-            {resumeUrl && (
-              <a
-                href={resumeUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                download
-                className="group inline-flex items-center gap-2 text-foreground transition-colors hover:text-primary"
-              >
-                <Download size={14} aria-hidden />
-                Résumé
-              </a>
-            )}
+            {/* The stable /resume route, not the raw Sanity asset — that URL
+                changes whenever the PDF is replaced. */}
+            <Link
+              href="/resume"
+              className="group inline-flex items-center gap-2 text-foreground transition-colors hover:text-primary"
+            >
+              <Download size={14} aria-hidden />
+              Résumé
+            </Link>
           </div>
         </PageHeader>
 

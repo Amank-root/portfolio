@@ -15,7 +15,7 @@ import { projectPlaceholder } from '@/lib/placeholder'
 import type { Project } from '@/sanity/lib/types'
 
 const PROJECTS_DESCRIPTION =
-  'Selected projects by Aman Kushwaha — full stack web apps, AI/ML systems and developer tooling built with Next.js, TypeScript, React and Python.'
+  'Selected projects by Aman Kushwaha — AI/ML systems, retrieval pipelines, full stack web apps and developer tooling built with Python, Next.js, TypeScript and React.'
 
 export const metadata: Metadata = {
   title: 'Projects',
@@ -28,11 +28,17 @@ export const metadata: Metadata = {
     description: PROJECTS_DESCRIPTION,
     url: absoluteUrl('/projects'),
     type: 'website',
+    // A route-level openGraph replaces the inherited one key-by-key, so the
+    // layout's images have to be restated here.
+    images: [{ url: absoluteUrl('/og.png'), width: 1200, height: 630, alt: siteConfig.title, type: 'image/png' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: `Projects | ${siteConfig.name}`,
     description: PROJECTS_DESCRIPTION,
+    site: siteConfig.author.twitter,
+    creator: siteConfig.author.twitter,
+    images: [absoluteUrl('/og.png')],
   },
 }
 

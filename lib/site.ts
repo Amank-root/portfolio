@@ -6,19 +6,30 @@
 
 const rawBaseUrl = process.env.NEXT_PUBLIC_BASE_URL?.trim()
 
+/**
+ * The one canonical origin. Apex, not www — that is the host that actually
+ * serves, and every consumer (canonical, og:url, JSON-LD, robots Host,
+ * sitemap) reads from here, so the two hosts can never drift apart again.
+ */
+const canonicalUrl = rawBaseUrl ? rawBaseUrl.replace(/\/$/, '') : 'https://amankushwaha.dev'
+
 export const siteConfig = {
   name: 'Aman Kushwaha',
   shortName: 'Aman',
-  title: 'Aman Kushwaha — Full Stack Developer & AI/ML Engineer',
+  title: 'Aman Kushwaha — AI/ML Engineer & Full Stack Developer',
   titleTemplate: '%s | Aman Kushwaha',
-  role: 'Full Stack Developer',
-  tagline: 'Full Stack Developer',
+  // ML leads everywhere: title, H1, schema and hero alt all read from this.
+  role: 'AI/ML Engineer',
+  tagline: 'AI/ML Engineer',
   description:
-    'Aman Kushwaha is a full stack developer and AI/ML engineer building fast, accessible web products with Next.js, TypeScript, React and Python. He ships machine learning systems, design-system-grade interfaces and open-source tools.',
+    'AI/ML engineer and full stack developer building retrieval systems, fine-tuning and evaluation pipelines — and the fast, accessible Next.js products that ship them.',
   shortDescription:
-    'Full stack developer and AI/ML engineer building fast, accessible web products with Next.js, TypeScript and Python.',
+    'AI/ML engineer building retrieval, fine-tuning and evaluation pipelines, plus the accessible Next.js products that ship them.',
+  // Availability line. "Remote" belongs on the homepage and About — it is a
+  // screening keyword for the roles this site is actually aimed at.
+  availability: 'Open to remote AI/ML and full stack roles',
   locale: 'en_US',
-  url: rawBaseUrl ? rawBaseUrl.replace(/\/$/, '') : 'https://www.amankushwaha.dev',
+  url: canonicalUrl,
   email: 'query@amankushwaha.dev',
   location: {
     city: 'New Delhi',
@@ -34,20 +45,20 @@ export const siteConfig = {
   author: {
     twitter: '@AmanKushwaha_28',
     name: 'Aman Kushwaha',
-    url: rawBaseUrl ? rawBaseUrl.replace(/\/$/, '') : 'https://www.amankushwaha.dev',
+    url: canonicalUrl,
   },
   keywords: [
     'Aman Kushwaha',
     'amank-root',
-    'Full Stack Developer',
-    'Data Scientist',
     'AI/ML Engineer',
+    'Machine Learning Engineer',
+    'Full Stack Developer',
     'Next.js Developer',
     'React Developer',
     'TypeScript',
-    'MERN Stack',
-    'Machine Learning',
     'Python',
+    'RAG',
+    'Data Science',
     'Portfolio',
   ],
   /** Fallback OG image. Generated per-route with opengraph-image.tsx where possible. */
