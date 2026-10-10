@@ -14,7 +14,7 @@ const securityHeaders = [
       "default-src 'self'",
       // reCAPTCHA injects these; without them the widget silently fails to
       // load, so the form looked like it had no captcha at all.
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.sanity.io https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.sanity.io https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://app.cal.com/",
       "style-src 'self' 'unsafe-inline'",
       // Markdown bodies commonly embed shields.io / badgen.net badges. These
       // were absent from img-src, so the images were blocked outright and
@@ -25,7 +25,7 @@ const securityHeaders = [
       // fetch(), and connect-src is what governs fetch/XHR. With only form-action
       // allowing it, the POST was blocked and surfaced as a bare "Failed to fetch".
       "connect-src 'self' https://*.api.sanity.io https://*.apicdn.sanity.io https://www.google.com/recaptcha/ https://formspree.io",
-      "frame-src 'self' https://*.sanity.io https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/",
+      "frame-src 'self' https://*.sanity.io https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/ https://app.cal.com/",
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self' https://formspree.io",

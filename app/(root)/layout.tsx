@@ -5,6 +5,7 @@ import { Aurora } from '@/components/aurora'
 import { ScrollProgress } from '@/components/scroll-progress'
 import { JsonLd } from '@/components/json-ld'
 import { graph, personSchema, webSiteSchema } from '@/lib/seo'
+import Meet from '@/components/Meet'
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
@@ -24,6 +25,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </main>
 
       <Footer />
+      <Meet />
     </div>
   )
 }
